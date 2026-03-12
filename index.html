@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="BrainStorm Quiz – Fun educational quizzes for school students Class 1–12" />
+  <title>BrainStorm Quiz 🧠</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Favicon (emoji) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+</head>
+<body>
+
+<!-- Animated Background Canvas -->
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<!-- Back Button (global) -->
+<button id="back-btn" class="back-btn" aria-label="Go back">← Back</button>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+<!-- ════════════════════════════════════════
+     APP WRAPPER
+════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ══════════════════════════════════
+       SCREEN 1 — Player Name
+  ══════════════════════════════════ -->
+  <section id="screen-name" class="screen active" role="main">
+    <div class="text-center" style="margin-bottom:32px;">
+      <h1 class="brand-logo">🧠 BrainStorm</h1>
+      <p class="brand-tagline">The Ultimate Quiz Challenge</p>
+    </div>
+
+    <div class="glass-card">
+      <h2 class="section-title">Welcome, Champion! 🎉</h2>
+      <p class="section-sub">Enter your name to begin your learning adventure</p>
+
+      <div class="input-group">
+        <label for="input-name">Your Name</label>
+        <input type="text" id="input-name" placeholder="e.g. Arjun, Priya..." maxlength="30" autocomplete="off" spellcheck="false" />
+      </div>
+
+      <button id="btn-start" class="btn btn-primary">🚀 Start Quiz</button>
+
+      <div style="text-align:center;margin-top:20px;">
+        <button id="btn-leaderboard" class="btn btn-secondary">🏆 Leaderboard</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       SCREEN 2 — Class Selection
+  ══════════════════════════════════ -->
+  <section id="screen-class" class="screen" role="main">
+    <h2 class="section-title" style="margin-bottom:6px;">Select Your Class 📚</h2>
+    <p class="section-sub">Choose the class level you want to be quizzed on</p>
+    <div id="class-grid" class="cards-grid" role="list" aria-label="Class selection"></div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       SCREEN 3 — Subject Selection
+  ══════════════════════════════════ -->
+  <section id="screen-subject" class="screen" role="main">
+    <h2 class="section-title" style="margin-bottom:4px;">Pick a Subject 🎨</h2>
+    <p class="section-sub">Available subjects for <strong id="subject-class-label">Class 1</strong></p>
+    <div id="subject-grid" class="cards-grid subjects-grid" role="list" aria-label="Subject selection"></div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       SCREEN 4 — Game Mode Selection
+  ══════════════════════════════════ -->
+  <section id="screen-mode" class="screen" role="main">
+    <h2 class="section-title" style="margin-bottom:6px;">Choose Your Mode ⚡</h2>
+    <p class="section-sub">How do you want to play today?</p>
+
+    <div class="cards-grid modes-grid" role="list" aria-label="Game mode selection">
+
+      <div id="mode-free" class="card-item mode-card color-4" role="listitem" tabindex="0">
+        <span class="mode-icon">🎮</span>
+        <div class="mode-title">Free Play</div>
+        <div class="mode-desc">No timer, no pressure. Practice at your own pace and learn without stress.</div>
+      </div>
+
+      <div id="mode-timer" class="card-item mode-card color-1" role="listitem" tabindex="0">
+        <span class="mode-icon">⏱️</span>
+        <div class="mode-title">Timer Mode</div>
+        <div class="mode-desc">Race against the clock! 20 seconds per question. Earn bonus XP for fast answers.</div>
+      </div>
+
+      <div id="mode-level" class="card-item mode-card color-2" role="listitem" tabindex="0">
+        <span class="mode-icon">🎯</span>
+        <div class="mode-title">Level Mode</div>
+        <div class="mode-desc">Start easy, go hard. Questions increase in difficulty. Level up with XP!</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       SCREEN 5 — Quiz
+  ══════════════════════════════════ -->
+  <section id="screen-quiz" class="screen" role="main">
+
+    <!-- Fixed Nav Bar -->
+    <nav class="nav-bar" aria-label="Quiz navigation">
+      <span class="nav-brand">🧠 BrainStorm</span>
+      <div class="nav-actions">
+        <span class="badge" id="nav-level">Lv.1</span>
+      </div>
+    </nav>
+
+    <!-- Quiz Header Row -->
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <span class="badge badge-score" id="badge-score">⭐ 0</span>
+        <span class="badge badge-xp" id="badge-xp">✨ 0 XP</span>
+      </div>
+      <!-- Timer -->
+      <div id="timer-wrap" class="timer-wrap" aria-label="Time remaining" style="display:none;">
+        <svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
+          <circle class="timer-track" cx="30" cy="30" r="26"/>
+          <circle class="timer-bar"   cx="30" cy="30" r="26" style="stroke-dasharray:163.36;stroke-dashoffset:0;"/>
+        </svg>
+        <span id="timer-text" class="timer-text">20</span>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-label">Question 1 of 3</span>
+        <span id="progress-pct"></span>
+      </div>
+      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+        <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="question-card" role="article">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span id="question-number" class="question-number">Q1</span>
+        <span id="question-difficulty" class="difficulty-pill diff-easy">easy</span>
+      </div>
+      <p id="question-text" class="question-text"></p>
+    </div>
+
+    <!-- Options -->
+    <div id="options-grid" class="options-grid" role="group" aria-label="Answer options"></div>
+
+    <!-- Next Button -->
+    <div class="next-wrap">
+      <button id="btn-next" aria-label="Next question">Next Question →</button>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════
+       SCREEN 6 — Result
+  ══════════════════════════════════ -->
+  <section id="screen-result" class="screen" role="main">
+    <div class="glass-card">
+      <span id="result-avatar" class="result-avatar">🏆</span>
+      <div id="result-player" class="result-name">Player</div>
+      <div id="result-meta" class="result-meta">Class 1 • Math • Free Play</div>
+
+      <div class="result-stats">
+        <div class="stat-box stat-score">
+          <span class="stat-num" id="result-score">0/0</span>
+          <span class="stat-label">Score</span>
+        </div>
+        <div class="stat-box stat-xp">
+          <span class="stat-num" id="result-xp">0</span>
+          <span class="stat-label">XP Earned</span>
+        </div>
+        <div class="stat-box stat-level">
+          <span class="stat-num" id="result-level" style="font-size:1.2rem;">Beginner</span>
+          <span class="stat-label">Level</span>
+        </div>
+        <div class="stat-box stat-acc">
+          <span class="stat-num" id="result-accuracy">0%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button id="btn-play-again"      class="btn btn-primary">🔄 Play Again</button>
+        <button id="btn-change-subject"  class="btn btn-cyan">🎨 Change Subject</button>
+        <button id="btn-change-class"    class="btn btn-secondary">📚 Change Class</button>
+        <button id="btn-home"            class="btn btn-secondary">🏠 Home</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       SCREEN 7 — Leaderboard
+  ══════════════════════════════════ -->
+  <section id="screen-leaderboard" class="screen" role="main">
+    <div class="glass-card" style="max-width:560px;">
+      <h2 class="section-title">🏆 Leaderboard</h2>
+      <p class="section-sub">Top 10 Champions</p>
+      <ul id="lb-list" class="lb-list" role="list" aria-label="Leaderboard scores"></ul>
+      <div style="display:flex;gap:12px;">
+        <button id="btn-lb-back"  class="btn btn-primary" style="flex:1;">← Back to Home</button>
+        <button id="btn-lb-clear" class="btn btn-secondary" style="flex:0 0 auto;padding:12px 18px;font-size:0.8rem;">🗑️ Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <span>© 2026 BrainStorm Quiz</span>
+    <span>All Rights Reserved</span>
+    <span>Educational Learning Platform 🌟</span>
+  </footer>
+
+</div><!-- /#app -->
+
+<script src="js/script.js"></script>
+</body>
+</html>
