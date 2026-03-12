@@ -1,4 +1,7 @@
-[
+{
+  "class": 1,
+  "subjects": ["English", "Hindi", "Math", "EVS", "GK", "Animals/Birds", "Computer"],
+  "questions": [
     {"id":1,"subject":"English","question":"Which letter comes after 'A' in the alphabet?","options":["C","B","D","E"],"answer":"B","level":"easy"},
     {"id":2,"subject":"English","question":"What is the first letter of the word 'Apple'?","options":["E","P","A","L"],"answer":"A","level":"easy"},
     {"id":3,"subject":"English","question":"How many vowels are there in the English alphabet?","options":["4","6","5","7"],"answer":"5","level":"easy"},
@@ -24,3 +27,4 @@
     {"id":23,"subject":"English","question":"Which of these is a fruit?","options":["Chair","Mango","Table","Book"],"answer":"Mango","level":"medium"},
     {"id":24,"subject":"Computer","question":"What is the screen of a computer called?","options":["CPU","Printer","Monitor","Scanner"],"answer":"Monitor","level":"medium"}
   ]
+}
