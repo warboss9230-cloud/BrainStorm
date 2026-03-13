@@ -110,9 +110,39 @@
   </section>
 
   <!-- SCREEN: MODE SELECTION -->
+  <!-- SCREEN: MODE SELECTION -->
   <section id="screen-mode" class="screen">
     <h2 class="section-title">Choose Your Mode 🎮</h2>
     <p class="section-sub">How do you want to play?</p>
+
+    <style>
+      .mode-grid{display:flex;flex-direction:column;gap:16px;width:100%;max-width:480px;margin:0 auto}
+      .mode-card{background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:22px;padding:22px 20px;cursor:pointer;transition:all 0.25s;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;-webkit-tap-highlight-color:transparent}
+      .mode-card:active{transform:scale(0.96)}
+      .mode-icon{font-size:2.8rem;line-height:1;margin-bottom:2px}
+      .mode-name{font-family:'Baloo 2',sans-serif;font-size:1.25rem;font-weight:900;color:#f0e6ff}
+      .mode-desc{font-size:0.83rem;color:rgba(240,230,255,0.6);line-height:1.55;max-width:300px}
+      .mode-badge{font-size:0.68rem;font-weight:800;padding:4px 14px;border-radius:20px;margin-top:4px;letter-spacing:0.07em;text-transform:uppercase}
+      .mode-free{border-color:rgba(0,230,118,0.5);background:rgba(0,230,118,0.06)}
+      .mode-free .mode-badge{background:rgba(0,230,118,0.18);color:#00e676}
+      .mode-free:active,.mode-free.selected{border-color:#00e676;background:rgba(0,230,118,0.12);box-shadow:0 0 28px rgba(0,230,118,0.25)}
+      .mode-timer{border-color:rgba(255,215,0,0.5);background:rgba(255,215,0,0.06)}
+      .mode-timer .mode-badge{background:rgba(255,215,0,0.18);color:#FFD700}
+      .mode-timer:active,.mode-timer.selected{border-color:#FFD700;background:rgba(255,215,0,0.12);box-shadow:0 0 28px rgba(255,215,0,0.25)}
+      .mode-level{border-color:rgba(179,136,255,0.5);background:rgba(179,136,255,0.06)}
+      .mode-level .mode-badge{background:rgba(179,136,255,0.18);color:#B388FF}
+      .mode-level:active,.mode-level.selected{border-color:#B388FF;background:rgba(179,136,255,0.12);box-shadow:0 0 28px rgba(179,136,255,0.25)}
+      @media(min-width:520px){
+        .mode-grid{flex-direction:row;flex-wrap:wrap;justify-content:center}
+        .mode-card{flex:1;min-width:130px;max-width:180px}
+      }
+      @media(hover:hover){
+        .mode-free:hover{border-color:#00e676;background:rgba(0,230,118,0.12);box-shadow:0 0 28px rgba(0,230,118,0.25)}
+        .mode-timer:hover{border-color:#FFD700;background:rgba(255,215,0,0.12);box-shadow:0 0 28px rgba(255,215,0,0.25)}
+        .mode-level:hover{border-color:#B388FF;background:rgba(179,136,255,0.12);box-shadow:0 0 28px rgba(179,136,255,0.25)}
+      }
+    </style>
+
     <div class="mode-grid">
 
       <div class="mode-card mode-free" id="mode-card-free">
