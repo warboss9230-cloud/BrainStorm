@@ -1,953 +1,779 @@
+/* =========================================================
+   BrainStorm Quiz — script.js
+   Full game logic: Free Play, Timer, Level Mode
+   ========================================================= */
+
 'use strict';
 
-/* ═══════════════════════════════════════════════════════════
-   BRAINSTORM QUIZ — script.js
-   Features: Progression System, Avatar, Progress Save, Sounds
-   ═══════════════════════════════════════════════════════════ */
-
-// ── CONSTANTS ─────────────────────────────────────────────────────────────────
-const LEVEL_QUESTIONS = [0, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]; // index = level
-const TOTAL_LEVELS    = 10;
-const STORAGE_KEY     = 'brainstorm_progress';
-const LB_KEY          = 'brainstorm_lb';
-const XP_CORRECT      = 10;
-const XP_BONUS_FAST   = 5;
-
-const LEVEL_TITLES = ['', 'Rookie Start', 'Rising Star', 'Brain Spark', 'Mind Surge',
-  'Knowledge Quest', 'Sharp Thinker', 'Genius Mode', 'Expert Zone', 'Master Class', 'Legend Peak'];
-
-const LEVEL_ICONS = ['', '🌱', '📚', '⚡', '🔥', '🎯', '💡', '🧠', '🏆', '👑', '🌟'];
-
+/* ── Avatar Library ────────────────────────────────────── */
 const AVATARS = [
-  { id: 'av1',  emoji: '🧒', label: 'Kid'       },
-  { id: 'av2',  emoji: '👦', label: 'Boy'       },
-  { id: 'av3',  emoji: '👧', label: 'Girl'      },
-  { id: 'av4',  emoji: '🧑', label: 'Teen'      },
-  { id: 'av5',  emoji: '👩', label: 'Lady'      },
-  { id: 'av6',  emoji: '👨', label: 'Man'       },
-  { id: 'av7',  emoji: '🧓', label: 'Elder'     },
-  { id: 'av8',  emoji: '🦸', label: 'Hero'      },
-  { id: 'av9',  emoji: '🧙', label: 'Wizard'    },
-  { id: 'av10', emoji: '🦊', label: 'Fox'       },
-  { id: 'av11', emoji: '🐼', label: 'Panda'     },
-  { id: 'av12', emoji: '🦁', label: 'Lion'      },
-  { id: 'av13', emoji: '🐯', label: 'Tiger'     },
-  { id: 'av14', emoji: '🐸', label: 'Frog'      },
-  { id: 'av15', emoji: '🤖', label: 'Robot'     },
-  { id: 'av16', emoji: '👾', label: 'Alien'     },
-  { id: 'av17', emoji: '🧑‍🚀', label: 'Astronaut' },
-  { id: 'av18', emoji: '🧑‍🎓', label: 'Scholar'  },
-  { id: 'av19', emoji: '🥷',  label: 'Ninja'    },
-  { id: 'av20', emoji: '🦄', label: 'Unicorn'   },
+  {id:'a1',  emoji:'🧑‍🚀', name:'Astronaut'},
+  {id:'a2',  emoji:'🦸',   name:'Hero'},
+  {id:'a3',  emoji:'🧙‍♂️', name:'Wizard'},
+  {id:'a4',  emoji:'🤖',   name:'Robot'},
+  {id:'a5',  emoji:'🦊',   name:'Fox'},
+  {id:'a6',  emoji:'🐼',   name:'Panda'},
+  {id:'a7',  emoji:'🦁',   name:'Lion'},
+  {id:'a8',  emoji:'🐯',   name:'Tiger'},
+  {id:'a9',  emoji:'🦋',   name:'Butterfly'},
+  {id:'a10', emoji:'🐉',   name:'Dragon'},
+  {id:'a11', emoji:'🦄',   name:'Unicorn'},
+  {id:'a12', emoji:'🐺',   name:'Wolf'},
+  {id:'a13', emoji:'🦅',   name:'Eagle'},
+  {id:'a14', emoji:'🐬',   name:'Dolphin'},
+  {id:'a15', emoji:'🦈',   name:'Shark'},
+  {id:'a16', emoji:'🌟',   name:'Star'},
+  {id:'a17', emoji:'🔥',   name:'Phoenix'},
+  {id:'a18', emoji:'⚡',   name:'Thunder'},
+  {id:'a19', emoji:'💎',   name:'Diamond'},
+  {id:'a20', emoji:'🌙',   name:'Moon'},
+  {id:'a21', emoji:'☄️',   name:'Comet'},
+  {id:'a22', emoji:'🏆',   name:'Champion'},
+  {id:'a23', emoji:'🎯',   name:'Target'},
+  {id:'a24', emoji:'🎮',   name:'Gamer'},
+  {id:'a25', emoji:'🧬',   name:'Scientist'},
+  {id:'a26', emoji:'🎸',   name:'Rockstar'},
+  {id:'a27', emoji:'🎨',   name:'Artist'},
+  {id:'a28', emoji:'📚',   name:'Scholar'},
+  {id:'a29', emoji:'💡',   name:'Genius'},
+  {id:'a30', emoji:'🚀',   name:'Rocketman'},
+  {id:'a31', emoji:'🌈',   name:'Rainbow'},
+  {id:'a32', emoji:'🐻',   name:'Bear'},
+  {id:'a33', emoji:'🦝',   name:'Raccoon'},
+  {id:'a34', emoji:'🐸',   name:'Frog'},
+  {id:'a35', emoji:'🦉',   name:'Owl'},
+  {id:'a36', emoji:'🐧',   name:'Penguin'},
+  {id:'a37', emoji:'🦊',   name:'Red Fox'},
+  {id:'a38', emoji:'🐳',   name:'Whale'},
+  {id:'a39', emoji:'🦋',   name:'Monarch'},
+  {id:'a40', emoji:'🌊',   name:'Wave'},
+  {id:'a41', emoji:'🏔️',  name:'Mountain'},
+  {id:'a42', emoji:'⚔️',   name:'Warrior'},
+  {id:'a43', emoji:'🛡️',  name:'Guardian'},
+  {id:'a44', emoji:'🧠',   name:'Brain'},
+  {id:'a45', emoji:'👑',   name:'King'},
+  {id:'a46', emoji:'🃏',   name:'Joker'},
+  {id:'a47', emoji:'🎭',   name:'Actor'},
+  {id:'a48', emoji:'🦸‍♀️',name:'Heroine'},
 ];
 
-const SUBJECTS_ALL = [
-  { name: 'English',       file: 'english',       icon: '📖' },
-  { name: 'Hindi',         file: 'hindi',         icon: '🇮🇳' },
-  { name: 'Math',          file: 'math',          icon: '🔢' },
-  { name: 'Science',       file: 'science',       icon: '🔬' },
-  { name: 'Computer',      file: 'computer',      icon: '💻' },
-  { name: 'EVS',           file: 'evs',           icon: '🌿' },
-  { name: 'GK',            file: 'gk',            icon: '🌍' },
-  { name: 'Economics',     file: 'economics',     icon: '📊' },
-  { name: 'Space',         file: 'space',         icon: '🚀' },
-  { name: 'Animals/Birds', file: 'animals-birds', icon: '🦁' },
-];
+/* ── Level Config ──────────────────────────────────────── */
+const LEVEL_CONFIG = {
+  1:15, 2:20, 3:25, 4:30, 5:35,
+  6:40, 7:45, 8:50, 9:55, 10:60
+};
 
-const XP_LEVELS = [
-  { level:1, name:'Beginner', minXP:0   },
-  { level:2, name:'Explorer', minXP:50  },
-  { level:3, name:'Scholar',  minXP:120 },
-  { level:4, name:'Expert',   minXP:220 },
-  { level:5, name:'Master',   minXP:350 },
-  { level:6, name:'Champion', minXP:500 },
-  { level:7, name:'Legend',   minXP:700 },
-];
+/* ── Timer Seconds per Mode ────────────────────────────── */
+const TIMER_SECONDS = 20;
 
-// ── DOM HELPER ────────────────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
+/* ── XP Values ─────────────────────────────────────────── */
+const XP_CORRECT = 10;
+const XP_WRONG   = -5;
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
+/* ── Free Play question count ──────────────────────────── */
+const FREE_PLAY_COUNT = 20;
+
+/* ── Game State ────────────────────────────────────────── */
 let state = {
-  // session
-  playerName:     '',
-  avatar:         '🧒',
-  avatarId:       'av1',
-  // game level / progression
-  gameLevel:      1,        // current progression level (1–10)
-  selectedClass:  null,
-  selectedSubject: null,
-  // quiz session
-  questions:      [],
-  currentIdx:     0,
-  sessionScore:   0,
-  sessionXP:      0,
-  sessionCorrect: 0,
-  answered:       false,
-  timerInterval:  null,
-  timeLeft:       20,
-  mode:           'free',   // 'free' | 'timer'
-  quizMode:       'level',  // 'free' | 'timer' | 'level'  (chosen in mode screen)
+  player: null,          // {name, avatarId, avatarEmoji}
+  mode: null,            // 'free'|'timer'|'level'
+  level: 1,              // selected level (level mode)
+  questions: [],         // current question pool
+  currentIdx: 0,
+  score: { correct:0, wrong:0, xp:0 },
+  sessionXP: 0,
+  timer: null,
+  timerVal: 0,
+  answered: false,
+  soundOn: true,
+  allQuestions: [],      // raw JSON
+  progress: null,        // stored progress
 };
 
-// ── PROGRESS (persisted) ──────────────────────────────────────────────────────
-let progress = {
-  name:            '',
-  avatar:          '🧒',
-  avatarId:        'av1',
-  currentLevel:    1,
-  score:           0,
-  completedLevels: [],
-  correctAnswers:  0,
-  totalQuestions:  0,
-  totalXP:         0,
-  lastPlayed:      '',
-};
+/* ── DOM Helpers ────────────────────────────────────────── */
+const $  = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
 
-// ── SOUND SYSTEM ──────────────────────────────────────────────────────────────
-const SFX = {
-  correct: new Audio('assets/sounds/correct.mp3'),
-  wrong:   new Audio('assets/sounds/wrong.mp3'),
-  levelup: new Audio('assets/sounds/levelup.mp3'),
-};
-Object.values(SFX).forEach(a => { a.preload = 'auto'; a.volume = 0.7; });
-
-function playSound(name) {
-  try {
-    const s = SFX[name];
-    if (!s) return;
-    s.currentTime = 0;
-    s.play().catch(() => {}); // silently ignore autoplay restrictions
-  } catch(e) {}
+/* ── Screen Navigation ──────────────────────────────────── */
+function showScreen(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0,0);
 }
 
-// ── LIVE CLOCK ────────────────────────────────────────────────────────────────
-function startClock() {
-  const el = $('live-datetime');
-  function tick() {
-    const now = new Date();
-    const d = now.toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
-    const t = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-    el.textContent = `${d}  ${t}`;
-  }
-  tick();
-  setInterval(tick, 1000);
-}
+/* ── LocalStorage helpers ───────────────────────────────── */
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  remove: k => localStorage.removeItem(k),
+};
 
-// ── PROGRESS: SAVE / LOAD / RESET ────────────────────────────────────────────
 function saveProgress() {
-  progress.lastPlayed = new Date().toLocaleDateString('en-IN');
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  const p = state.progress || {};
+  LS.set('bsq_progress', {
+    name: state.player.name,
+    avatarId: state.player.avatarId,
+    avatarEmoji: state.player.avatarEmoji,
+    currentLevel: state.level,
+    xp: p.xp !== undefined ? p.xp + state.sessionXP : state.sessionXP,
+    completedLevels: p.completedLevels || [],
+    correctAnswers: (p.correctAnswers||0) + state.score.correct,
+    totalQuestions: (p.totalQuestions||0) + state.questions.length,
+  });
 }
 
 function loadProgress() {
+  return LS.get('bsq_progress');
+}
+
+/* ── Leaderboard ────────────────────────────────────────── */
+function getLeaderboard() {
+  return LS.get('bsq_leaderboard') || [];
+}
+function saveToLeaderboard() {
+  let lb = getLeaderboard();
+  const prog = loadProgress();
+  const entry = {
+    name: state.player.name,
+    avatarEmoji: state.player.avatarEmoji,
+    xp: prog ? prog.xp : state.sessionXP,
+    correct: prog ? prog.correctAnswers : state.score.correct,
+    total: prog ? prog.totalQuestions : state.questions.length,
+    mode: state.mode,
+    date: new Date().toLocaleDateString(),
+  };
+  // Remove old entry for same player
+  lb = lb.filter(e => e.name.toLowerCase() !== entry.name.toLowerCase());
+  lb.push(entry);
+  lb.sort((a,b) => b.xp - a.xp);
+  lb = lb.slice(0, 20);
+  LS.set('bsq_leaderboard', lb);
+}
+
+/* ── Sound ──────────────────────────────────────────────── */
+function playSound(type) {
+  if (!state.soundOn) return;
+  // Web Audio API synthesized sounds (no files needed)
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) { progress = { ...progress, ...JSON.parse(raw) }; return true; }
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (type === 'correct') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.5);
+    } else {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.setValueAtTime(180, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    }
   } catch(e) {}
-  return false;
 }
 
-function resetProgress() {
-  localStorage.removeItem(STORAGE_KEY);
-  progress = { name:'', avatar:'🧒', avatarId:'av1', currentLevel:1, score:0,
-    completedLevels:[], correctAnswers:0, totalQuestions:0, totalXP:0, lastPlayed:'' };
+/* ── Toast Notification ─────────────────────────────────── */
+function toast(msg, type='info') {
+  const c = $('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
-function isLevelUnlocked(lvl) {
-  if (lvl === 1) return true;
-  return progress.completedLevels.includes(lvl - 1);
-}
-
-function isLevelCompleted(lvl) {
-  return progress.completedLevels.includes(lvl);
-}
-
-// ── SCREEN NAVIGATION ─────────────────────────────────────────────────────────
-const SCREENS = ['home','avatar','levelmap','class','subject','mode','quiz','levelup','result','leaderboard','profile'];
-const BACK_MAP = {
-  avatar:      () => showScreen('home'),
-  levelmap:    () => showScreen('home'),
-  class:       () => showScreen('levelmap'),
-  subject:     () => { showScreen('class'); renderClasses(); },
-  mode:        () => { showScreen('subject'); renderSubjects(); },
-  quiz:        () => { clearTimer(); showScreen('levelmap'); },
-  levelup:     () => showScreen('levelmap'),
-  result:      () => showScreen('levelmap'),
-  leaderboard: () => showScreen('home'),
-  profile:     () => showScreen('home'),
-};
-
-function showScreen(name) {
-  SCREENS.forEach(s => {
-    const el = $('screen-' + s);
-    if (el) el.classList.remove('active');
-  });
-  const target = $('screen-' + name);
-  if (target) target.classList.add('active');
-  // back button
-  const backBtn = $('back-btn');
-  if (BACK_MAP[name]) {
-    backBtn.classList.add('visible');
-    backBtn.onclick = () => BACK_MAP[name]();
-  } else {
-    backBtn.classList.remove('visible');
-  }
-  window.scrollTo(0, 0);
-}
-
-// ── ANIMATED BACKGROUND ───────────────────────────────────────────────────────
-(function initBg() {
+/* ── Canvas Background Stars ────────────────────────────── */
+function initCanvas() {
   const canvas = $('bg-canvas');
-  const ctx    = canvas.getContext('2d');
-  let W, H, particles = [];
-  const COLS = ['#FFD700','#FF6B9D','#00E5FF','#B388FF','#00E676','#FF6B35'];
-
-  class P {
-    constructor(init) {
-      this.x     = Math.random() * (W||400);
-      this.y     = init ? Math.random() * (H||700) : (H||700) + 20;
-      this.r     = Math.random() * 2.5 + 1;
-      this.color = COLS[Math.floor(Math.random() * COLS.length)];
-      this.speed = Math.random() * 0.5 + 0.2;
-      this.drift = (Math.random() - 0.5) * 0.35;
-      this.alpha = Math.random() * 0.45 + 0.15;
-      this.pulse = Math.random() * Math.PI * 2;
-    }
-    tick() {
-      this.y    -= this.speed; this.x += this.drift;
-      this.pulse += 0.02;
-      this.alpha = 0.15 + Math.sin(this.pulse) * 0.13;
-      if (this.y < -20) { Object.assign(this, new P(false)); }
-    }
-    draw() {
-      ctx.save(); ctx.globalAlpha = this.alpha;
-      ctx.fillStyle = this.color; ctx.shadowBlur = 10; ctx.shadowColor = this.color;
-      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
-    }
-  }
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [];
 
   function resize() {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
-    particles = Array.from({ length: 70 }, () => new P(true));
+    stars = Array.from({length: 120}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      r: Math.random()*1.5+0.3,
+      o: Math.random()*0.6+0.1,
+      speed: Math.random()*0.15+0.03,
+      pulse: Math.random()*Math.PI*2,
+    }));
   }
-  function loop() {
-    ctx.clearRect(0, 0, W, H);
-    const g = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H)*0.7);
-    g.addColorStop(0,'rgba(18,8,44,0.35)'); g.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    particles.forEach(p => { p.tick(); p.draw(); });
-    requestAnimationFrame(loop);
+
+  function draw(t) {
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s => {
+      s.pulse += s.speed * 0.04;
+      const alpha = s.o * (0.6 + 0.4*Math.sin(s.pulse));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(180,230,255,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
   }
-  window.addEventListener('resize', resize); resize(); loop();
-})();
-
-// ── TOP BAR BUTTONS ───────────────────────────────────────────────────────────
-$('btn-top-leaderboard').onclick = () => { renderLeaderboard(); showScreen('leaderboard'); };
-$('btn-top-profile').onclick     = () => { renderProfile();     showScreen('profile'); };
-
-// ════════════════════════════════════════════════════════════
-//  SCREEN: HOME
-// ════════════════════════════════════════════════════════════
-function renderHome() {
-  const hasSave = progress.name && progress.name.length > 0;
-  const resumeCard = $('resume-card');
-  if (hasSave) {
-    resumeCard.style.display = 'block';
-    $('resume-avatar').textContent = progress.avatar || '🧒';
-    $('resume-name').textContent   = progress.name;
-    $('resume-info').textContent   = `Level ${progress.currentLevel} • Score ${progress.score}`;
-    $('resume-time').textContent   = `Last played: ${progress.lastPlayed || '—'}`;
-  } else {
-    resumeCard.style.display = 'none';
-  }
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(draw);
 }
 
-$('btn-start').onclick = () => {
-  const name = $('input-name').value.trim();
-  if (!name) { showToast('Please enter your name! 😊', 'wrong-toast'); return; }
-  // Start fresh
-  resetProgress();
-  progress.name = name;
-  state.playerName = name;
-  saveProgress();
-  renderAvatars();
-  showScreen('avatar');
-};
-
-$('input-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-start').onclick(); });
-
-$('btn-resume').onclick = () => {
-  state.playerName = progress.name;
-  state.avatar     = progress.avatar;
-  state.avatarId   = progress.avatarId;
-  state.gameLevel  = progress.currentLevel;
-  renderLevelMap();
-  showScreen('levelmap');
-};
-
-$('btn-reset').onclick = () => {
-  if (confirm('Reset all progress? This cannot be undone.')) {
-    resetProgress();
-    renderHome();
-    showToast('Progress reset ✓', '');
-  }
-};
-
-// ════════════════════════════════════════════════════════════
-//  SCREEN: AVATAR
-// ════════════════════════════════════════════════════════════
-let selectedAvatarId = null;
-
-function renderAvatars() {
-  const grid = $('avatar-grid');
-  grid.innerHTML = '';
-  selectedAvatarId = null;
-  $('btn-avatar-confirm').disabled = true;
-
-  AVATARS.forEach(av => {
-    const div = document.createElement('div');
-    div.className = 'avatar-item';
-    div.dataset.id = av.id;
-    div.innerHTML = `<span>${av.emoji}</span><span class="av-label">${av.label}</span>`;
-    div.onclick = () => {
-      document.querySelectorAll('.avatar-item').forEach(d => d.classList.remove('selected'));
-      div.classList.add('selected');
-      selectedAvatarId = av.id;
-      $('btn-avatar-confirm').disabled = false;
-    };
-    grid.appendChild(div);
-  });
-}
-
-$('btn-avatar-confirm').onclick = () => {
-  if (!selectedAvatarId) return;
-  const av = AVATARS.find(a => a.id === selectedAvatarId);
-  if (!av) return;
-  state.avatar   = av.emoji;
-  state.avatarId = av.id;
-  progress.avatar   = av.emoji;
-  progress.avatarId = av.id;
-  saveProgress();
-  renderLevelMap();
-  showScreen('levelmap');
-};
-
-// ════════════════════════════════════════════════════════════
-//  SCREEN: LEVEL MAP
-// ════════════════════════════════════════════════════════════
-function renderLevelMap() {
-  // Header
-  $('lm-avatar').textContent = progress.avatar || state.avatar || '🧒';
-  $('lm-name').textContent   = progress.name   || state.playerName || 'Player';
-  $('lm-stats').textContent  = `Score: ${progress.score} • ${progress.correctAnswers}/${progress.totalQuestions} Correct`;
-  $('lm-total-xp').textContent = `${progress.totalXP || 0} XP`;
-
-  // Overall progress bar
-  const pct = Math.round((progress.completedLevels.length / TOTAL_LEVELS) * 100);
-  $('lm-prog-fill').style.width = pct + '%';
-  $('lm-prog-pct').textContent  = pct + '%';
-
-  // Level cards
-  const grid = $('level-grid');
-  grid.innerHTML = '';
-
-  for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
-    const completed = isLevelCompleted(lvl);
-    const unlocked  = isLevelUnlocked(lvl);
-    const isCurrent = progress.currentLevel === lvl && !completed;
-
-    const card = document.createElement('div');
-    let cls = 'level-card';
-    if (completed)     cls += ' completed';
-    else if (isCurrent) cls += ' current unlocked';
-    else if (unlocked)  cls += ' unlocked';
-    else                cls += ' locked';
-    card.className = cls;
-
-    let badgeHtml = '';
-    if (completed)      badgeHtml = `<span class="lc-badge done">✅ Done</span>`;
-    else if (isCurrent) badgeHtml = `<span class="lc-badge active">▶ Play</span>`;
-    else if (unlocked)  badgeHtml = `<span class="lc-badge active">🔓 Open</span>`;
-    else                badgeHtml = `<span class="lc-badge lk">🔒 Locked</span>`;
-
-    card.innerHTML = `
-      <div class="lc-top">
-        <span class="lc-num">${lvl}</span>
-        <span class="lc-icon">${LEVEL_ICONS[lvl]}</span>
-      </div>
-      <div class="lc-title">${LEVEL_TITLES[lvl]}</div>
-      <div class="lc-qs">${LEVEL_QUESTIONS[lvl]} Questions</div>
-      ${badgeHtml}`;
-
-    if (unlocked || isCurrent) {
-      card.onclick = () => startLevelFlow(lvl);
-    }
-    grid.appendChild(card);
-  }
-}
-
-function startLevelFlow(lvl) {
-  state.gameLevel = lvl;
-  progress.currentLevel = lvl;
-  $('class-level-num').textContent = lvl;
-  renderClasses();
-  showScreen('class');
-}
-
-// ════════════════════════════════════════════════════════════
-//  SCREEN: CLASS SELECTION
-// ════════════════════════════════════════════════════════════
-function renderClasses() {
-  const grid   = $('class-grid');
-  grid.innerHTML = '';
-  const icons  = ['🌱','📚','✏️','🎨','🔭','🧮','🔬','🌍','⚗️','📐','🧬','🎓'];
-  const colors = ['color-1','color-2','color-3','color-4','color-5','color-6'];
-
-  for (let i = 1; i <= 12; i++) {
-    const div = document.createElement('div');
-    div.className = `card-item ${colors[(i-1)%6]}`;
-    div.innerHTML = `<span class="card-icon">${icons[i-1]}</span><span class="card-label">Class ${i}</span>`;
-    div.onclick = () => {
-      state.selectedClass = i;
-      $('subject-class-label').textContent = i;
-      renderSubjects();
-      showScreen('subject');
-    };
-    grid.appendChild(div);
-  }
-}
-
-// ════════════════════════════════════════════════════════════
-//  SCREEN: SUBJECT SELECTION
-// ════════════════════════════════════════════════════════════
-function renderSubjects() {
-  const grid = $('subject-grid');
-  grid.innerHTML = '';
-  const colors = ['color-1','color-2','color-3','color-4','color-5','color-6'];
-
-  // Mix All
-  const mixDiv = document.createElement('div');
-  mixDiv.className = 'card-item mix-card color-1';
-  mixDiv.innerHTML = `<span class="card-icon">🎲</span><span class="card-label">Mix All</span>`;
-  mixDiv.onclick = () => { state.selectedSubject = 'Mix'; showModeScreen(); };
-  grid.appendChild(mixDiv);
-
-  SUBJECTS_ALL.forEach((subj, i) => {
-    const div = document.createElement('div');
-    div.className = `card-item ${colors[(i+1)%6]}`;
-    div.innerHTML = `<span class="card-icon">${subj.icon}</span><span class="card-label">${subj.name}</span>`;
-    div.onclick = () => { state.selectedSubject = subj.name; showModeScreen(); };
-    grid.appendChild(div);
-  });
-}
-
-// ════════════════════════════════════════════════════════════
-//  SCREEN: MODE SELECTION
-// ════════════════════════════════════════════════════════════
-function showModeScreen() {
-  // Reset selection highlight
-  ['free','timer','level'].forEach(m => {
-    const el = $('mode-card-' + m);
-    if (el) el.classList.remove('selected');
-  });
-  showScreen('mode');
-
-  $('mode-card-free').onclick = () => {
-    state.quizMode = 'free';
-    startQuiz();
-  };
-  $('mode-card-timer').onclick = () => {
-    state.quizMode = 'timer';
-    startQuiz();
-  };
-  $('mode-card-level').onclick = () => {
-    state.quizMode = 'level';
-    startQuiz();
-  };
-}
-
-// ════════════════════════════════════════════════════════════
-//  DATA LOADING
-// ════════════════════════════════════════════════════════════
-function subjectURL(classNum, file) {
-  return `data/class${classNum}/${file}.json`;
-}
-
-async function fetchSubject(classNum, subj) {
-  const res  = await fetch(subjectURL(classNum, subj.file));
-  if (!res.ok) throw new Error(`404: ${subjectURL(classNum, subj.file)}`);
-  const data = await res.json();
-  return data.questions.map(q => ({ ...q, subject: subj.name }));
-}
-
-function showLoader(on, msg = 'Loading questions…') {
-  let el = $('quiz-loader');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'quiz-loader';
-    el.style.cssText = 'position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,5,24,0.93);backdrop-filter:blur(10px);color:#f0e6ff;font-size:1.1rem;font-weight:800;gap:16px;';
-    el.innerHTML = '<div style="font-size:2.5rem;animation:spin 1s linear infinite">🎲</div><div id="loader-msg">Loading…</div>';
-    if (!document.getElementById('spin-style')) {
-      const s = document.createElement('style');
-      s.id = 'spin-style';
-      s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-      document.head.appendChild(s);
-    }
-    document.body.appendChild(el);
-  }
-  el.style.display = on ? 'flex' : 'none';
-  const m = document.getElementById('loader-msg');
-  if (m) m.textContent = msg;
-}
-
+/* ── Load Questions ─────────────────────────────────────── */
 async function loadQuestions() {
-  const needed   = LEVEL_QUESTIONS[state.gameLevel];  // how many questions for this level
-  const classNum = state.selectedClass;
-
   try {
-    let pool = [];
-
-    if (state.selectedSubject === 'Mix') {
-      showLoader(true, `Loading Mix for Level ${state.gameLevel}…`);
-      const results = await Promise.all(
-        SUBJECTS_ALL.map(s => fetchSubject(classNum, s).catch(() => []))
-      );
-      showLoader(false);
-      results.forEach(arr => pool.push(...arr));
-    } else {
-      const subj = SUBJECTS_ALL.find(s => s.name === state.selectedSubject);
-      if (!subj) return [];
-      showLoader(true, `Loading ${subj.name} — Level ${state.gameLevel}…`);
-      pool = await fetchSubject(classNum, subj);
-      showLoader(false);
-    }
-
-    if (!pool.length) { showToast('No questions found!', 'wrong-toast'); return []; }
-
-    // Shuffle pool, then take exactly `needed` questions
-    pool = shuffle(pool);
-
-    // If pool smaller than needed, repeat / loop questions to fill
-    while (pool.length < needed) pool = [...pool, ...shuffle(pool)];
-    return pool.slice(0, needed);
-
+    const res = await fetch('data/class1/math.json');
+    state.allQuestions = await res.json();
   } catch(e) {
-    showLoader(false);
-    showToast('Could not load questions!', 'wrong-toast');
-    return [];
+    // Fallback: small inline set if file not found
+    state.allQuestions = [
+      {id:1,level:1,subject:'Math',question:'What is 2+2?',options:['2','3','4','5'],answer:'4',difficulty:'easy'},
+      {id:2,level:1,subject:'Science',question:'Our planet is called?',options:['Mars','Venus','Earth','Jupiter'],answer:'Earth',difficulty:'easy'},
+    ];
+    console.warn('Questions JSON not found, using fallback.');
   }
 }
 
-// ════════════════════════════════════════════════════════════
-//  QUIZ: START
-// ════════════════════════════════════════════════════════════
-async function startQuiz() {
-  const qs = await loadQuestions();
-  if (!qs.length) { showScreen('subject'); return; }
-
-  state.questions      = qs;
-  state.currentIdx     = 0;
-  state.sessionScore   = 0;
-  state.sessionXP      = 0;
-  state.sessionCorrect = 0;
-  state.answered       = false;
-
-  // Update quiz nav
-  $('nav-av').textContent        = state.avatar || progress.avatar || '🧒';
-  const modeLabel = state.quizMode === 'free' ? '🕊️ Free' : state.quizMode === 'timer' ? '⏱️ Timer' : '📈 Progress';
-  $('nav-level-label').textContent = `Level ${state.gameLevel} — ${modeLabel}`;
-
-  showScreen('quiz');
-  updateQuizMeta();
-  renderQuestion();
-}
-
-// ════════════════════════════════════════════════════════════
-//  QUIZ: RENDER QUESTION
-// ════════════════════════════════════════════════════════════
-function renderQuestion() {
-  clearTimer();
-  state.answered = false;
-
-  const q     = state.questions[state.currentIdx];
-  const total = state.questions.length;
-  const pct   = Math.round((state.currentIdx / total) * 100);
-
-  $('progress-fill').style.width  = pct + '%';
-  $('progress-label').textContent = `Question ${state.currentIdx + 1} of ${total}`;
-  $('progress-pct').textContent   = pct + '%';
-
-  $('question-number').textContent     = `Q${state.currentIdx + 1}`;
-  $('question-difficulty').className   = `difficulty-pill diff-${q.level}`;
-  $('question-difficulty').textContent = q.level;
-  $('question-text').textContent       = q.question;
-
-  // Subject tag (Mix mode)
-  const tag = $('question-subject-tag');
-  if (state.selectedSubject === 'Mix' && q.subject) {
-    const info = SUBJECTS_ALL.find(s => s.name === q.subject);
-    tag.textContent   = `${info ? info.icon : '📚'} ${q.subject}`;
-    tag.style.display = 'inline-block';
-  } else {
-    tag.style.display = 'none';
-  }
-
-  // Render options
-  const LABELS = ['A','B','C','D'];
-  const opts   = shuffle(q.options.map(t => ({ text: t })));
-  const grid   = $('options-grid');
-  grid.innerHTML = '';
-  opts.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className      = 'option-btn';
-    btn.dataset.answer = opt.text;
-    btn.innerHTML      = `<span class="option-label">${LABELS[i]}</span><span>${opt.text}</span>`;
-    btn.onclick = () => handleAnswer(btn, opt.text, q.answer);
-    grid.appendChild(btn);
-  });
-
-  $('btn-next').classList.remove('visible');
-
-  // Mode logic
-  if (state.quizMode === 'timer' || (state.quizMode === 'level' && state.gameLevel >= 5)) {
-    state.mode = 'timer';
-    startTimer();
-  } else {
-    state.mode = 'free';
-    $('timer-wrap').style.display = 'none';
-  }
-}
-
-// ════════════════════════════════════════════════════════════
-//  QUIZ: HANDLE ANSWER
-// ════════════════════════════════════════════════════════════
-function handleAnswer(btn, chosen, correct) {
-  if (state.answered) return;
-  state.answered = true;
-  clearTimer();
-
-  const isCorrect = chosen === correct;
-
-  // Mark all options
-  document.querySelectorAll('.option-btn').forEach(b => {
-    b.classList.add('disabled');
-    if (b.dataset.answer === correct) b.classList.add('correct');
-  });
-
-  if (isCorrect) {
-    state.sessionScore++;
-    state.sessionCorrect++;
-    let xp = XP_CORRECT;
-    if (state.mode === 'timer' && state.timeLeft > 10) xp += XP_BONUS_FAST;
-    state.sessionXP += xp;
-    playSound('correct');
-    showToast(`✅ Correct! +${xp} XP`, 'correct-toast');
-  } else {
-    btn.classList.add('wrong');
-    playSound('wrong');
-    showToast(`❌ Wrong! Ans: ${correct}`, 'wrong-toast');
-  }
-
-  updateQuizMeta();
-  $('btn-next').classList.add('visible');
-}
-
-// ── Next Question ──────────────────────────────────────────────────────────────
-$('btn-next').onclick = () => {
-  state.currentIdx++;
-  if (state.currentIdx >= state.questions.length) finishLevel();
-  else renderQuestion();
-};
-
-// ════════════════════════════════════════════════════════════
-//  FINISH LEVEL
-// ════════════════════════════════════════════════════════════
-function finishLevel() {
-  clearTimer();
-  const total    = state.questions.length;
-  const accuracy = total > 0 ? Math.round((state.sessionCorrect / total) * 100) : 0;
-  const passed   = accuracy >= 50; // need 50% to pass
-
-  // Update global progress
-  progress.score          += state.sessionScore;
-  progress.correctAnswers += state.sessionCorrect;
-  progress.totalQuestions += total;
-  progress.totalXP        = (progress.totalXP || 0) + state.sessionXP;
-
-  if (passed && !progress.completedLevels.includes(state.gameLevel)) {
-    // Only update level progress in 'level' mode
-    if (state.quizMode === 'level') {
-      progress.completedLevels.push(state.gameLevel);
-      // Unlock next level
-      if (state.gameLevel < TOTAL_LEVELS) {
-        progress.currentLevel = state.gameLevel + 1;
-      }
-    }
-  }
-  saveProgress();
-
-  // Save to leaderboard
-  saveLBEntry({
-    name:    progress.name,
-    avatar:  progress.avatar || state.avatar,
-    level:   state.gameLevel,
-    subject: state.selectedSubject,
-    score:   state.sessionScore,
-    total,
-    accuracy,
-    xp:      state.sessionXP,
-    date:    new Date().toLocaleDateString('en-IN'),
-  });
-
-  if (passed) {
-    // Level up screen
-    playSound('levelup');
-    launchConfetti();
-    $('levelup-badge').textContent = LEVEL_ICONS[state.gameLevel];
-    $('levelup-title').textContent = `Level ${state.gameLevel} Complete!`;
-    $('levelup-sub').textContent   = `${LEVEL_TITLES[state.gameLevel]} — ${accuracy}% accuracy`;
-    $('lu-score').textContent      = `${state.sessionScore}/${total}`;
-    $('lu-acc').textContent        = accuracy + '%';
-    $('lu-xp').textContent         = state.sessionXP;
-    const nextLvl = state.gameLevel + 1;
-    if (nextLvl <= TOTAL_LEVELS) {
-      $('lu-next').textContent    = nextLvl;
-      $('btn-next-num').textContent = nextLvl;
-      $('btn-next-level').style.display = '';
-    } else {
-      $('lu-next').textContent    = '🏆';
-      $('btn-next-level').style.display = 'none';
-    }
-    showScreen('levelup');
-  } else {
-    // Failed — show result screen
-    showResultScreen(total, accuracy, false);
-  }
-}
-
-// Level Up button actions
-$('btn-next-level').onclick = () => {
-  const next = state.gameLevel + 1;
-  if (next <= TOTAL_LEVELS) {
-    startLevelFlow(next);
-  }
-};
-$('btn-levelup-map').onclick = () => { renderLevelMap(); showScreen('levelmap'); };
-
-// ════════════════════════════════════════════════════════════
-//  RESULT SCREEN (fail / info)
-// ════════════════════════════════════════════════════════════
-function showResultScreen(total, accuracy, passed) {
-  const pct = state.sessionScore / total;
-  $('result-avatar-emoji').textContent = pct >= 0.8 ? '🏆' : pct >= 0.6 ? '🌟' : pct >= 0.4 ? '😊' : '💪';
-  $('result-player').textContent       = progress.name || state.playerName;
-  $('result-meta').textContent         = `Level ${state.gameLevel} • Class ${state.selectedClass} • ${state.selectedSubject} • ${state.quizMode === 'free' ? '🕊️ Free' : state.quizMode === 'timer' ? '⏱️ Timer' : '📈 Progress'}`;
-  $('result-score').textContent        = `${state.sessionScore}/${total}`;
-  $('result-xp').textContent           = state.sessionXP;
-  $('result-level').textContent        = getXPLevelName(progress.totalXP);
-  $('result-accuracy').textContent     = accuracy + '%';
-  showScreen('result');
-}
-
-$('btn-retry').onclick          = () => startQuiz();
-$('btn-result-map').onclick     = () => { renderLevelMap(); showScreen('levelmap'); };
-$('btn-change-subject').onclick = () => { renderSubjects(); showScreen('subject'); };
-$('btn-home').onclick           = () => { renderHome(); showScreen('home'); };
-
-// ════════════════════════════════════════════════════════════
-//  TIMER
-// ════════════════════════════════════════════════════════════
-function startTimer() {
-  state.timeLeft = 20;
-  $('timer-wrap').style.display = 'block';
-  updateTimerUI();
-  state.timerInterval = setInterval(() => {
-    state.timeLeft--;
-    updateTimerUI();
-    if (state.timeLeft <= 0) { clearTimer(); if (!state.answered) autoFail(); }
-  }, 1000);
-}
-
-function autoFail() {
-  state.answered = true;
-  const q = state.questions[state.currentIdx];
-  document.querySelectorAll('.option-btn').forEach(b => {
-    b.classList.add('disabled');
-    if (b.dataset.answer === q.answer) b.classList.add('correct');
-  });
-  playSound('wrong');
-  showToast(`⏰ Time's up! Ans: ${q.answer}`, 'wrong-toast');
-  $('btn-next').classList.add('visible');
-}
-
-function clearTimer() {
-  clearInterval(state.timerInterval);
-  state.timerInterval = null;
-}
-
-function updateTimerUI() {
-  const pct  = state.timeLeft / 20;
-  const circ = 2 * Math.PI * 21;
-  const bar  = document.querySelector('.timer-bar');
-  if (!bar) return;
-  bar.style.strokeDasharray  = circ;
-  bar.style.strokeDashoffset = circ * (1 - pct);
-  bar.style.stroke = pct > 0.5 ? 'var(--green)' : pct > 0.25 ? 'var(--yellow)' : 'var(--red)';
-  $('timer-text').textContent = state.timeLeft;
-}
-
-// ── Quiz meta badges ───────────────────────────────────────────────────────────
-function updateQuizMeta() {
-  $('badge-score').textContent = `⭐ ${state.sessionScore}`;
-  $('badge-xp').textContent    = `✨ ${state.sessionXP} XP`;
-}
-
-// ════════════════════════════════════════════════════════════
-//  LEADERBOARD
-// ════════════════════════════════════════════════════════════
-function saveLBEntry(entry) {
-  let lb = JSON.parse(localStorage.getItem(LB_KEY) || '[]');
-  lb.push(entry);
-  lb.sort((a,b) => b.score - a.score || b.xp - a.xp);
-  lb = lb.slice(0, 10);
-  localStorage.setItem(LB_KEY, JSON.stringify(lb));
-}
-
-function renderLeaderboard() {
-  const lb   = JSON.parse(localStorage.getItem(LB_KEY) || '[]');
-  const list = $('lb-list');
-  list.innerHTML = '';
-  if (!lb.length) {
-    list.innerHTML = '<li style="text-align:center;color:var(--text-muted);padding:24px;">No scores yet 🎮</li>';
-    return;
-  }
-  lb.forEach((e, i) => {
-    const li    = document.createElement('li');
-    li.className = 'lb-item';
-    li.style.animationDelay = i * 0.05 + 's';
-    const medal = ['🥇','🥈','🥉'];
-    li.innerHTML = `
-      <span class="lb-rank">${i < 3 ? medal[i] : i+1}</span>
-      <span class="lb-av">${e.avatar || '🧒'}</span>
-      <div class="lb-info">
-        <div class="lb-name">${escHtml(e.name)}</div>
-        <div class="lb-sub">Level ${e.level} • ${escHtml(e.subject||'')} • ${e.date}</div>
-      </div>
-      <div class="lb-score">${e.score}</div>`;
-    list.appendChild(li);
-  });
-}
-
-$('btn-lb-clear').onclick = () => {
-  if (confirm('Clear all leaderboard scores?')) {
-    localStorage.removeItem(LB_KEY);
-    renderLeaderboard();
-  }
-};
-
-// ════════════════════════════════════════════════════════════
-//  PROFILE
-// ════════════════════════════════════════════════════════════
-function renderProfile() {
-  const lb   = JSON.parse(localStorage.getItem(LB_KEY) || '[]');
-  const mine = lb.filter(e => e.name === (progress.name || state.playerName));
-
-  const games     = mine.length;
-  const bestScore = games ? Math.max(...mine.map(e => e.score)) : 0;
-  const avgAcc    = games ? Math.round(mine.reduce((s,e) => s+(e.accuracy||0),0)/games) : 0;
-  const totalXP   = progress.totalXP || 0;
-
-  const av = progress.avatar || state.avatar || '🧒';
-  $('profile-avatar').textContent      = av;
-  $('profile-name').textContent        = progress.name || state.playerName || 'Player';
-  $('profile-level-label').textContent = `${getXPLevelName(totalXP)} • ${totalXP} XP`;
-  $('profile-games').textContent       = games;
-  $('profile-best').textContent        = bestScore;
-  $('profile-accuracy').textContent    = avgAcc + '%';
-  $('profile-total-xp').textContent    = totalXP;
-
-  const hist = $('profile-history');
-  hist.innerHTML = '';
-  if (!mine.length) {
-    hist.innerHTML = '<li style="text-align:center;color:var(--text-muted);padding:14px;">No games yet!</li>';
-    return;
-  }
-  [...mine].reverse().slice(0, 5).forEach((e, i) => {
-    const li = document.createElement('li');
-    li.className = 'lb-item';
-    li.style.animationDelay = i * 0.05 + 's';
-    li.innerHTML = `
-      <span class="lb-rank">${i+1}</span>
-      <span class="lb-av">${e.avatar||'🧒'}</span>
-      <div class="lb-info">
-        <div class="lb-name">Level ${e.level} • ${escHtml(e.subject||'')}</div>
-        <div class="lb-sub">${e.date}</div>
-      </div>
-      <div class="lb-score">${e.score} ⭐</div>`;
-    hist.appendChild(li);
-  });
-}
-
-// ════════════════════════════════════════════════════════════
-//  UTILS
-// ════════════════════════════════════════════════════════════
+/* ── Shuffle ────────────────────────────────────────────── */
 function shuffle(arr) {
   const a = [...arr];
-  for (let i = a.length-1; i > 0; i--) {
+  for (let i = a.length-1; i>0; i--) {
     const j = Math.floor(Math.random()*(i+1));
     [a[i],a[j]] = [a[j],a[i]];
   }
   return a;
 }
 
-function getXPLevelName(xp) {
-  let name = XP_LEVELS[0].name;
-  XP_LEVELS.forEach(l => { if (xp >= l.minXP) name = l.name; });
-  return name;
+/* ── ═══════════════════════════════════════════════════
+   SCREEN BUILDERS
+   ═══════════════════════════════════════════════════ */
+
+/* ── Home Screen ────────────────────────────────────────── */
+function buildHome() {
+  const prog = loadProgress();
+  state.progress = prog;
+  const resume = $('resume-section');
+  if (prog) {
+    resume.classList.remove('hidden');
+    $('resume-name').textContent = `${prog.avatarEmoji || '🧑‍🚀'} ${prog.name}`;
+    $('resume-stats').textContent =
+      `Level ${prog.currentLevel} · ${prog.xp} XP · ${prog.correctAnswers}/${prog.totalQuestions} correct`;
+  } else {
+    resume.classList.add('hidden');
+  }
+  showScreen('screen-home');
 }
 
-function escHtml(s) {
-  return String(s).replace(/[&<>"']/g, c =>
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
-  );
+/* ── Setup Screen ───────────────────────────────────────── */
+function buildSetup() {
+  // Pre-fill from progress
+  const prog = loadProgress();
+  if (prog) {
+    $('player-name').value = prog.name;
+    state.player = { name: prog.name, avatarId: prog.avatarId, avatarEmoji: prog.avatarEmoji };
+  }
+  buildAvatarGrid();
+  showScreen('screen-setup');
 }
 
-let toastTimer;
-function showToast(msg, cls = '') {
-  const t = $('toast');
-  t.textContent = msg;
-  t.className   = `toast ${cls} show`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+function buildAvatarGrid() {
+  const grid = $('avatar-grid');
+  grid.innerHTML = '';
+  AVATARS.forEach(av => {
+    const item = document.createElement('div');
+    item.className = 'avatar-item';
+    item.dataset.id = av.id;
+    if (state.player && state.player.avatarId === av.id) item.classList.add('selected');
+    item.innerHTML = `<span class="avatar-emoji">${av.emoji}</span><span class="avatar-name">${av.name}</span>`;
+    item.addEventListener('click', () => {
+      $$('.avatar-item').forEach(el => el.classList.remove('selected'));
+      item.classList.add('selected');
+    });
+    grid.appendChild(item);
+  });
 }
 
-function launchConfetti() {
-  const COLS = ['#FFD700','#FF6B9D','#00E5FF','#B388FF','#00E676','#FF6B35','#fff'];
-  for (let i = 0; i < 100; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.cssText = `left:${Math.random()*100}vw;top:-20px;
-        background:${COLS[Math.floor(Math.random()*COLS.length)]};
-        width:${Math.random()*10+5}px;height:${Math.random()*13+7}px;
-        transform:rotate(${Math.random()*360}deg);
-        animation-duration:${Math.random()*2+2}s;
-        animation-delay:${Math.random()*0.4}s;
-        border-radius:${Math.random()>0.5?'50%':'3px'};`;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 3500);
-    }, i * 22);
+function setupContinue() {
+  const name = $('player-name').value.trim();
+  if (!name) { toast('Please enter your name!', 'error'); return; }
+  const sel = document.querySelector('.avatar-item.selected');
+  if (!sel) { toast('Please select an avatar!', 'error'); return; }
+  const av = AVATARS.find(a => a.id === sel.dataset.id);
+  state.player = { name, avatarId: av.id, avatarEmoji: av.emoji };
+  buildModeSelect();
+}
+
+/* ── Mode Select Screen ─────────────────────────────────── */
+function buildModeSelect() {
+  state.mode = null;
+  $$('.mode-card').forEach(c => c.classList.remove('selected'));
+  $('level-picker').classList.remove('show');
+  $('btn-start-game').disabled = true;
+  showScreen('screen-mode');
+  buildLevelGrid();
+}
+
+function buildLevelGrid() {
+  const prog = loadProgress();
+  const completed = prog ? (prog.completedLevels || []) : [];
+  const grid = $('level-grid');
+  grid.innerHTML = '';
+
+  Object.entries(LEVEL_CONFIG).forEach(([lvl, qs]) => {
+    const n = parseInt(lvl);
+    const isCompleted = completed.includes(n);
+    const isLocked = n > 1 && !completed.includes(n-1);
+
+    const btn = document.createElement('div');
+    btn.className = 'level-btn' + (isLocked ? ' locked' : '') + (isCompleted ? ' completed' : '');
+    btn.innerHTML = `
+      <div class="level-num">L${n}</div>
+      <div class="level-qs">${qs} Qs</div>
+      <div class="level-icon">${isLocked ? '🔒' : isCompleted ? '✅' : '▶'}</div>
+    `;
+    if (!isLocked) {
+      btn.addEventListener('click', () => {
+        $$('.level-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.level = n;
+      });
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function selectMode(mode) {
+  state.mode = mode;
+  $$('.mode-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.mode === mode);
+  });
+  $('level-picker').classList.toggle('show', mode === 'level');
+  $('btn-start-game').disabled = false;
+}
+
+/* ── Start Game ─────────────────────────────────────────── */
+function startGame() {
+  if (!state.mode) { toast('Pick a game mode!', 'error'); return; }
+
+  // Reset session score
+  state.score = { correct:0, wrong:0, xp:0 };
+  state.sessionXP = 0;
+  state.currentIdx = 0;
+  state.answered = false;
+
+  // Build question pool
+  let pool;
+  if (state.mode === 'free') {
+    pool = shuffle(state.allQuestions).slice(0, FREE_PLAY_COUNT);
+  } else if (state.mode === 'timer') {
+    pool = shuffle(state.allQuestions).slice(0, FREE_PLAY_COUNT);
+  } else {
+    // level mode
+    pool = shuffle(state.allQuestions.filter(q => q.level === state.level))
+           .slice(0, LEVEL_CONFIG[state.level]);
+    if (pool.length < LEVEL_CONFIG[state.level]) {
+      // pad with random questions if not enough in JSON
+      const extra = shuffle(state.allQuestions.filter(q => q.level !== state.level))
+                    .slice(0, LEVEL_CONFIG[state.level] - pool.length);
+      pool = [...pool, ...extra];
+    }
+  }
+  state.questions = pool;
+
+  buildQuizHUD();
+  loadQuestion();
+  showScreen('screen-quiz');
+}
+
+/* ── Quiz HUD ───────────────────────────────────────────── */
+function buildQuizHUD() {
+  $('hud-avatar').textContent = state.player.avatarEmoji;
+  $('hud-name').textContent   = state.player.name;
+  $('hud-mode-badge').textContent = state.mode === 'free' ? '∞ Free Play'
+    : state.mode === 'timer' ? '⏱ Timer Mode'
+    : `⚔ Level ${state.level}`;
+  updateHUDXP();
+  updateProgress();
+
+  // Show timer only in timer mode
+  $('timer-display').style.display = state.mode === 'timer' ? 'block' : 'none';
+}
+
+function updateHUDXP() {
+  const prog = loadProgress();
+  const baseXP = prog ? prog.xp : 0;
+  $('hud-xp').innerHTML = `XP: <span>${baseXP + state.sessionXP}</span>`;
+}
+
+function updateProgress() {
+  const total = state.questions.length;
+  const curr  = state.currentIdx + 1;
+  const pct   = Math.round((state.currentIdx / total) * 100);
+  $('progress-bar-fill').style.width = pct + '%';
+  $('progress-text').innerHTML = `Question <span>${Math.min(curr, total)}</span> of <span>${total}</span>`;
+}
+
+/* ── Load Question ──────────────────────────────────────── */
+function loadQuestion() {
+  if (state.currentIdx >= state.questions.length) {
+    endRound();
+    return;
+  }
+  state.answered = false;
+  clearTimer();
+
+  const q = state.questions[state.currentIdx];
+  updateProgress();
+
+  $('q-subject').textContent = q.subject || 'General';
+  $('q-difficulty').textContent = q.difficulty || 'medium';
+  $('q-difficulty').className = 'q-difficulty ' + (q.difficulty||'medium');
+  $('question-text').textContent = q.question;
+
+  // Render options
+  const grid = $('options-grid');
+  grid.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  const opts = shuffle(q.options.map((o,i) => ({text:o, orig:i})));
+
+  opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `
+      <span class="option-label">${labels[i]}</span>
+      <span class="option-text">${opt.text}</span>
+    `;
+    btn.addEventListener('click', () => handleAnswer(btn, opt.text, q.answer));
+    grid.appendChild(btn);
+  });
+
+  // Question card animation reset
+  const card = $('question-card');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = '';
+
+  // Start timer if timer mode
+  if (state.mode === 'timer') {
+    startTimer();
   }
 }
 
-// ════════════════════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════════════════════
-(function init() {
-  startClock();
-  const hasSave = loadProgress();
-  if (hasSave) renderHome();
-  showScreen('home');
-})();
+/* ── Handle Answer ──────────────────────────────────────── */
+function handleAnswer(btn, chosen, correct) {
+  if (state.answered) return;
+  state.answered = true;
+  clearTimer();
+
+  const isCorrect = chosen === correct;
+  const xpDelta = isCorrect ? XP_CORRECT : XP_WRONG;
+
+  if (isCorrect) {
+    state.score.correct++;
+    btn.classList.add('correct');
+    playSound('correct');
+    showXPPopup('+10 XP', true);
+  } else {
+    btn.classList.add('wrong');
+    playSound('wrong');
+    showXPPopup('-5 XP', false);
+    // Show correct answer
+    $$('.option-btn').forEach(b => {
+      if (b.querySelector('.option-text').textContent === correct) {
+        b.classList.add('correct');
+      }
+    });
+  }
+
+  state.score.wrong += isCorrect ? 0 : 1;
+  state.sessionXP = Math.max(0, state.sessionXP + xpDelta);
+  state.score.xp  = state.sessionXP;
+  updateHUDXP();
+
+  // Disable all buttons
+  $$('.option-btn').forEach(b => b.disabled = true);
+
+  // Auto-advance
+  setTimeout(() => {
+    state.currentIdx++;
+    loadQuestion();
+  }, 1500);
+}
+
+/* ── Timer ──────────────────────────────────────────────── */
+function startTimer() {
+  state.timerVal = TIMER_SECONDS;
+  $('timer-display').textContent = state.timerVal;
+  $('timer-display').className = 'timer-display';
+
+  state.timer = setInterval(() => {
+    state.timerVal--;
+    $('timer-display').textContent = state.timerVal;
+
+    if (state.timerVal <= 5) {
+      $('timer-display').className = 'timer-display danger';
+    } else if (state.timerVal <= 10) {
+      $('timer-display').className = 'timer-display warning';
+    }
+
+    if (state.timerVal <= 0) {
+      clearTimer();
+      // Auto-wrong: find correct and mark it
+      if (!state.answered) {
+        state.answered = true;
+        const q = state.questions[state.currentIdx];
+        $$('.option-btn').forEach(b => {
+          b.disabled = true;
+          if (b.querySelector('.option-text').textContent === q.answer) {
+            b.classList.add('correct');
+          }
+        });
+        state.score.wrong++;
+        state.sessionXP = Math.max(0, state.sessionXP + XP_WRONG);
+        state.score.xp  = state.sessionXP;
+        updateHUDXP();
+        showXPPopup('⏱ -5 XP', false);
+        toast('Time\'s up!', 'error');
+        setTimeout(() => { state.currentIdx++; loadQuestion(); }, 1500);
+      }
+    }
+  }, 1000);
+}
+
+function clearTimer() {
+  if (state.timer) { clearInterval(state.timer); state.timer = null; }
+}
+
+/* ── XP Popup ───────────────────────────────────────────── */
+function showXPPopup(msg, correct) {
+  const el = $('xp-popup');
+  el.textContent = msg;
+  el.className = 'xp-popup ' + (correct ? 'show-correct' : 'show-wrong');
+  setTimeout(() => { el.className = 'xp-popup'; }, 900);
+}
+
+/* ── End Round ──────────────────────────────────────────── */
+function endRound() {
+  clearTimer();
+
+  // Level completion check
+  if (state.mode === 'level') {
+    const prog = loadProgress() || {};
+    const completed = prog.completedLevels || [];
+    if (!completed.includes(state.level)) {
+      completed.push(state.level);
+    }
+    prog.completedLevels = completed;
+    LS.set('bsq_progress', { ...prog, completedLevels: completed });
+  }
+
+  saveProgress();
+  saveToLeaderboard();
+  buildResults();
+  showScreen('screen-result');
+}
+
+/* ── Results Screen ─────────────────────────────────────── */
+function buildResults() {
+  const total   = state.questions.length;
+  const correct = state.score.correct;
+  const wrong   = state.score.wrong;
+  const xp      = state.sessionXP;
+  const pct     = total > 0 ? Math.round((correct/total)*100) : 0;
+
+  // Grade
+  let grade, gradeClass, msg;
+  if (pct >= 90)      { grade='S'; gradeClass='grade-s'; msg='🏆 Legendary! Absolute genius!'; }
+  else if (pct >= 75) { grade='A'; gradeClass='grade-a'; msg='⭐ Excellent! You crushed it!'; }
+  else if (pct >= 60) { grade='B'; gradeClass='grade-b'; msg='✨ Great job! Keep it up!'; }
+  else if (pct >= 45) { grade='C'; gradeClass='grade-c'; msg='💪 Good effort! Keep practicing!'; }
+  else                { grade='D'; gradeClass='grade-d'; msg='🔄 Keep trying! You\'ll improve!'; }
+
+  $('result-avatar-big').textContent = state.player.avatarEmoji;
+  $('result-grade').textContent = grade;
+  $('result-grade').className   = 'result-grade ' + gradeClass;
+  $('result-message').textContent = msg;
+  $('result-player-name').textContent = state.player.name;
+
+  $('stat-correct').textContent = correct;
+  $('stat-wrong').textContent   = wrong;
+  $('stat-xp').textContent      = '+' + xp;
+  $('stat-score').textContent   = pct + '%';
+  $('stat-total').textContent   = total;
+
+  // Level complete badge
+  const badge = $('level-complete-badge');
+  if (state.mode === 'level') {
+    badge.classList.remove('hidden');
+    badge.textContent = `✅ Level ${state.level} Complete!`;
+  } else {
+    badge.classList.add('hidden');
+  }
+
+  // Next level button
+  const nextBtn = $('btn-next-level');
+  if (state.mode === 'level' && state.level < 10) {
+    nextBtn.classList.remove('hidden');
+    nextBtn.textContent = `▶ Level ${state.level+1}`;
+  } else {
+    nextBtn.classList.add('hidden');
+  }
+}
+
+/* ── Leaderboard Screen ─────────────────────────────────── */
+function buildLeaderboard() {
+  renderLB('all');
+  showScreen('screen-leaderboard');
+}
+
+function renderLB(filter) {
+  let lb = getLeaderboard();
+  if (filter !== 'all') lb = lb.filter(e => e.mode === filter);
+
+  const list = $('leaderboard-list');
+  if (lb.length === 0) {
+    list.innerHTML = '<div class="lb-empty">No scores yet. Play a game first!</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  lb.forEach((entry, i) => {
+    const rank = i+1;
+    const item = document.createElement('div');
+    item.className = 'lb-item' + (rank<=3 ? ` rank-${rank}` : '');
+    item.style.animationDelay = (i*0.06) + 's';
+
+    const rankHTML = rank===1 ? '🥇' : rank===2 ? '🥈' : rank===3 ? '🥉'
+      : `<span class="lb-rank other">#${rank}</span>`;
+    const rankClass = rank<=3 ? `r${rank}` : 'other';
+
+    item.innerHTML = `
+      <div class="lb-rank ${rankClass}">${rank<=3 ? rankHTML : '#'+rank}</div>
+      <div class="lb-avatar">${entry.avatarEmoji || '🧑‍🚀'}</div>
+      <div class="lb-info">
+        <div class="lb-name">${escapeHTML(entry.name)}</div>
+        <div class="lb-details">${entry.correct}/${entry.total} correct · ${capFirst(entry.mode)} Mode · ${entry.date}</div>
+      </div>
+      <div class="lb-xp">
+        <div>${entry.xp}</div>
+        <div class="lb-xp-label">XP</div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+/* ── Utility ────────────────────────────────────────────── */
+function escapeHTML(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(str));
+  return d.innerHTML;
+}
+function capFirst(str) {
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+}
+
+/* ── Sound Toggle ───────────────────────────────────────── */
+function toggleSound() {
+  state.soundOn = !state.soundOn;
+  LS.set('bsq_sound', state.soundOn);
+  $('sound-btn').textContent = state.soundOn ? '🔊' : '🔇';
+  toast(state.soundOn ? 'Sound ON' : 'Sound OFF', 'info');
+}
+
+/* ── Resume / Reset ─────────────────────────────────────── */
+function resumeGame() {
+  const prog = loadProgress();
+  if (!prog) return;
+  state.player = { name: prog.name, avatarId: prog.avatarId, avatarEmoji: prog.avatarEmoji };
+  state.progress = prog;
+  selectMode('level');
+  buildModeSelect();
+  // Auto-select current level
+  state.level = prog.currentLevel || 1;
+  setTimeout(() => {
+    selectMode('level');
+    startGame();
+  }, 100);
+}
+
+function resetProgress() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  LS.remove('bsq_progress');
+  state.progress = null;
+  toast('Progress reset!', 'info');
+  buildHome();
+}
+
+/* ── Event Listeners ────────────────────────────────────── */
+function attachEvents() {
+  // Home
+  $('btn-new-game').addEventListener('click', buildSetup);
+  $('btn-resume').addEventListener('click', resumeGame);
+  $('btn-leaderboard-home').addEventListener('click', buildLeaderboard);
+  $('btn-reset').addEventListener('click', resetProgress);
+
+  // Setup
+  $('btn-setup-continue').addEventListener('click', setupContinue);
+  $('btn-setup-back').addEventListener('click', buildHome);
+
+  // Mode Select
+  $$('.mode-card').forEach(card => {
+    card.addEventListener('click', () => selectMode(card.dataset.mode));
+  });
+  $('btn-start-game').addEventListener('click', startGame);
+  $('btn-mode-back').addEventListener('click', buildSetup);
+
+  // Quiz
+  $('btn-quit-quiz').addEventListener('click', () => {
+    clearTimer();
+    saveProgress();
+    buildHome();
+  });
+  $('sound-btn').addEventListener('click', toggleSound);
+
+  // Results
+  $('btn-play-again').addEventListener('click', () => {
+    startGame();
+  });
+  $('btn-next-level').addEventListener('click', () => {
+    state.level = Math.min(state.level + 1, 10);
+    startGame();
+  });
+  $('btn-go-leaderboard').addEventListener('click', buildLeaderboard);
+  $('btn-result-home').addEventListener('click', buildHome);
+
+  // Leaderboard tabs
+  $$('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderLB(btn.dataset.filter);
+    });
+  });
+  $('btn-lb-back').addEventListener('click', buildHome);
+}
+
+/* ── Init ───────────────────────────────────────────────── */
+async function init() {
+  // Load sound pref
+  const sp = LS.get('bsq_sound');
+  state.soundOn = sp === null ? true : sp;
+  $('sound-btn').textContent = state.soundOn ? '🔊' : '🔇';
+
+  initCanvas();
+  await loadQuestions();
+  attachEvents();
+  buildHome();
+}
+
+document.addEventListener('DOMContentLoaded', init);
