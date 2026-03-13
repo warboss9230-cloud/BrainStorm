@@ -502,8 +502,36 @@ footer span { display: block; line-height: 1.8; }
   .question-text { font-size: 0.9rem; }
 }
 
+/* ── Subject tag (shown in Mix mode) ── */
+.subject-tag {
+  display: inline-block; padding: 3px 10px; border-radius: 50px;
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;
+  background: rgba(179,136,255,0.15); color: var(--accent-purple);
+  border: 1px solid rgba(179,136,255,0.35);
+}
+
+/* ── Mix Card ── */
+.mix-card {
+  border-color: rgba(255,215,0,0.6) !important;
+  background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,107,157,0.12)) !important;
+  position: relative;
+  overflow: hidden;
+}
+.mix-card::after {
+  content: '✨ NEW';
+  position: absolute; top: 5px; right: 5px;
+  font-size: 0.52rem; font-weight: 900;
+  background: var(--accent-yellow); color: #1a0a00;
+  padding: 2px 6px; border-radius: 50px; letter-spacing: 0.5px;
+}
+.mix-card:hover {
+  border-color: var(--accent-yellow) !important;
+  box-shadow: 0 8px 28px rgba(255,215,0,0.35) !important;
+  transform: translateY(-5px) scale(1.05) !important;
+}
+.mix-card .card-label { color: var(--accent-yellow) !important; font-size: 0.85rem !important; }
+
 /* ── Utility ── */
 .hidden { display: none !important; }
 .text-center { text-align: center; }
 .mt-4 { margin-top: 14px; }
-
