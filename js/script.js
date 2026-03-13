@@ -1,46 +1,46 @@
-/* ========================================
-   BRAINSTORM QUIZ - script.js
-   Data path: data/class{N}/{subject}.json
-   JSON format: { questions: [{ id, question, options:[4], answer, level }] }
-   ======================================== */
 'use strict';
 
-// ── State ──────────────────────────────────────────────────────────────────
-const state = {
-  playerName: '',
-  selectedClass: null,
-  selectedSubject: null,
-  selectedMode: null,
-  selectedDifficulty: 'all',   // 'all' | 'easy' | 'medium' | 'hard'
-  questions: [],
-  currentIdx: 0,
-  score: 0,
-  xp: 0,
-  level: 1,
-  answered: false,
-  timerInterval: null,
-  timeLeft: 20,
-  totalTime: 20,
-  correctCount: 0,
-};
+/* ═══════════════════════════════════════════════════════════
+   BRAINSTORM QUIZ — script.js
+   Features: Progression System, Avatar, Progress Save, Sounds
+   ═══════════════════════════════════════════════════════════ */
 
-// ── XP / Level Config ───────────────────────────────────────────────────────
-const XP_CORRECT    = 10;
-const XP_BONUS_FAST = 5;
-const LEVELS = [
-  { level: 1, name: 'Beginner',  minXP: 0   },
-  { level: 2, name: 'Explorer',  minXP: 50  },
-  { level: 3, name: 'Scholar',   minXP: 120 },
-  { level: 4, name: 'Expert',    minXP: 220 },
-  { level: 5, name: 'Master',    minXP: 350 },
-  { level: 6, name: 'Champion',  minXP: 500 },
-  { level: 7, name: 'Legend',    minXP: 700 },
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const LEVEL_QUESTIONS = [0, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]; // index = level
+const TOTAL_LEVELS    = 10;
+const STORAGE_KEY     = 'brainstorm_progress';
+const LB_KEY          = 'brainstorm_lb';
+const XP_CORRECT      = 10;
+const XP_BONUS_FAST   = 5;
+
+const LEVEL_TITLES = ['', 'Rookie Start', 'Rising Star', 'Brain Spark', 'Mind Surge',
+  'Knowledge Quest', 'Sharp Thinker', 'Genius Mode', 'Expert Zone', 'Master Class', 'Legend Peak'];
+
+const LEVEL_ICONS = ['', '🌱', '📚', '⚡', '🔥', '🎯', '💡', '🧠', '🏆', '👑', '🌟'];
+
+const AVATARS = [
+  { id: 'av1',  emoji: '🧒', label: 'Kid'       },
+  { id: 'av2',  emoji: '👦', label: 'Boy'       },
+  { id: 'av3',  emoji: '👧', label: 'Girl'      },
+  { id: 'av4',  emoji: '🧑', label: 'Teen'      },
+  { id: 'av5',  emoji: '👩', label: 'Lady'      },
+  { id: 'av6',  emoji: '👨', label: 'Man'       },
+  { id: 'av7',  emoji: '🧓', label: 'Elder'     },
+  { id: 'av8',  emoji: '🦸', label: 'Hero'      },
+  { id: 'av9',  emoji: '🧙', label: 'Wizard'    },
+  { id: 'av10', emoji: '🦊', label: 'Fox'       },
+  { id: 'av11', emoji: '🐼', label: 'Panda'     },
+  { id: 'av12', emoji: '🦁', label: 'Lion'      },
+  { id: 'av13', emoji: '🐯', label: 'Tiger'     },
+  { id: 'av14', emoji: '🐸', label: 'Frog'      },
+  { id: 'av15', emoji: '🤖', label: 'Robot'     },
+  { id: 'av16', emoji: '👾', label: 'Alien'     },
+  { id: 'av17', emoji: '🧑‍🚀', label: 'Astronaut' },
+  { id: 'av18', emoji: '🧑‍🎓', label: 'Scholar'  },
+  { id: 'av19', emoji: '🥷',  label: 'Ninja'    },
+  { id: 'av20', emoji: '🦄', label: 'Unicorn'   },
 ];
 
-// ── Subject Config ──────────────────────────────────────────────────────────
-// name   → display name & identifier used in state
-// file   → filename (without .json) inside data/class{N}/ folder
-// icon   → emoji shown on subject card
 const SUBJECTS_ALL = [
   { name: 'English',       file: 'english',       icon: '📖' },
   { name: 'Hindi',         file: 'hindi',         icon: '🇮🇳' },
@@ -54,469 +54,683 @@ const SUBJECTS_ALL = [
   { name: 'Animals/Birds', file: 'animals-birds', icon: '🦁' },
 ];
 
-// ── DOM Helper ─────────────────────────────────────────────────────────────
+const XP_LEVELS = [
+  { level:1, name:'Beginner', minXP:0   },
+  { level:2, name:'Explorer', minXP:50  },
+  { level:3, name:'Scholar',  minXP:120 },
+  { level:4, name:'Expert',   minXP:220 },
+  { level:5, name:'Master',   minXP:350 },
+  { level:6, name:'Champion', minXP:500 },
+  { level:7, name:'Legend',   minXP:700 },
+];
+
+// ── DOM HELPER ────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
-const screens = {
-  name:        $('screen-name'),
-  profile:     $('screen-profile'),
-  class:       $('screen-class'),
-  subject:     $('screen-subject'),
-  mode:        $('screen-mode'),
-  difficulty:  $('screen-difficulty'),
-  quiz:        $('screen-quiz'),
-  result:      $('screen-result'),
-  leaderboard: $('screen-leaderboard'),
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let state = {
+  // session
+  playerName:     '',
+  avatar:         '🧒',
+  avatarId:       'av1',
+  // game level / progression
+  gameLevel:      1,        // current progression level (1–10)
+  selectedClass:  null,
+  selectedSubject: null,
+  // quiz session
+  questions:      [],
+  currentIdx:     0,
+  sessionScore:   0,
+  sessionXP:      0,
+  sessionCorrect: 0,
+  answered:       false,
+  timerInterval:  null,
+  timeLeft:       20,
+  mode:           'free',   // 'free' | 'timer'
 };
 
-// ── Show Screen ─────────────────────────────────────────────────────────────
-function showScreen(name) {
-  Object.values(screens).forEach(s => s.classList.remove('active'));
-  screens[name].classList.add('active');
-  updateBackBtn(name);
-  window.scrollTo(0, 0);
+// ── PROGRESS (persisted) ──────────────────────────────────────────────────────
+let progress = {
+  name:            '',
+  avatar:          '🧒',
+  avatarId:        'av1',
+  currentLevel:    1,
+  score:           0,
+  completedLevels: [],
+  correctAnswers:  0,
+  totalQuestions:  0,
+  totalXP:         0,
+  lastPlayed:      '',
+};
+
+// ── SOUND SYSTEM ──────────────────────────────────────────────────────────────
+const SFX = {
+  correct: new Audio('assets/sounds/correct.mp3'),
+  wrong:   new Audio('assets/sounds/wrong.mp3'),
+  levelup: new Audio('assets/sounds/levelup.mp3'),
+};
+Object.values(SFX).forEach(a => { a.preload = 'auto'; a.volume = 0.7; });
+
+function playSound(name) {
+  try {
+    const s = SFX[name];
+    if (!s) return;
+    s.currentTime = 0;
+    s.play().catch(() => {}); // silently ignore autoplay restrictions
+  } catch(e) {}
 }
 
-// ── Back Button (fixed bottom, visible on all pages except home) ─────────────
-const backBtn = $('back-btn');
-const backMap = {
-  profile:     'name',
-  class:       'name',
-  subject:     'class',
-  mode:        'subject',
-  difficulty:  'mode',
-  quiz:        'difficulty',
-  result:      'name',
-  leaderboard: 'name',
+// ── LIVE CLOCK ────────────────────────────────────────────────────────────────
+function startClock() {
+  const el = $('live-datetime');
+  function tick() {
+    const now = new Date();
+    const d = now.toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+    const t = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    el.textContent = `${d}  ${t}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ── PROGRESS: SAVE / LOAD / RESET ────────────────────────────────────────────
+function saveProgress() {
+  progress.lastPlayed = new Date().toLocaleDateString('en-IN');
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { progress = { ...progress, ...JSON.parse(raw) }; return true; }
+  } catch(e) {}
+  return false;
+}
+
+function resetProgress() {
+  localStorage.removeItem(STORAGE_KEY);
+  progress = { name:'', avatar:'🧒', avatarId:'av1', currentLevel:1, score:0,
+    completedLevels:[], correctAnswers:0, totalQuestions:0, totalXP:0, lastPlayed:'' };
+}
+
+function isLevelUnlocked(lvl) {
+  if (lvl === 1) return true;
+  return progress.completedLevels.includes(lvl - 1);
+}
+
+function isLevelCompleted(lvl) {
+  return progress.completedLevels.includes(lvl);
+}
+
+// ── SCREEN NAVIGATION ─────────────────────────────────────────────────────────
+const SCREENS = ['home','avatar','levelmap','class','subject','quiz','levelup','result','leaderboard','profile'];
+const BACK_MAP = {
+  avatar:      () => showScreen('home'),
+  levelmap:    () => showScreen('home'),
+  class:       () => showScreen('levelmap'),
+  subject:     () => { showScreen('class'); renderClasses(); },
+  quiz:        () => { clearTimer(); showScreen('levelmap'); },
+  levelup:     () => showScreen('levelmap'),
+  result:      () => showScreen('levelmap'),
+  leaderboard: () => showScreen('home'),
+  profile:     () => showScreen('home'),
 };
 
-function updateBackBtn(screen) {
-  if (backMap[screen]) {
+function showScreen(name) {
+  SCREENS.forEach(s => {
+    const el = $('screen-' + s);
+    if (el) el.classList.remove('active');
+  });
+  const target = $('screen-' + name);
+  if (target) target.classList.add('active');
+  // back button
+  const backBtn = $('back-btn');
+  if (BACK_MAP[name]) {
     backBtn.classList.add('visible');
-    backBtn.onclick = () => {
-      if (screen === 'quiz') clearTimer();
-      const target = backMap[screen];
-      showScreen(target);
-      if (target === 'subject') renderSubjects();
-      if (target === 'class')   renderClasses();
-    };
+    backBtn.onclick = () => BACK_MAP[name]();
   } else {
     backBtn.classList.remove('visible');
   }
+  window.scrollTo(0, 0);
 }
 
-// ── Animated Background Canvas ───────────────────────────────────────────────
-(function initCanvas() {
+// ── ANIMATED BACKGROUND ───────────────────────────────────────────────────────
+(function initBg() {
   const canvas = $('bg-canvas');
   const ctx    = canvas.getContext('2d');
   let W, H, particles = [];
-  const COLORS = ['#FFD700','#FF6B9D','#00E5FF','#B388FF','#00E676','#FF6B35'];
+  const COLS = ['#FFD700','#FF6B9D','#00E5FF','#B388FF','#00E676','#FF6B35'];
 
-  class Particle {
-    constructor() { this.reset(true); }
-    reset(init = false) {
-      this.x     = Math.random() * W;
-      this.y     = init ? Math.random() * H : H + 20;
-      this.r     = Math.random() * 3 + 1;
-      this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-      this.speed = Math.random() * 0.6 + 0.2;
-      this.drift = (Math.random() - 0.5) * 0.4;
-      this.alpha = Math.random() * 0.5 + 0.2;
+  class P {
+    constructor(init) {
+      this.x     = Math.random() * (W||400);
+      this.y     = init ? Math.random() * (H||700) : (H||700) + 20;
+      this.r     = Math.random() * 2.5 + 1;
+      this.color = COLS[Math.floor(Math.random() * COLS.length)];
+      this.speed = Math.random() * 0.5 + 0.2;
+      this.drift = (Math.random() - 0.5) * 0.35;
+      this.alpha = Math.random() * 0.45 + 0.15;
       this.pulse = Math.random() * Math.PI * 2;
     }
-    update() {
-      this.y    -= this.speed;
-      this.x    += this.drift;
+    tick() {
+      this.y    -= this.speed; this.x += this.drift;
       this.pulse += 0.02;
-      this.alpha  = 0.2 + Math.sin(this.pulse) * 0.15;
-      if (this.y < -20) this.reset();
+      this.alpha = 0.15 + Math.sin(this.pulse) * 0.13;
+      if (this.y < -20) { Object.assign(this, new P(false)); }
     }
     draw() {
-      ctx.save();
-      ctx.globalAlpha = this.alpha;
-      ctx.fillStyle   = this.color;
-      ctx.shadowBlur  = 12;
-      ctx.shadowColor = this.color;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+      ctx.save(); ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = this.color; ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
     }
   }
 
   function resize() {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
-    particles = Array.from({ length: 80 }, () => new Particle());
+    particles = Array.from({ length: 70 }, () => new P(true));
   }
   function loop() {
     ctx.clearRect(0, 0, W, H);
     const g = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H)*0.7);
-    g.addColorStop(0, 'rgba(20,10,50,0.3)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-    particles.forEach(p => { p.update(); p.draw(); });
+    g.addColorStop(0,'rgba(18,8,44,0.35)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    particles.forEach(p => { p.tick(); p.draw(); });
     requestAnimationFrame(loop);
   }
-  window.addEventListener('resize', resize);
-  resize(); loop();
+  window.addEventListener('resize', resize); resize(); loop();
 })();
 
-// ── Top Bar: Leaderboard & Profile ───────────────────────────────────────────
-$('btn-top-leaderboard').addEventListener('click', () => { renderLeaderboard(); showScreen('leaderboard'); });
-$('btn-top-profile').addEventListener('click',     () => { renderProfile();     showScreen('profile'); });
+// ── TOP BAR BUTTONS ───────────────────────────────────────────────────────────
+$('btn-top-leaderboard').onclick = () => { renderLeaderboard(); showScreen('leaderboard'); };
+$('btn-top-profile').onclick     = () => { renderProfile();     showScreen('profile'); };
 
-// ── Step 1: Name Screen ──────────────────────────────────────────────────────
-$('btn-start').addEventListener('click', () => {
+// ════════════════════════════════════════════════════════════
+//  SCREEN: HOME
+// ════════════════════════════════════════════════════════════
+function renderHome() {
+  const hasSave = progress.name && progress.name.length > 0;
+  const resumeCard = $('resume-card');
+  if (hasSave) {
+    resumeCard.style.display = 'block';
+    $('resume-avatar').textContent = progress.avatar || '🧒';
+    $('resume-name').textContent   = progress.name;
+    $('resume-info').textContent   = `Level ${progress.currentLevel} • Score ${progress.score}`;
+    $('resume-time').textContent   = `Last played: ${progress.lastPlayed || '—'}`;
+  } else {
+    resumeCard.style.display = 'none';
+  }
+}
+
+$('btn-start').onclick = () => {
   const name = $('input-name').value.trim();
   if (!name) { showToast('Please enter your name! 😊', 'wrong-toast'); return; }
+  // Start fresh
+  resetProgress();
+  progress.name = name;
   state.playerName = name;
-  showScreen('class');
-  renderClasses();
-});
-$('input-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-start').click(); });
+  saveProgress();
+  renderAvatars();
+  showScreen('avatar');
+};
 
-// ── Step 2: Class Selection ──────────────────────────────────────────────────
+$('input-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-start').onclick(); });
+
+$('btn-resume').onclick = () => {
+  state.playerName = progress.name;
+  state.avatar     = progress.avatar;
+  state.avatarId   = progress.avatarId;
+  state.gameLevel  = progress.currentLevel;
+  renderLevelMap();
+  showScreen('levelmap');
+};
+
+$('btn-reset').onclick = () => {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    resetProgress();
+    renderHome();
+    showToast('Progress reset ✓', '');
+  }
+};
+
+// ════════════════════════════════════════════════════════════
+//  SCREEN: AVATAR
+// ════════════════════════════════════════════════════════════
+let selectedAvatarId = null;
+
+function renderAvatars() {
+  const grid = $('avatar-grid');
+  grid.innerHTML = '';
+  selectedAvatarId = null;
+  $('btn-avatar-confirm').disabled = true;
+
+  AVATARS.forEach(av => {
+    const div = document.createElement('div');
+    div.className = 'avatar-item';
+    div.dataset.id = av.id;
+    div.innerHTML = `<span>${av.emoji}</span><span class="av-label">${av.label}</span>`;
+    div.onclick = () => {
+      document.querySelectorAll('.avatar-item').forEach(d => d.classList.remove('selected'));
+      div.classList.add('selected');
+      selectedAvatarId = av.id;
+      $('btn-avatar-confirm').disabled = false;
+    };
+    grid.appendChild(div);
+  });
+}
+
+$('btn-avatar-confirm').onclick = () => {
+  if (!selectedAvatarId) return;
+  const av = AVATARS.find(a => a.id === selectedAvatarId);
+  if (!av) return;
+  state.avatar   = av.emoji;
+  state.avatarId = av.id;
+  progress.avatar   = av.emoji;
+  progress.avatarId = av.id;
+  saveProgress();
+  renderLevelMap();
+  showScreen('levelmap');
+};
+
+// ════════════════════════════════════════════════════════════
+//  SCREEN: LEVEL MAP
+// ════════════════════════════════════════════════════════════
+function renderLevelMap() {
+  // Header
+  $('lm-avatar').textContent = progress.avatar || state.avatar || '🧒';
+  $('lm-name').textContent   = progress.name   || state.playerName || 'Player';
+  $('lm-stats').textContent  = `Score: ${progress.score} • ${progress.correctAnswers}/${progress.totalQuestions} Correct`;
+  $('lm-total-xp').textContent = `${progress.totalXP || 0} XP`;
+
+  // Overall progress bar
+  const pct = Math.round((progress.completedLevels.length / TOTAL_LEVELS) * 100);
+  $('lm-prog-fill').style.width = pct + '%';
+  $('lm-prog-pct').textContent  = pct + '%';
+
+  // Level cards
+  const grid = $('level-grid');
+  grid.innerHTML = '';
+
+  for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
+    const completed = isLevelCompleted(lvl);
+    const unlocked  = isLevelUnlocked(lvl);
+    const isCurrent = progress.currentLevel === lvl && !completed;
+
+    const card = document.createElement('div');
+    let cls = 'level-card';
+    if (completed)     cls += ' completed';
+    else if (isCurrent) cls += ' current unlocked';
+    else if (unlocked)  cls += ' unlocked';
+    else                cls += ' locked';
+    card.className = cls;
+
+    let badgeHtml = '';
+    if (completed)      badgeHtml = `<span class="lc-badge done">✅ Done</span>`;
+    else if (isCurrent) badgeHtml = `<span class="lc-badge active">▶ Play</span>`;
+    else if (unlocked)  badgeHtml = `<span class="lc-badge active">🔓 Open</span>`;
+    else                badgeHtml = `<span class="lc-badge lk">🔒 Locked</span>`;
+
+    card.innerHTML = `
+      <div class="lc-top">
+        <span class="lc-num">${lvl}</span>
+        <span class="lc-icon">${LEVEL_ICONS[lvl]}</span>
+      </div>
+      <div class="lc-title">${LEVEL_TITLES[lvl]}</div>
+      <div class="lc-qs">${LEVEL_QUESTIONS[lvl]} Questions</div>
+      ${badgeHtml}`;
+
+    if (unlocked || isCurrent) {
+      card.onclick = () => startLevelFlow(lvl);
+    }
+    grid.appendChild(card);
+  }
+}
+
+function startLevelFlow(lvl) {
+  state.gameLevel = lvl;
+  progress.currentLevel = lvl;
+  $('class-level-num').textContent = lvl;
+  renderClasses();
+  showScreen('class');
+}
+
+// ════════════════════════════════════════════════════════════
+//  SCREEN: CLASS SELECTION
+// ════════════════════════════════════════════════════════════
 function renderClasses() {
   const grid   = $('class-grid');
   grid.innerHTML = '';
   const icons  = ['🌱','📚','✏️','🎨','🔭','🧮','🔬','🌍','⚗️','📐','🧬','🎓'];
   const colors = ['color-1','color-2','color-3','color-4','color-5','color-6'];
+
   for (let i = 1; i <= 12; i++) {
     const div = document.createElement('div');
-    div.className = `card-item class-card ${colors[(i - 1) % 6]}`;
-    div.setAttribute('role', 'listitem');
-    div.setAttribute('tabindex', '0');
-    div.innerHTML = `<span class="card-icon">${icons[i - 1]}</span><span class="card-label">Class ${i}</span>`;
-    const pick = () => { state.selectedClass = i; showScreen('subject'); renderSubjects(); };
-    div.addEventListener('click', pick);
-    div.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') pick(); });
+    div.className = `card-item ${colors[(i-1)%6]}`;
+    div.innerHTML = `<span class="card-icon">${icons[i-1]}</span><span class="card-label">Class ${i}</span>`;
+    div.onclick = () => {
+      state.selectedClass = i;
+      $('subject-class-label').textContent = i;
+      renderSubjects();
+      showScreen('subject');
+    };
     grid.appendChild(div);
   }
 }
 
-// ── Step 3: Subject Selection ────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+//  SCREEN: SUBJECT SELECTION
+// ════════════════════════════════════════════════════════════
 function renderSubjects() {
   const grid = $('subject-grid');
   grid.innerHTML = '';
-  $('subject-class-label').textContent = `Class ${state.selectedClass}`;
   const colors = ['color-1','color-2','color-3','color-4','color-5','color-6'];
 
-  // Mix All — always first
+  // Mix All
   const mixDiv = document.createElement('div');
   mixDiv.className = 'card-item mix-card color-1';
-  mixDiv.setAttribute('role', 'listitem');
-  mixDiv.setAttribute('tabindex', '0');
   mixDiv.innerHTML = `<span class="card-icon">🎲</span><span class="card-label">Mix All</span>`;
-  mixDiv.title = 'Random questions from every subject';
-  const pickMix = () => { state.selectedSubject = 'Mix'; showScreen('mode'); };
-  mixDiv.addEventListener('click', pickMix);
-  mixDiv.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') pickMix(); });
+  mixDiv.onclick = () => { state.selectedSubject = 'Mix'; startQuiz(); };
   grid.appendChild(mixDiv);
 
-  // All 10 subjects (same for every class)
   SUBJECTS_ALL.forEach((subj, i) => {
     const div = document.createElement('div');
-    div.className = `card-item ${colors[(i + 1) % 6]}`;
-    div.setAttribute('role', 'listitem');
-    div.setAttribute('tabindex', '0');
+    div.className = `card-item ${colors[(i+1)%6]}`;
     div.innerHTML = `<span class="card-icon">${subj.icon}</span><span class="card-label">${subj.name}</span>`;
-    const pick = () => { state.selectedSubject = subj.name; showScreen('mode'); };
-    div.addEventListener('click', pick);
-    div.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') pick(); });
+    div.onclick = () => { state.selectedSubject = subj.name; startQuiz(); };
     grid.appendChild(div);
   });
 }
 
-// ── Step 4: Mode Selection ───────────────────────────────────────────────────
-['mode-free','mode-timer','mode-level'].forEach(id => {
-  const modeMap = { 'mode-free': 'free', 'mode-timer': 'timer', 'mode-level': 'level' };
-  const pick = () => { state.selectedMode = modeMap[id]; showScreen('difficulty'); };
-  $(id).addEventListener('click', pick);
-  $(id).addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') pick(); });
-});
-
-// ── Step 5: Difficulty Selection ─────────────────────────────────────────────
-['all','easy','medium','hard'].forEach(diff => {
-  const el   = $('diff-' + diff);
-  const pick = () => { state.selectedDifficulty = diff; startGame(state.selectedMode); };
-  el.addEventListener('click', pick);
-  el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') pick(); });
-});
-
-// ══════════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 //  DATA LOADING
-//  Folder : data/class{N}/{file}.json
-//  Format : { "questions": [ { "id", "question", "options":[4], "answer", "level" } ] }
-//
-//  Mix Subject Logic:
-//    • state.selectedSubject === 'Mix'
-//    • All 10 subject files fetched in parallel via Promise.all
-//    • 5 questions picked per subject (filtered by difficulty if set)
-//    • Each question gets .subject injected → shown as tag in quiz card
-// ══════════════════════════════════════════════════════════════════════════════
-
-// How many questions to pick per subject in Mix mode
-const MIX_PER_SUBJECT = 5;
-
-// Build file URL:  data/class3/animals-birds.json
+// ════════════════════════════════════════════════════════════
 function subjectURL(classNum, file) {
   return `data/class${classNum}/${file}.json`;
 }
 
-// Fetch one subject file → returns questions[] with .subject name injected
 async function fetchSubject(classNum, subj) {
-  const url  = subjectURL(classNum, subj.file);
-  const res  = await fetch(url);
-  if (!res.ok) throw new Error(`404: ${url}`);
+  const res  = await fetch(subjectURL(classNum, subj.file));
+  if (!res.ok) throw new Error(`404: ${subjectURL(classNum, subj.file)}`);
   const data = await res.json();
   return data.questions.map(q => ({ ...q, subject: subj.name }));
 }
 
-// Show / hide a full-screen loading overlay while fetching
-function showLoader(visible, msg = 'Loading questions…') {
+function showLoader(on, msg = 'Loading questions…') {
   let el = $('quiz-loader');
   if (!el) {
     el = document.createElement('div');
     el.id = 'quiz-loader';
-    el.style.cssText = `
-      position:fixed;inset:0;z-index:500;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      background:rgba(13,6,32,0.92);backdrop-filter:blur(8px);
-      color:#f0e6ff;font-size:1.1rem;font-weight:700;gap:16px;
-      transition:opacity 0.3s;`;
-    el.innerHTML = `
-      <div style="font-size:2.5rem;animation:spin 1s linear infinite;">🎲</div>
-      <div id="quiz-loader-msg">${msg}</div>`;
-    // spin keyframe
+    el.style.cssText = 'position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,5,24,0.93);backdrop-filter:blur(10px);color:#f0e6ff;font-size:1.1rem;font-weight:800;gap:16px;';
+    el.innerHTML = '<div style="font-size:2.5rem;animation:spin 1s linear infinite">🎲</div><div id="loader-msg">Loading…</div>';
     if (!document.getElementById('spin-style')) {
       const s = document.createElement('style');
       s.id = 'spin-style';
-      s.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+      s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
       document.head.appendChild(s);
     }
     document.body.appendChild(el);
   }
-  el.style.display = visible ? 'flex' : 'none';
-  if (visible) ($('quiz-loader-msg') || el.querySelector('div:last-child')).textContent = msg;
+  el.style.display = on ? 'flex' : 'none';
+  const m = document.getElementById('loader-msg');
+  if (m) m.textContent = msg;
 }
 
-// Main question loader
 async function loadQuestions() {
+  const needed   = LEVEL_QUESTIONS[state.gameLevel];  // how many questions for this level
+  const classNum = state.selectedClass;
+
   try {
-    let qs = [];
+    let pool = [];
 
     if (state.selectedSubject === 'Mix') {
-      // ── MIX MODE ────────────────────────────────────────────────────────────
-      // Fetch all 10 subject JSON files concurrently
-      showLoader(true, `Loading Mix — fetching all subjects for Class ${state.selectedClass}…`);
-
+      showLoader(true, `Loading Mix for Level ${state.gameLevel}…`);
       const results = await Promise.all(
-        SUBJECTS_ALL.map(subj =>
-          fetchSubject(state.selectedClass, subj)
-            .catch(err => {
-              console.warn(`[Mix] Skipped missing file: ${err.message}`);
-              return [];   // gracefully skip any missing subject file
-            })
-        )
+        SUBJECTS_ALL.map(s => fetchSubject(classNum, s).catch(() => []))
       );
-
       showLoader(false);
-
-      // Pick MIX_PER_SUBJECT questions from each subject (after difficulty filter)
-      results.forEach((pool, i) => {
-        const subjectName = SUBJECTS_ALL[i].name;
-        let filtered = state.selectedDifficulty !== 'all'
-          ? pool.filter(q => q.level === state.selectedDifficulty)
-          : pool;
-
-        if (!filtered.length) {
-          console.info(`[Mix] No questions for subject "${subjectName}" at difficulty "${state.selectedDifficulty}"`);
-          return;
-        }
-
-        qs.push(...shuffle(filtered).slice(0, MIX_PER_SUBJECT));
-      });
-
-      if (!qs.length) {
-        showToast('No Mix questions found! Add data files first.', 'wrong-toast');
-        return [];
-      }
-
+      results.forEach(arr => pool.push(...arr));
     } else {
-      // ── SINGLE SUBJECT ───────────────────────────────────────────────────────
       const subj = SUBJECTS_ALL.find(s => s.name === state.selectedSubject);
-      if (!subj) { showToast('Unknown subject!', 'wrong-toast'); return []; }
-
-      showLoader(true, `Loading ${subj.name} — Class ${state.selectedClass}…`);
-      qs = await fetchSubject(state.selectedClass, subj);
+      if (!subj) return [];
+      showLoader(true, `Loading ${subj.name} — Level ${state.gameLevel}…`);
+      pool = await fetchSubject(classNum, subj);
       showLoader(false);
-
-      if (state.selectedDifficulty !== 'all')
-        qs = qs.filter(q => q.level === state.selectedDifficulty);
-
-      if (!qs.length) {
-        showToast(`No "${state.selectedDifficulty}" questions for ${subj.name}!`, 'wrong-toast');
-        return [];
-      }
     }
 
-    // ── Sort by difficulty (Level Mode) or shuffle ────────────────────────────
-    if (state.selectedMode === 'level') {
-      const order = { easy: 0, medium: 1, hard: 2 };
-      qs.sort((a, b) => (order[a.level] ?? 1) - (order[b.level] ?? 1));
-    } else {
-      qs = shuffle(qs);
-    }
+    if (!pool.length) { showToast('No questions found!', 'wrong-toast'); return []; }
 
-    return qs;
+    // Shuffle pool, then take exactly `needed` questions
+    pool = shuffle(pool);
 
-  } catch (err) {
+    // If pool smaller than needed, repeat / loop questions to fill
+    while (pool.length < needed) pool = [...pool, ...shuffle(pool)];
+    return pool.slice(0, needed);
+
+  } catch(e) {
     showLoader(false);
-    console.error('[loadQuestions]', err);
-    showToast('Could not load questions. Check data files!', 'wrong-toast');
+    showToast('Could not load questions!', 'wrong-toast');
     return [];
   }
 }
 
-// ── Shuffle utility ───────────────────────────────────────────────────────────
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-// ── Start Game ───────────────────────────────────────────────────────────────
-async function startGame(mode) {
-  state.selectedMode = mode;
-  state.score        = 0;
-  state.xp           = 0;
-  state.level        = 1;
-  state.currentIdx   = 0;
-  state.correctCount = 0;
-
+// ════════════════════════════════════════════════════════════
+//  QUIZ: START
+// ════════════════════════════════════════════════════════════
+async function startQuiz() {
   const qs = await loadQuestions();
   if (!qs.length) { showScreen('subject'); return; }
-  state.questions = qs;
+
+  state.questions      = qs;
+  state.currentIdx     = 0;
+  state.sessionScore   = 0;
+  state.sessionXP      = 0;
+  state.sessionCorrect = 0;
+  state.answered       = false;
+
+  // Update quiz nav
+  $('nav-av').textContent        = state.avatar || progress.avatar || '🧒';
+  $('nav-level-label').textContent = `Level ${state.gameLevel} — ${LEVEL_TITLES[state.gameLevel]}`;
 
   showScreen('quiz');
-  const diffEmoji = { all: '🌈', easy: '😊', medium: '🤔', hard: '🔥' };
-  const subjLabel = state.selectedSubject === 'Mix' ? '🎲 Mix' : state.selectedSubject;
-  $('nav-level').textContent = `${subjLabel} • Lv.${state.level} ${diffEmoji[state.selectedDifficulty] || ''}`;
   updateQuizMeta();
   renderQuestion();
 }
 
-// ── Render Question ───────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+//  QUIZ: RENDER QUESTION
+// ════════════════════════════════════════════════════════════
 function renderQuestion() {
   clearTimer();
   state.answered = false;
 
   const q     = state.questions[state.currentIdx];
   const total = state.questions.length;
+  const pct   = Math.round((state.currentIdx / total) * 100);
 
-  // Progress
-  $('progress-fill').style.width   = `${(state.currentIdx / total) * 100}%`;
-  $('progress-label').textContent  = `Question ${state.currentIdx + 1} of ${total}`;
+  $('progress-fill').style.width  = pct + '%';
+  $('progress-label').textContent = `Question ${state.currentIdx + 1} of ${total}`;
+  $('progress-pct').textContent   = pct + '%';
 
-  // Question info
   $('question-number').textContent     = `Q${state.currentIdx + 1}`;
   $('question-difficulty').className   = `difficulty-pill diff-${q.level}`;
   $('question-difficulty').textContent = q.level;
   $('question-text').textContent       = q.question;
 
-  // Subject tag — clearly visible colour-coded banner in Mix mode
-  const subjTag = $('question-subject-tag');
+  // Subject tag (Mix mode)
+  const tag = $('question-subject-tag');
   if (state.selectedSubject === 'Mix' && q.subject) {
-    const info     = SUBJECTS_ALL.find(s => s.name === q.subject);
-    const icon     = info ? info.icon : '📚';
-    const colorMap = {
-      'English'      : '#00e5ff',
-      'Hindi'        : '#ff6b9d',
-      'Math'         : '#ffd700',
-      'Science'      : '#00e676',
-      'Computer'     : '#b388ff',
-      'EVS'          : '#69f0ae',
-      'GK'           : '#ff9800',
-      'Economics'    : '#f06292',
-      'Space'        : '#80d8ff',
-      'Animals/Birds': '#ffcc02',
-    };
-    const col = colorMap[q.subject] || '#b388ff';
-    subjTag.innerHTML = `${icon} ${q.subject}`;
-    subjTag.style.cssText = [
-      'display:inline-flex',
-      'align-items:center',
-      'gap:5px',
-      'padding:5px 14px',
-      'border-radius:20px',
-      'font-size:0.82rem',
-      'font-weight:800',
-      'letter-spacing:0.4px',
-      `color:${col}`,
-      `background:${col}22`,
-      `border:1.5px solid ${col}88`,
-      `box-shadow:0 0 10px ${col}44`,
-    ].join(';');
+    const info = SUBJECTS_ALL.find(s => s.name === q.subject);
+    tag.textContent   = `${info ? info.icon : '📚'} ${q.subject}`;
+    tag.style.display = 'inline-block';
   } else {
-    subjTag.style.cssText = 'display:none';
+    tag.style.display = 'none';
   }
 
-  // Options — shuffled, labelled A–D
-  const LABELS   = ['A','B','C','D'];
-  const opts     = shuffle(q.options.map(text => ({ text })));
-  const optGrid  = $('options-grid');
-  optGrid.innerHTML = '';
+  // Render options
+  const LABELS = ['A','B','C','D'];
+  const opts   = shuffle(q.options.map(t => ({ text: t })));
+  const grid   = $('options-grid');
+  grid.innerHTML = '';
   opts.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className      = 'option-btn';
     btn.dataset.answer = opt.text;
     btn.innerHTML      = `<span class="option-label">${LABELS[i]}</span><span>${opt.text}</span>`;
-    btn.addEventListener('click', () => handleAnswer(btn, opt.text, q.answer));
-    optGrid.appendChild(btn);
+    btn.onclick = () => handleAnswer(btn, opt.text, q.answer);
+    grid.appendChild(btn);
   });
 
   $('btn-next').classList.remove('visible');
-  if (state.selectedMode === 'timer') startTimer();
+
+  // Timer mode for higher levels (level >= 5)
+  if (state.gameLevel >= 5) {
+    state.mode = 'timer';
+    startTimer();
+  } else {
+    state.mode = 'free';
+    $('timer-wrap').style.display = 'none';
+  }
 }
 
-// ── Handle Answer ─────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+//  QUIZ: HANDLE ANSWER
+// ════════════════════════════════════════════════════════════
 function handleAnswer(btn, chosen, correct) {
   if (state.answered) return;
   state.answered = true;
   clearTimer();
 
+  const isCorrect = chosen === correct;
+
+  // Mark all options
   document.querySelectorAll('.option-btn').forEach(b => {
     b.classList.add('disabled');
     if (b.dataset.answer === correct) b.classList.add('correct');
   });
 
-  if (chosen === correct) {
-    state.score++;
-    state.correctCount++;
-    let earned = XP_CORRECT;
-    if (state.selectedMode === 'timer' && state.timeLeft > 10) earned += XP_BONUS_FAST;
-    if (state.selectedMode !== 'free') {
-      state.xp   += earned;
-      state.level  = getLevel(state.xp);
-    }
-    showToast(`✅ Correct! +${earned} XP`, 'correct-toast');
+  if (isCorrect) {
+    state.sessionScore++;
+    state.sessionCorrect++;
+    let xp = XP_CORRECT;
+    if (state.mode === 'timer' && state.timeLeft > 10) xp += XP_BONUS_FAST;
+    state.sessionXP += xp;
+    playSound('correct');
+    showToast(`✅ Correct! +${xp} XP`, 'correct-toast');
   } else {
     btn.classList.add('wrong');
-    showToast(`❌ Oops! Correct: ${correct}`, 'wrong-toast');
+    playSound('wrong');
+    showToast(`❌ Wrong! Ans: ${correct}`, 'wrong-toast');
   }
 
   updateQuizMeta();
   $('btn-next').classList.add('visible');
 }
 
-// ── Timer ──────────────────────────────────────────────────────────────────
+// ── Next Question ──────────────────────────────────────────────────────────────
+$('btn-next').onclick = () => {
+  state.currentIdx++;
+  if (state.currentIdx >= state.questions.length) finishLevel();
+  else renderQuestion();
+};
+
+// ════════════════════════════════════════════════════════════
+//  FINISH LEVEL
+// ════════════════════════════════════════════════════════════
+function finishLevel() {
+  clearTimer();
+  const total    = state.questions.length;
+  const accuracy = total > 0 ? Math.round((state.sessionCorrect / total) * 100) : 0;
+  const passed   = accuracy >= 50; // need 50% to pass
+
+  // Update global progress
+  progress.score          += state.sessionScore;
+  progress.correctAnswers += state.sessionCorrect;
+  progress.totalQuestions += total;
+  progress.totalXP        = (progress.totalXP || 0) + state.sessionXP;
+
+  if (passed && !progress.completedLevels.includes(state.gameLevel)) {
+    progress.completedLevels.push(state.gameLevel);
+    // Unlock next level
+    if (state.gameLevel < TOTAL_LEVELS) {
+      progress.currentLevel = state.gameLevel + 1;
+    }
+  }
+  saveProgress();
+
+  // Save to leaderboard
+  saveLBEntry({
+    name:    progress.name,
+    avatar:  progress.avatar || state.avatar,
+    level:   state.gameLevel,
+    subject: state.selectedSubject,
+    score:   state.sessionScore,
+    total,
+    accuracy,
+    xp:      state.sessionXP,
+    date:    new Date().toLocaleDateString('en-IN'),
+  });
+
+  if (passed) {
+    // Level up screen
+    playSound('levelup');
+    launchConfetti();
+    $('levelup-badge').textContent = LEVEL_ICONS[state.gameLevel];
+    $('levelup-title').textContent = `Level ${state.gameLevel} Complete!`;
+    $('levelup-sub').textContent   = `${LEVEL_TITLES[state.gameLevel]} — ${accuracy}% accuracy`;
+    $('lu-score').textContent      = `${state.sessionScore}/${total}`;
+    $('lu-acc').textContent        = accuracy + '%';
+    $('lu-xp').textContent         = state.sessionXP;
+    const nextLvl = state.gameLevel + 1;
+    if (nextLvl <= TOTAL_LEVELS) {
+      $('lu-next').textContent    = nextLvl;
+      $('btn-next-num').textContent = nextLvl;
+      $('btn-next-level').style.display = '';
+    } else {
+      $('lu-next').textContent    = '🏆';
+      $('btn-next-level').style.display = 'none';
+    }
+    showScreen('levelup');
+  } else {
+    // Failed — show result screen
+    showResultScreen(total, accuracy, false);
+  }
+}
+
+// Level Up button actions
+$('btn-next-level').onclick = () => {
+  const next = state.gameLevel + 1;
+  if (next <= TOTAL_LEVELS) {
+    startLevelFlow(next);
+  }
+};
+$('btn-levelup-map').onclick = () => { renderLevelMap(); showScreen('levelmap'); };
+
+// ════════════════════════════════════════════════════════════
+//  RESULT SCREEN (fail / info)
+// ════════════════════════════════════════════════════════════
+function showResultScreen(total, accuracy, passed) {
+  const pct = state.sessionScore / total;
+  $('result-avatar-emoji').textContent = pct >= 0.8 ? '🏆' : pct >= 0.6 ? '🌟' : pct >= 0.4 ? '😊' : '💪';
+  $('result-player').textContent       = progress.name || state.playerName;
+  $('result-meta').textContent         = `Level ${state.gameLevel} • Class ${state.selectedClass} • ${state.selectedSubject}`;
+  $('result-score').textContent        = `${state.sessionScore}/${total}`;
+  $('result-xp').textContent           = state.sessionXP;
+  $('result-level').textContent        = getXPLevelName(progress.totalXP);
+  $('result-accuracy').textContent     = accuracy + '%';
+  showScreen('result');
+}
+
+$('btn-retry').onclick          = () => startQuiz();
+$('btn-result-map').onclick     = () => { renderLevelMap(); showScreen('levelmap'); };
+$('btn-change-subject').onclick = () => { renderSubjects(); showScreen('subject'); };
+$('btn-home').onclick           = () => { renderHome(); showScreen('home'); };
+
+// ════════════════════════════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════════════════════════════
 function startTimer() {
-  state.timeLeft = state.totalTime = 20;
+  state.timeLeft = 20;
+  $('timer-wrap').style.display = 'block';
   updateTimerUI();
   state.timerInterval = setInterval(() => {
     state.timeLeft--;
@@ -532,7 +746,8 @@ function autoFail() {
     b.classList.add('disabled');
     if (b.dataset.answer === q.answer) b.classList.add('correct');
   });
-  showToast(`⏰ Time's up! Answer: ${q.answer}`, 'wrong-toast');
+  playSound('wrong');
+  showToast(`⏰ Time's up! Ans: ${q.answer}`, 'wrong-toast');
   $('btn-next').classList.add('visible');
 }
 
@@ -542,125 +757,81 @@ function clearTimer() {
 }
 
 function updateTimerUI() {
-  const wrap = $('timer-wrap');
-  if (state.selectedMode !== 'timer') { wrap.style.display = 'none'; return; }
-  wrap.style.display = 'block';
-  const pct  = state.timeLeft / state.totalTime;
+  const pct  = state.timeLeft / 20;
   const circ = 2 * Math.PI * 21;
   const bar  = document.querySelector('.timer-bar');
+  if (!bar) return;
   bar.style.strokeDasharray  = circ;
   bar.style.strokeDashoffset = circ * (1 - pct);
-  bar.style.stroke = pct > 0.5 ? 'var(--accent-green)' : pct > 0.25 ? 'var(--accent-yellow)' : 'var(--wrong)';
+  bar.style.stroke = pct > 0.5 ? 'var(--green)' : pct > 0.25 ? 'var(--yellow)' : 'var(--red)';
   $('timer-text').textContent = state.timeLeft;
 }
 
-// ── Quiz Meta (score / xp / level badges) ─────────────────────────────────────
+// ── Quiz meta badges ───────────────────────────────────────────────────────────
 function updateQuizMeta() {
-  $('badge-score').textContent = `⭐ ${state.score}`;
-  $('badge-xp').textContent    = `✨ ${state.xp} XP`;
-  $('nav-level').textContent   = `Lv.${state.level}`;
+  $('badge-score').textContent = `⭐ ${state.sessionScore}`;
+  $('badge-xp').textContent    = `✨ ${state.sessionXP} XP`;
 }
 
-// ── Next / End ────────────────────────────────────────────────────────────────
-$('btn-next').addEventListener('click', () => {
-  state.currentIdx++;
-  if (state.currentIdx >= state.questions.length) endGame();
-  else renderQuestion();
-});
-
-// ── End Game ─────────────────────────────────────────────────────────────────
-function endGame() {
-  clearTimer();
-  const total    = state.questions.length;
-  const accuracy = total > 0 ? Math.round((state.correctCount / total) * 100) : 0;
-
-  saveScore({
-    name:    state.playerName,
-    class:   state.selectedClass,
-    subject: state.selectedSubject,
-    mode:    state.selectedMode,
-    score:   state.score,
-    xp:      state.xp,
-    accuracy,
-    date:    new Date().toLocaleDateString(),
-  });
-
-  const modeLabel = { free: 'Free Play', timer: 'Timer Mode', level: 'Level Mode' };
-  const diffLabel = state.selectedDifficulty === 'all'
-    ? 'All Levels'
-    : state.selectedDifficulty.charAt(0).toUpperCase() + state.selectedDifficulty.slice(1);
-
-  $('result-player').textContent    = state.playerName;
-  $('result-meta').textContent      = `Class ${state.selectedClass} • ${state.selectedSubject === 'Mix' ? '🎲 Mix All' : state.selectedSubject} • ${modeLabel[state.selectedMode]} • ${diffLabel}`;
-  $('result-score').textContent     = `${state.score}/${total}`;
-  $('result-xp').textContent        = state.xp;
-  $('result-level').textContent     = getLevelName(state.xp);
-  $('result-accuracy').textContent  = accuracy + '%';
-
-  const pct = state.score / total;
-  $('result-avatar').textContent = pct >= 0.8 ? '🏆' : pct >= 0.6 ? '🌟' : pct >= 0.4 ? '😊' : '💪';
-
-  showScreen('result');
-  if (pct >= 0.7) launchConfetti();
-}
-
-// ── Leaderboard ───────────────────────────────────────────────────────────────
-function saveScore(entry) {
-  let lb = JSON.parse(localStorage.getItem('brainstorm_lb') || '[]');
+// ════════════════════════════════════════════════════════════
+//  LEADERBOARD
+// ════════════════════════════════════════════════════════════
+function saveLBEntry(entry) {
+  let lb = JSON.parse(localStorage.getItem(LB_KEY) || '[]');
   lb.push(entry);
-  lb.sort((a, b) => b.score - a.score || b.xp - a.xp);
+  lb.sort((a,b) => b.score - a.score || b.xp - a.xp);
   lb = lb.slice(0, 10);
-  localStorage.setItem('brainstorm_lb', JSON.stringify(lb));
+  localStorage.setItem(LB_KEY, JSON.stringify(lb));
 }
 
 function renderLeaderboard() {
-  const lb   = JSON.parse(localStorage.getItem('brainstorm_lb') || '[]');
+  const lb   = JSON.parse(localStorage.getItem(LB_KEY) || '[]');
   const list = $('lb-list');
   list.innerHTML = '';
   if (!lb.length) {
-    list.innerHTML = '<li style="text-align:center;color:var(--text-muted);padding:24px;">No scores yet. Play your first quiz! 🎮</li>';
+    list.innerHTML = '<li style="text-align:center;color:var(--text-muted);padding:24px;">No scores yet 🎮</li>';
     return;
   }
   lb.forEach((e, i) => {
-    const li  = document.createElement('li');
+    const li    = document.createElement('li');
     li.className = 'lb-item';
-    li.style.animationDelay = `${i * 0.05}s`;
+    li.style.animationDelay = i * 0.05 + 's';
     const medal = ['🥇','🥈','🥉'];
-    const rank  = i < 3
-      ? `<span class="lb-rank">${medal[i]}</span>`
-      : `<span class="lb-rank" style="color:var(--text-muted)">${i + 1}</span>`;
-    li.innerHTML = `${rank}
+    li.innerHTML = `
+      <span class="lb-rank">${i < 3 ? medal[i] : i+1}</span>
+      <span class="lb-av">${e.avatar || '🧒'}</span>
       <div class="lb-info">
         <div class="lb-name">${escHtml(e.name)}</div>
-        <div class="lb-sub">Class ${e.class} • ${escHtml(e.subject)} • ${e.date}</div>
+        <div class="lb-sub">Level ${e.level} • ${escHtml(e.subject||'')} • ${e.date}</div>
       </div>
       <div class="lb-score">${e.score}</div>`;
     list.appendChild(li);
   });
 }
 
-$('btn-lb-clear').addEventListener('click', () => {
-  if (confirm('Clear all leaderboard data?')) {
-    localStorage.removeItem('brainstorm_lb');
+$('btn-lb-clear').onclick = () => {
+  if (confirm('Clear all leaderboard scores?')) {
+    localStorage.removeItem(LB_KEY);
     renderLeaderboard();
   }
-});
+};
 
-// ── Profile ───────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+//  PROFILE
+// ════════════════════════════════════════════════════════════
 function renderProfile() {
-  const lb   = JSON.parse(localStorage.getItem('brainstorm_lb') || '[]');
-  const name = state.playerName || 'Player';
-  const mine = lb.filter(e => e.name === name);
+  const lb   = JSON.parse(localStorage.getItem(LB_KEY) || '[]');
+  const mine = lb.filter(e => e.name === (progress.name || state.playerName));
 
   const games     = mine.length;
   const bestScore = games ? Math.max(...mine.map(e => e.score)) : 0;
-  const avgAcc    = games ? Math.round(mine.reduce((s, e) => s + (e.accuracy || 0), 0) / games) : 0;
-  const totalXP   = mine.reduce((s, e) => s + (e.xp || 0), 0);
+  const avgAcc    = games ? Math.round(mine.reduce((s,e) => s+(e.accuracy||0),0)/games) : 0;
+  const totalXP   = progress.totalXP || 0;
 
-  const avatarMap = ['🌱','📚','🎓','🔬','⚗️','🏆','👑'];
-  $('profile-avatar').textContent      = avatarMap[getLevel(totalXP) - 1] || '🧠';
-  $('profile-name').textContent        = name;
-  $('profile-level-label').textContent = `${getLevelName(totalXP)} • ${totalXP} XP`;
+  const av = progress.avatar || state.avatar || '🧒';
+  $('profile-avatar').textContent      = av;
+  $('profile-name').textContent        = progress.name || state.playerName || 'Player';
+  $('profile-level-label').textContent = `${getXPLevelName(totalXP)} • ${totalXP} XP`;
   $('profile-games').textContent       = games;
   $('profile-best').textContent        = bestScore;
   $('profile-accuracy').textContent    = avgAcc + '%';
@@ -669,79 +840,83 @@ function renderProfile() {
   const hist = $('profile-history');
   hist.innerHTML = '';
   if (!mine.length) {
-    hist.innerHTML = '<li style="text-align:center;color:var(--text-muted);padding:16px;">No games yet!</li>';
+    hist.innerHTML = '<li style="text-align:center;color:var(--text-muted);padding:14px;">No games yet!</li>';
     return;
   }
   [...mine].reverse().slice(0, 5).forEach((e, i) => {
     const li = document.createElement('li');
     li.className = 'lb-item';
-    li.style.animationDelay = `${i * 0.05}s`;
+    li.style.animationDelay = i * 0.05 + 's';
     li.innerHTML = `
-      <span class="lb-rank">${i + 1}</span>
+      <span class="lb-rank">${i+1}</span>
+      <span class="lb-av">${e.avatar||'🧒'}</span>
       <div class="lb-info">
-        <div class="lb-name">Class ${e.class} • ${escHtml(e.subject)}</div>
-        <div class="lb-sub">${e.mode || ''} • ${e.date}</div>
+        <div class="lb-name">Level ${e.level} • ${escHtml(e.subject||'')}</div>
+        <div class="lb-sub">${e.date}</div>
       </div>
       <div class="lb-score">${e.score} ⭐</div>`;
     hist.appendChild(li);
   });
 }
 
-// ── Confetti ───────────────────────────────────────────────────────────────
-function launchConfetti() {
-  const COLS = ['#FFD700','#FF6B9D','#00E5FF','#B388FF','#00E676','#FF6B35','#fff'];
-  for (let i = 0; i < 120; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.cssText = `
-        left:${Math.random()*100}vw; top:-20px;
-        background:${COLS[Math.floor(Math.random()*COLS.length)]};
-        width:${Math.random()*10+6}px; height:${Math.random()*14+8}px;
-        transform:rotate(${Math.random()*360}deg);
-        animation-duration:${Math.random()*2+2}s;
-        animation-delay:${Math.random()*0.5}s;
-        border-radius:${Math.random()>0.5?'50%':'3px'};`;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 3500);
-    }, i * 20);
+// ════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
   }
+  return a;
 }
 
-// ── Toast ──────────────────────────────────────────────────────────────────
-let toastTimeout;
+function getXPLevelName(xp) {
+  let name = XP_LEVELS[0].name;
+  XP_LEVELS.forEach(l => { if (xp >= l.minXP) name = l.name; });
+  return name;
+}
+
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+  );
+}
+
+let toastTimer;
 function showToast(msg, cls = '') {
   const t = $('toast');
   t.textContent = msg;
   t.className   = `toast ${cls} show`;
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), 2000);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ── Level Utilities ───────────────────────────────────────────────────────────
-function getLevel(xp) {
-  let lv = 1;
-  LEVELS.forEach(l => { if (xp >= l.minXP) lv = l.level; });
-  return lv;
-}
-function getLevelName(xp) {
-  let n = LEVELS[0].name;
-  LEVELS.forEach(l => { if (xp >= l.minXP) n = l.name; });
-  return n;
+function launchConfetti() {
+  const COLS = ['#FFD700','#FF6B9D','#00E5FF','#B388FF','#00E676','#FF6B35','#fff'];
+  for (let i = 0; i < 100; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `left:${Math.random()*100}vw;top:-20px;
+        background:${COLS[Math.floor(Math.random()*COLS.length)]};
+        width:${Math.random()*10+5}px;height:${Math.random()*13+7}px;
+        transform:rotate(${Math.random()*360}deg);
+        animation-duration:${Math.random()*2+2}s;
+        animation-delay:${Math.random()*0.4}s;
+        border-radius:${Math.random()>0.5?'50%':'3px'};`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }, i * 22);
+  }
 }
 
-// ── Escape HTML ───────────────────────────────────────────────────────────────
-function escHtml(s) {
-  return String(s).replace(/[&<>"']/g, c =>
-    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])
-  );
-}
-
-// ── Result Action Buttons ─────────────────────────────────────────────────────
-$('btn-play-again').addEventListener('click',     () => startGame(state.selectedMode));
-$('btn-change-subject').addEventListener('click', () => { showScreen('subject'); renderSubjects(); });
-$('btn-change-class').addEventListener('click',   () => { showScreen('class');   renderClasses(); });
-$('btn-home').addEventListener('click',           () => showScreen('name'));
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-showScreen('name');
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+(function init() {
+  startClock();
+  const hasSave = loadProgress();
+  if (hasSave) renderHome();
+  showScreen('home');
+})();
