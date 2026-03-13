@@ -1,0 +1,126 @@
+{
+  "class": 1,
+  "subject": "Science",
+  "questions": [
+    {
+      "question": "Which is the closest star to the Earth?",
+      "options": ["Sun", "Moon", "Mars", "Venus"],
+      "answer": "Sun",
+      "level": "easy"
+    },
+    {
+      "question": "Which sense do we use to smell?",
+      "options": ["Nose", "Eyes", "Ears", "Tongue"],
+      "answer": "Nose",
+      "level": "easy"
+    },
+    {
+      "question": "What do plants need to make food?",
+      "options": ["Sunlight", "Darkness", "Sand", "Ice"],
+      "answer": "Sunlight",
+      "level": "easy"
+    },
+    {
+      "question": "Which animal gives us milk?",
+      "options": ["Cow", "Dog", "Cat", "Hen"],
+      "answer": "Cow",
+      "level": "easy"
+    },
+    {
+      "question": "What do we breathe in?",
+      "options": ["Oxygen", "Carbon dioxide", "Nitrogen", "Smoke"],
+      "answer": "Oxygen",
+      "level": "easy"
+    },
+    {
+      "question": "Which part of the plant grows underground?",
+      "options": ["Root", "Leaf", "Flower", "Stem"],
+      "answer": "Root",
+      "level": "easy"
+    },
+    {
+      "question": "What do birds use to fly?",
+      "options": ["Wings", "Legs", "Fins", "Tail"],
+      "answer": "Wings",
+      "level": "easy"
+    },
+    {
+      "question": "Which of these is a living thing?",
+      "options": ["Tree", "Stone", "Book", "Chair"],
+      "answer": "Tree",
+      "level": "easy"
+    },
+    {
+      "question": "Where do fish live?",
+      "options": ["Water", "Land", "Sky", "Desert"],
+      "answer": "Water",
+      "level": "easy"
+    },
+    {
+      "question": "How many legs does an insect have?",
+      "options": ["6", "4", "8", "2"],
+      "answer": "6",
+      "level": "medium"
+    },
+    {
+      "question": "Which organ pumps blood in our body?",
+      "options": ["Heart", "Brain", "Lungs", "Stomach"],
+      "answer": "Heart",
+      "level": "medium"
+    },
+    {
+      "question": "What do we use our eyes for?",
+      "options": ["Seeing", "Hearing", "Smelling", "Tasting"],
+      "answer": "Seeing",
+      "level": "easy"
+    },
+    {
+      "question": "Which animal lays eggs?",
+      "options": ["Hen", "Dog", "Cow", "Cat"],
+      "answer": "Hen",
+      "level": "easy"
+    },
+    {
+      "question": "What colour is a healthy leaf?",
+      "options": ["Green", "Red", "Blue", "Yellow"],
+      "answer": "Green",
+      "level": "easy"
+    },
+    {
+      "question": "What do we need to drink every day to stay healthy?",
+      "options": ["Water", "Juice", "Milk", "Soda"],
+      "answer": "Water",
+      "level": "easy"
+    },
+    {
+      "question": "Which of these is a fruit?",
+      "options": ["Mango", "Carrot", "Potato", "Onion"],
+      "answer": "Mango",
+      "level": "easy"
+    },
+    {
+      "question": "The Sun rises in which direction?",
+      "options": ["East", "West", "North", "South"],
+      "answer": "East",
+      "level": "medium"
+    },
+    {
+      "question": "Which is the biggest animal on land?",
+      "options": ["Elephant", "Lion", "Tiger", "Giraffe"],
+      "answer": "Elephant",
+      "level": "easy"
+    },
+    {
+      "question": "What do caterpillars turn into?",
+      "options": ["Butterflies", "Bees", "Ants", "Flies"],
+      "answer": "Butterflies",
+      "level": "easy"
+    },
+    {
+      "question": "Which body part do we use to think?",
+      "options": ["Brain", "Heart", "Eyes", "Hands"],
+      "answer": "Brain",
+      "level": "easy"
+    }
+  ]
+}
