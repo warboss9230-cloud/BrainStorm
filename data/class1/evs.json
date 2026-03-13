@@ -1,0 +1,126 @@
+{
+  "class": 1,
+  "subject": "EVS",
+  "questions": [
+    {
+      "question": "Which of these is a source of light?",
+      "options": ["Sun", "Rock", "Wood", "Soil"],
+      "answer": "Sun",
+      "level": "easy"
+    },
+    {
+      "question": "What do we plant in the soil to grow vegetables?",
+      "options": ["Seeds", "Stones", "Bricks", "Sand"],
+      "answer": "Seeds",
+      "level": "easy"
+    },
+    {
+      "question": "Which is a natural source of water?",
+      "options": ["River", "Tap", "Bucket", "Bottle"],
+      "answer": "River",
+      "level": "easy"
+    },
+    {
+      "question": "What should we do with garbage?",
+      "options": ["Put in dustbin", "Throw on road", "Burn anywhere", "Leave it"],
+      "answer": "Put in dustbin",
+      "level": "easy"
+    },
+    {
+      "question": "Which of these is a mode of transport?",
+      "options": ["Bus", "Rock", "Tree", "Cloud"],
+      "answer": "Bus",
+      "level": "easy"
+    },
+    {
+      "question": "What do plants give us to breathe?",
+      "options": ["Oxygen", "Smoke", "Carbon dioxide", "Dust"],
+      "answer": "Oxygen",
+      "level": "medium"
+    },
+    {
+      "question": "How many seasons are there in India?",
+      "options": ["6", "4", "3", "2"],
+      "answer": "6",
+      "level": "medium"
+    },
+    {
+      "question": "Which animal is called the 'Ship of the Desert'?",
+      "options": ["Camel", "Horse", "Elephant", "Tiger"],
+      "answer": "Camel",
+      "level": "medium"
+    },
+    {
+      "question": "What do we use to keep our body clean?",
+      "options": ["Soap and water", "Mud", "Sand", "Oil"],
+      "answer": "Soap and water",
+      "level": "easy"
+    },
+    {
+      "question": "Which day is celebrated as Environment Day?",
+      "options": ["June 5", "January 26", "August 15", "October 2"],
+      "answer": "June 5",
+      "level": "hard"
+    },
+    {
+      "question": "Which of these is a non-living thing?",
+      "options": ["Chair", "Bird", "Fish", "Tree"],
+      "answer": "Chair",
+      "level": "easy"
+    },
+    {
+      "question": "What do we call the land around us with trees, rivers and hills?",
+      "options": ["Environment", "City", "School", "Market"],
+      "answer": "Environment",
+      "level": "medium"
+    },
+    {
+      "question": "Which fuel do cars usually use?",
+      "options": ["Petrol", "Water", "Milk", "Sand"],
+      "answer": "Petrol",
+      "level": "easy"
+    },
+    {
+      "question": "What should we do to save water?",
+      "options": ["Turn off taps when not in use", "Let taps run all day", "Fill pools daily", "Wash cars with pipes"],
+      "answer": "Turn off taps when not in use",
+      "level": "easy"
+    },
+    {
+      "question": "Which of these is a community helper?",
+      "options": ["Doctor", "Lion", "Mountain", "River"],
+      "answer": "Doctor",
+      "level": "easy"
+    },
+    {
+      "question": "What is the sound of thunder during rain called?",
+      "options": ["Lightning", "Rainbow", "Wind", "Hail"],
+      "answer": "Lightning",
+      "level": "medium"
+    },
+    {
+      "question": "Which of these comes from the ground?",
+      "options": ["Coal", "Rain", "Wind", "Sunlight"],
+      "answer": "Coal",
+      "level": "medium"
+    },
+    {
+      "question": "Where do we usually go to study?",
+      "options": ["School", "Hospital", "Market", "Park"],
+      "answer": "School",
+      "level": "easy"
+    },
+    {
+      "question": "Which of these is a form of pollution?",
+      "options": ["Smoke from factories", "Rain", "Sunlight", "Fresh air"],
+      "answer": "Smoke from factories",
+      "level": "medium"
+    },
+    {
+      "question": "What do we call the place where many trees grow together?",
+      "options": ["Forest", "Desert", "Ocean", "City"],
+      "answer": "Forest",
+      "level": "easy"
+    }
+  ]
+}
