@@ -1,1159 +1,940 @@
-/* =========================================================
-   BrainStorm Quiz v2 — script.js
-   ALL FEATURES: Hints, Lifelines, Streaks, Daily, Multiplayer,
-   Power-ups, Achievements, Stats, Review, Share, Theme, Admin
-   ========================================================= */
+/* ═══════════════════════════════════════════════════════
+   BrainQuiz · script.js
+   Class 1–12 · Per-Subject JSON · Live Clock · All Features
+   ═══════════════════════════════════════════════════════ */
 'use strict';
 
-/* ── Avatars ────────────────────────────────────────────── */
+/* ── Config ─────────────────────────────────────────────── */
+const SUBJECTS = [
+  { id:'math',          name:'Mathematics',    icon:'➕', file:'math.json'          },
+  { id:'science',       name:'Science',        icon:'🔬', file:'science.json'       },
+  { id:'english',       name:'English',        icon:'📖', file:'english.json'       },
+  { id:'hindi',         name:'Hindi',          icon:'🇮🇳', file:'hindi.json'         },
+  { id:'computer',      name:'Computer',       icon:'💻', file:'computer.json'      },
+  { id:'evs',           name:'EVS',            icon:'🌿', file:'evs.json'           },
+  { id:'gk',            name:'G.K.',           icon:'🌍', file:'gk.json'            },
+  { id:'economics',     name:'Economics',      icon:'💰', file:'economics.json'     },
+  { id:'space',         name:'Space',          icon:'🚀', file:'space.json'         },
+  { id:'animals-birds', name:'Animals & Birds',icon:'🦁', file:'animals-birds.json' },
+];
+
 const AVATARS = [
-  {id:'a1',e:'🧑‍🚀',n:'Astronaut'},{id:'a2',e:'🦸',n:'Hero'},{id:'a3',e:'🧙‍♂️',n:'Wizard'},
-  {id:'a4',e:'🤖',n:'Robot'},{id:'a5',e:'🦊',n:'Fox'},{id:'a6',e:'🐼',n:'Panda'},
-  {id:'a7',e:'🦁',n:'Lion'},{id:'a8',e:'🐯',n:'Tiger'},{id:'a9',e:'🦋',n:'Butterfly'},
-  {id:'a10',e:'🐉',n:'Dragon'},{id:'a11',e:'🦄',n:'Unicorn'},{id:'a12',e:'🐺',n:'Wolf'},
-  {id:'a13',e:'🦅',n:'Eagle'},{id:'a14',e:'🐬',n:'Dolphin'},{id:'a15',e:'🦈',n:'Shark'},
-  {id:'a16',e:'🌟',n:'Star'},{id:'a17',e:'🔥',n:'Phoenix'},{id:'a18',e:'⚡',n:'Thunder'},
-  {id:'a19',e:'💎',n:'Diamond'},{id:'a20',e:'🌙',n:'Moon'},{id:'a21',e:'☄️',n:'Comet'},
-  {id:'a22',e:'🏆',n:'Champion'},{id:'a23',e:'🎯',n:'Target'},{id:'a24',e:'🎮',n:'Gamer'},
-  {id:'a25',e:'🧬',n:'Scientist'},{id:'a26',e:'🎸',n:'Rockstar'},{id:'a27',e:'🎨',n:'Artist'},
-  {id:'a28',e:'📚',n:'Scholar'},{id:'a29',e:'💡',n:'Genius'},{id:'a30',e:'🚀',n:'Rocketman'},
-  {id:'a31',e:'🌈',n:'Rainbow'},{id:'a32',e:'🐻',n:'Bear'},{id:'a33',e:'🦝',n:'Raccoon'},
-  {id:'a34',e:'🐸',n:'Frog'},{id:'a35',e:'🦉',n:'Owl'},{id:'a36',e:'🐧',n:'Penguin'},
-  {id:'a37',e:'🐳',n:'Whale'},{id:'a38',e:'🌊',n:'Wave'},{id:'a39',e:'🏔️',n:'Mountain'},
-  {id:'a40',e:'⚔️',n:'Warrior'},{id:'a41',e:'🛡️',n:'Guardian'},{id:'a42',e:'🧠',n:'Brain'},
-  {id:'a43',e:'👑',n:'King'},{id:'a44',e:'🃏',n:'Joker'},{id:'a45',e:'🎭',n:'Actor'},
-  {id:'a46',e:'🦸‍♀️',n:'Heroine'},{id:'a47',e:'🌺',n:'Blossom'},{id:'a48',e:'🦜',n:'Parrot'},
+  {id:'a1',e:'🧑‍🚀',n:'Astronaut'},{id:'a2',e:'🦸',n:'Hero'},
+  {id:'a3',e:'🧙‍♂️',n:'Wizard'},{id:'a4',e:'🤖',n:'Robot'},
+  {id:'a5',e:'🦊',n:'Fox'},{id:'a6',e:'🐼',n:'Panda'},
+  {id:'a7',e:'🦁',n:'Lion'},{id:'a8',e:'🐯',n:'Tiger'},
+  {id:'a9',e:'🐉',n:'Dragon'},{id:'a10',e:'🦄',n:'Unicorn'},
+  {id:'a11',e:'🦅',n:'Eagle'},{id:'a12',e:'🐬',n:'Dolphin'},
+  {id:'a13',e:'🌟',n:'Star'},{id:'a14',e:'🔥',n:'Phoenix'},
+  {id:'a15',e:'⚡',n:'Thunder'},{id:'a16',e:'💎',n:'Diamond'},
+  {id:'a17',e:'🎯',n:'Target'},{id:'a18',e:'🎮',n:'Gamer'},
+  {id:'a19',e:'📚',n:'Scholar'},{id:'a20',e:'💡',n:'Genius'},
+  {id:'a21',e:'🚀',n:'Rocket'},{id:'a22',e:'🏆',n:'Champ'},
+  {id:'a23',e:'🐻',n:'Bear'},{id:'a24',e:'🦉',n:'Owl'},
+  {id:'a25',e:'🐧',n:'Penguin'},{id:'a26',e:'🧠',n:'Brain'},
+  {id:'a27',e:'👑',n:'King'},{id:'a28',e:'🦸‍♀️',n:'Heroine'},
+  {id:'a29',e:'🌈',n:'Rainbow'},{id:'a30',e:'🦋',n:'Butterfly'},
+  {id:'a31',e:'🐸',n:'Frog'},{id:'a32',e:'☄️',n:'Comet'},
 ];
 
-/* ── XP Titles ──────────────────────────────────────────── */
-const XP_TITLES = [
-  {min:0,    title:'Rookie',     icon:'🌱'},
-  {min:50,   title:'Scholar',    icon:'📖'},
-  {min:150,  title:'Explorer',   icon:'🧭'},
-  {min:300,  title:'Expert',     icon:'⚡'},
-  {min:500,  title:'Master',     icon:'💎'},
-  {min:800,  title:'Grandmaster',icon:'🏆'},
-  {min:1200, title:'Legend',     icon:'👑'},
-  {min:2000, title:'Mythic',     icon:'🔥'},
+const TITLES = [
+  {min:0,    t:'Rookie',       i:'🌱'},
+  {min:50,   t:'Scholar',      i:'📖'},
+  {min:150,  t:'Explorer',     i:'🧭'},
+  {min:300,  t:'Expert',       i:'⚡'},
+  {min:500,  t:'Master',       i:'💎'},
+  {min:800,  t:'Grand Master', i:'🏆'},
+  {min:1200, t:'Legend',       i:'👑'},
+  {min:2000, t:'Mythic',       i:'🔥'},
 ];
 
-/* ── Achievements ───────────────────────────────────────── */
-const ACHIEVEMENTS = [
-  {id:'first_win',   name:'First Win',     icon:'🎉', desc:'Complete your first quiz',         check:s=>s.totalQuestions>=10},
-  {id:'streak3',     name:'Hot Streak',    icon:'🔥', desc:'Get 3 correct in a row',           check:s=>s.bestStreak>=3},
-  {id:'streak10',    name:'Unstoppable',   icon:'⚡', desc:'Get 10 correct in a row',          check:s=>s.bestStreak>=10},
-  {id:'xp100',       name:'XP Rookie',     icon:'💰', desc:'Earn 100 total XP',                check:s=>s.xp>=100},
-  {id:'xp500',       name:'XP Hunter',     icon:'💎', desc:'Earn 500 total XP',                check:s=>s.xp>=500},
-  {id:'xp1000',      name:'XP Master',     icon:'👑', desc:'Earn 1000 total XP',               check:s=>s.xp>=1000},
-  {id:'perfect',     name:'Perfect Round', icon:'⭐', desc:'Answer all questions correctly',    check:(s,r)=>r&&r.wrong===0&&r.total>=5},
-  {id:'daily',       name:'Daily Champ',   icon:'📅', desc:'Complete a Daily Challenge',       check:s=>s.dailyCompleted>0},
-  {id:'lvl5',        name:'Level 5',       icon:'🏅', desc:'Complete Level 5',                 check:s=>s.completedLevels&&s.completedLevels.includes(5)},
-  {id:'lvl10',       name:'Master Level',  icon:'🎖️', desc:'Complete Level 10',               check:s=>s.completedLevels&&s.completedLevels.includes(10)},
-  {id:'multi',       name:'Multiplayer',   icon:'👥', desc:'Play a multiplayer game',          check:s=>s.multiPlayed>0},
-  {id:'custom',      name:'Creator',       icon:'✏️', desc:'Add a custom question',            check:s=>s.customQAdded>0},
+const ACHS = [
+  {id:'first',  n:'First Quiz',    i:'🎉', d:'Complete first quiz',           c: s=>s.totalQ>=5},
+  {id:'s3',     n:'Hot Streak',    i:'🔥', d:'3 correct answers in a row',    c: s=>s.bestStreak>=3},
+  {id:'s10',    n:'Unstoppable',   i:'⚡', d:'10 correct in a row',           c: s=>s.bestStreak>=10},
+  {id:'xp100',  n:'XP Rookie',     i:'💰', d:'Earn 100 total XP',             c: s=>s.xp>=100},
+  {id:'xp500',  n:'XP Hunter',     i:'💎', d:'Earn 500 total XP',             c: s=>s.xp>=500},
+  {id:'xp1k',   n:'XP Master',     i:'👑', d:'Earn 1000 total XP',            c: s=>s.xp>=1000},
+  {id:'perfect',n:'Perfect Score', i:'⭐', d:'100% in a round (≥5 questions)',(c:(s,r)=>r&&r.wrong===0&&r.total>=5)},
+  {id:'cls10',  n:'Senior Student',i:'🎓', d:'Play from Class 10+',           c: s=>s.maxClass>=10},
+  {id:'multi',  n:'Team Player',   i:'👥', d:'Complete a multiplayer game',   c: s=>s.multiPlayed>0},
+  {id:'custom', n:'Quiz Creator',  i:'✏️', d:'Add a custom question',         c: s=>s.customAdded>0},
+  {id:'6subj',  n:'All Rounder',   i:'🌈', d:'Play 6 different subjects',     c: s=>(s.subjsPlayed||[]).length>=6},
 ];
 
-/* ── Level Config ───────────────────────────────────────── */
-const LEVEL_CONFIG = {1:15,2:20,3:25,4:30,5:35,6:40,7:45,8:50,9:55,10:60};
-const TIMER_SECS = 20;
-const XP_CORRECT = 10, XP_WRONG = -5;
-const FREE_COUNT = 20;
-
-/* ── Power-up costs ─────────────────────────────────────── */
-const POWERUP_XP_COST = {doublexp:20, shield:15, extratime:10};
+const XP_OK = 10, XP_NG = -5, FREE_COUNT = 20, TIMER_SEC = 20;
 
 /* ── State ──────────────────────────────────────────────── */
 let G = {
-  player: null, mode: null, level: 1,
-  questions: [], currentIdx: 0,
-  score: {correct:0, wrong:0, xp:0},
-  sessionXP: 0, streak: 0, bestStreak: 0,
-  timer: null, timerVal: 0, answered: false,
-  soundOn: true, themeLight: false,
-  allQ: [], progress: null,
-  lifelines: {fifty:true, skip:true, extratime:true},
-  powerups: {doublexp:2, shield:2, extratime:2},
-  activePowerups: {doublexp:false, shield:false, extratime:false},
-  hintUsed: false, reviewData: [],
-  mp: {active:false, p2name:'', p2avatar:'🤖', p1score:0, p2score:0, turn:1},
-  customQ: [],
+  player: null, cls: 1, subject: null, mode: null,
+  qs: [], idx: 0,
+  score: {ok:0, ng:0}, sesXP: 0,
+  streak: 0, bestStr: 0,
+  answered: false, hintUsed: false,
+  timer: null, timerVal: 0,
+  ll: {fifty:true, skip:true, etime:true},
+  pu: {dbl:2, shield:2, etime:2},
+  apu: {dbl:false, shield:false, etime:false},
+  review: [],
+  sound: true, light: false,
+  progress: null,
+  mp: {on:false, p2n:'Player 2', p2a:'🤖', s1:0, s2:0, turn:1},
 };
 
-/* ── DOM ────────────────────────────────────────────────── */
-const $ = id => document.getElementById(id);
-const $$ = s => document.querySelectorAll(s);
+/* ── DOM helpers ─────────────────────────────────────────── */
+const $  = id => document.getElementById(id);
+const $$ = s  => document.querySelectorAll(s);
+const esc = s => { const d=document.createElement('div'); d.appendChild(document.createTextNode(s||'')); return d.innerHTML; };
+const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : '';
 
-/* ── LocalStorage ───────────────────────────────────────── */
+/* ── LocalStorage ────────────────────────────────────────── */
 const LS = {
-  get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
-  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
-  del:k=>localStorage.removeItem(k),
+  get:  k    => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set:  (k,v)=> localStorage.setItem(k, JSON.stringify(v)),
+  del:  k    => localStorage.removeItem(k),
 };
 
-/* ── Screens ────────────────────────────────────────────── */
-function show(id){
-  $$('.screen').forEach(s=>s.classList.remove('active'));
+/* ── Screen router ───────────────────────────────────────── */
+function show(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
-/* ── Save / Load Progress ───────────────────────────────── */
-function saveProgress(){
-  const p = G.progress || {};
+/* ════════════════════════════════════════════════════════
+   LIVE CLOCK
+   ════════════════════════════════════════════════════════ */
+const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function tickClock() {
+  const now  = new Date();
+  const h12  = now.getHours() % 12 || 12;
+  const mm   = String(now.getMinutes()).padStart(2,'0');
+  const ss   = String(now.getSeconds()).padStart(2,'0');
+  const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+  const timeStr = `${String(h12).padStart(2,'0')}:${mm}:${ss} ${ampm}`;
+  const dateStr = `${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  const dayStr  = DAYS[now.getDay()].toUpperCase();
+
+  $$('.clk-time').forEach(el => el.textContent = timeStr);
+  $$('.clk-date').forEach(el => el.textContent = dateStr);
+  $$('.clk-day' ).forEach(el => el.textContent = dayStr);
+}
+setInterval(tickClock, 1000);
+tickClock(); // run immediately
+
+/* ════════════════════════════════════════════════════════
+   CANVAS STARS
+   ════════════════════════════════════════════════════════ */
+function initCanvas() {
+  const c = $('canvas-bg');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    W = c.width  = window.innerWidth;
+    H = c.height = window.innerHeight;
+    stars = Array.from({length:70}, () => ({
+      x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*1.3+.3, o:Math.random()*.45+.1,
+      s:Math.random()*.1+.02, p:Math.random()*Math.PI*2,
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s => {
+      s.p += s.s * .04;
+      const a = s.o * (.6+.4*Math.sin(s.p));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(200,225,255,${a})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize(); draw();
+}
+
+/* ════════════════════════════════════════════════════════
+   SOUND
+   ════════════════════════════════════════════════════════ */
+function snd(type) {
+  if (!G.sound) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const note = (f,t,dur,wave='sine',vol=.22) => {
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type=wave; o.frequency.value=f;
+      g.gain.setValueAtTime(vol, ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+t+dur);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+dur);
+    };
+    if (type==='correct') [523,659,784].forEach((f,i)=>note(f,i*.08,.4));
+    if (type==='wrong')   { note(220,.0,.35,'sawtooth',.2); note(174,.1,.28,'sawtooth',.15); }
+    if (type==='streak')  [440,550,660,880].forEach((f,i)=>note(f,i*.06,.3,'triangle',.18));
+    if (type==='level')   [261,329,392,523].forEach((f,i)=>note(f,i*.1,.5));
+  } catch(_) {}
+}
+
+/* ════════════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════════════ */
+function toast(msg, type='info', dur=2800) {
+  const el = document.createElement('div');
+  el.className = `toast t-${type}`;
+  el.textContent = msg;
+  $('toast-box').appendChild(el);
+  setTimeout(() => el.remove(), dur);
+}
+
+/* ════════════════════════════════════════════════════════
+   CONFETTI
+   ════════════════════════════════════════════════════════ */
+function confetti() {
+  const cols = ['#ffd60a','#06d6a0','#4cc9f0','#ef476f','#f77f00','#f72585'];
+  for (let i=0; i<55; i++) {
+    const p = document.createElement('div');
+    p.className = 'cf-piece';
+    p.style.cssText = `left:${Math.random()*100}vw;background:${cols[i%cols.length]};animation-delay:${Math.random()*1.5}s;animation-duration:${1.8+Math.random()}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 3200);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   PROGRESS
+   ════════════════════════════════════════════════════════ */
+function saveProgress() {
+  const old = G.progress || {};
+  const sp  = [...new Set([...(old.subjsPlayed||[]), G.subject])];
   const data = {
-    name:G.player.name, avatarId:G.player.avatarId, avatarEmoji:G.player.avatarEmoji,
-    currentLevel:G.level,
-    xp:(p.xp||0)+G.sessionXP,
-    completedLevels:p.completedLevels||[],
-    correctAnswers:(p.correctAnswers||0)+G.score.correct,
-    totalQuestions:(p.totalQuestions||0)+G.questions.length,
-    bestStreak:Math.max(p.bestStreak||0, G.bestStreak),
-    dailyCompleted:p.dailyCompleted||0,
-    multiPlayed:p.multiPlayed||0,
-    customQAdded:p.customQAdded||0,
-    subjectStats:mergeSubjectStats(p.subjectStats||{}, buildSessionSubjectStats()),
-    achievements:p.achievements||[],
+    name:        G.player.name,
+    avatarId:    G.player.avatarId,
+    avatarEmoji: G.player.avatarEmoji,
+    xp:          (old.xp||0) + G.sesXP,
+    totalQ:      (old.totalQ||0) + G.qs.length,
+    correctA:    (old.correctA||0) + G.score.ok,
+    bestStreak:  Math.max(old.bestStreak||0, G.bestStr),
+    maxClass:    Math.max(old.maxClass||0, G.cls),
+    subjsPlayed: sp,
+    multiPlayed: old.multiPlayed||0,
+    customAdded: old.customAdded||0,
+    achievements:old.achievements||[],
+    subjectStats:mergeStats(old.subjectStats||{}, buildSesStats()),
+    lastCls:  G.cls,
+    lastSubj: G.subject,
   };
   LS.set('bsq_prog', data);
   G.progress = data;
-  checkAchievements(data);
+  checkAchs(data);
 }
 
-function loadProgress(){ return LS.get('bsq_prog'); }
+function loadProgress() { return LS.get('bsq_prog'); }
 
-function buildSessionSubjectStats(){
-  const ss = {};
-  G.reviewData.forEach(r=>{
-    const s = r.subject||'General';
-    if(!ss[s]) ss[s]={correct:0,total:0};
-    ss[s].total++;
-    if(r.wasCorrect) ss[s].correct++;
+function buildSesStats() {
+  const m = {};
+  G.review.forEach(r => {
+    const k = r.subj||G.subject;
+    if (!m[k]) m[k] = {ok:0,total:0};
+    m[k].total++; if (r.wasOk) m[k].ok++;
   });
-  return ss;
-}
-function mergeSubjectStats(old, session){
-  const merged = {...old};
-  for(const [subj,data] of Object.entries(session)){
-    if(!merged[subj]) merged[subj]={correct:0,total:0};
-    merged[subj].correct += data.correct;
-    merged[subj].total   += data.total;
-  }
-  return merged;
+  return m;
 }
 
-/* ── Leaderboard ────────────────────────────────────────── */
-function getLB(){ return LS.get('bsq_lb')||[]; }
-function saveToLB(){
+function mergeStats(a, b) {
+  const m = {...a};
+  for (const [k,v] of Object.entries(b)) {
+    if (!m[k]) m[k]={ok:0,total:0};
+    m[k].ok+=v.ok; m[k].total+=v.total;
+  }
+  return m;
+}
+
+function getLB() { return LS.get('bsq_lb')||[]; }
+function saveToLB() {
   let lb = getLB();
   const prog = loadProgress();
   const e = {
-    name:G.player.name, avatarEmoji:G.player.avatarEmoji,
-    xp:prog?prog.xp:G.sessionXP,
-    correct:prog?prog.correctAnswers:G.score.correct,
-    total:prog?prog.totalQuestions:G.questions.length,
-    mode:G.mode, date:new Date().toLocaleDateString(),
+    name:        G.player.name,
+    avatarEmoji: G.player.avatarEmoji,
+    xp:          prog ? prog.xp : G.sesXP,
+    ok:          G.score.ok,
+    total:       G.qs.length,
+    cls:         G.cls,
+    subj:        G.subject,
+    mode:        G.mode,
+    date:        new Date().toLocaleDateString('en-IN'),
   };
-  lb = lb.filter(x=>x.name.toLowerCase()!==e.name.toLowerCase());
+  lb = lb.filter(x => x.name.toLowerCase() !== e.name.toLowerCase());
   lb.push(e); lb.sort((a,b)=>b.xp-a.xp); lb=lb.slice(0,20);
   LS.set('bsq_lb', lb);
 }
 
-/* ── Achievements ───────────────────────────────────────── */
-function checkAchievements(prog, roundResult=null){
-  const unlocked = prog.achievements||[];
-  ACHIEVEMENTS.forEach(ach=>{
-    if(!unlocked.includes(ach.id) && ach.check(prog, roundResult)){
-      unlocked.push(ach.id);
-      showAchievementUnlock(ach);
+function checkAchs(prog, rnd=null) {
+  const ul = prog.achievements||[];
+  ACHS.forEach(a => {
+    if (!ul.includes(a.id) && a.c(prog,rnd)) {
+      ul.push(a.id);
+      toast(`🏅 Unlocked: ${a.i} ${a.n}`, 'gold', 4000);
     }
   });
-  prog.achievements = unlocked;
+  prog.achievements = ul;
   LS.set('bsq_prog', prog);
 }
 
-function showAchievementUnlock(ach){
-  toast(`🏅 Achievement: ${ach.icon} ${ach.name}`, 't-gold', 4000);
-}
-
-/* ── XP Title ────────────────────────────────────────────── */
-function getTitle(xp){
-  let t = XP_TITLES[0];
-  XP_TITLES.forEach(x=>{ if(xp>=x.min) t=x; });
+function getTitle(xp) {
+  let t = TITLES[0];
+  TITLES.forEach(x => { if (xp >= x.min) t=x; });
   return t;
 }
 
-/* ── Sound (Web Audio API) ───────────────────────────────── */
-function playSound(type){
-  if(!G.soundOn) return;
-  try{
-    const ctx = new(window.AudioContext||window.webkitAudioContext)();
-    if(type==='correct'){
-      [523,659,784].forEach((f,i)=>{
-        const o=ctx.createOscillator(), g=ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type='sine'; o.frequency.value=f;
-        g.gain.setValueAtTime(.25,ctx.currentTime+i*.08);
-        g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.08+.4);
-        o.start(ctx.currentTime+i*.08); o.stop(ctx.currentTime+i*.08+.4);
-      });
-    } else if(type==='wrong'){
-      const o=ctx.createOscillator(), g=ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.type='sawtooth'; o.frequency.setValueAtTime(220,ctx.currentTime);
-      o.frequency.linearRampToValueAtTime(140,ctx.currentTime+.35);
-      g.gain.setValueAtTime(.2,ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.4);
-      o.start(); o.stop(ctx.currentTime+.4);
-    } else if(type==='streak'){
-      [440,550,660,880].forEach((f,i)=>{
-        const o=ctx.createOscillator(), g=ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type='triangle'; o.frequency.value=f;
-        g.gain.setValueAtTime(.2,ctx.currentTime+i*.06);
-        g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.06+.3);
-        o.start(ctx.currentTime+i*.06); o.stop(ctx.currentTime+i*.06+.3);
-      });
-    } else if(type==='level'){
-      [261,329,392,523].forEach((f,i)=>{
-        const o=ctx.createOscillator(), g=ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type='sine'; o.frequency.value=f;
-        g.gain.setValueAtTime(.3,ctx.currentTime+i*.1);
-        g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.1+.5);
-        o.start(ctx.currentTime+i*.1); o.stop(ctx.currentTime+i*.1+.5);
-      });
-    }
-  }catch(e){}
+/* ════════════════════════════════════════════════════════
+   FETCH QUESTIONS
+   ════════════════════════════════════════════════════════ */
+async function fetchQs(cls, subj) {
+  const file = SUBJECTS.find(s=>s.id===subj)?.file || subj+'.json';
+  try {
+    const res = await fetch(`data/class${cls}/${file}`);
+    if (!res.ok) throw 0;
+    return await res.json();
+  } catch { return []; }
 }
 
-/* ── Toast ───────────────────────────────────────────────── */
-function toast(msg, cls='t-info', dur=2800){
-  const c=$('toast-wrap');
-  const t=document.createElement('div');
-  t.className=`toast ${cls}`; t.textContent=msg;
-  c.appendChild(t);
-  setTimeout(()=>t.remove(),dur);
+function shuffle(arr) {
+  const a=[...arr];
+  for (let i=a.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
 }
 
-/* ── Confetti ────────────────────────────────────────────── */
-function launchConfetti(){
-  const colors=['#00f5ff','#ff2d78','#ffd700','#39ff14','#b44dff','#ff6b2b'];
-  for(let i=0;i<60;i++){
-    const p=document.createElement('div');
-    p.className='confetti-piece';
-    p.style.cssText=`
-      left:${Math.random()*100}vw;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      animation-delay:${Math.random()*1.5}s;
-      animation-duration:${1.8+Math.random()}s;
-      transform:rotate(${Math.random()*360}deg);
-    `;
-    document.body.appendChild(p);
-    setTimeout(()=>p.remove(),3500);
-  }
-}
+/* ════════════════════════════════════════════════════════
+   SCREENS
+   ════════════════════════════════════════════════════════ */
 
-/* ── Canvas BG ───────────────────────────────────────────── */
-function initCanvas(){
-  const canvas=$('bg-canvas'), ctx=canvas.getContext('2d');
-  let W,H,stars=[];
-  function resize(){
-    W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight;
-    stars=Array.from({length:100},()=>({
-      x:Math.random()*W, y:Math.random()*H,
-      r:Math.random()*1.4+.3, o:Math.random()*.5+.1,
-      s:Math.random()*.12+.03, p:Math.random()*Math.PI*2,
-    }));
-  }
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    stars.forEach(s=>{
-      s.p+=s.s*.04;
-      const a=s.o*(.6+.4*Math.sin(s.p));
-      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(180,230,255,${a})`; ctx.fill();
-    });
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener('resize',resize); resize(); draw();
-}
-
-/* ── Load Questions ─────────────────────────────────────── */
-async function loadQuestions(){
-  const files=['data/subjects/math.json','data/subjects/science.json','data/subjects/other.json'];
-  let all=[];
-  for(const f of files){
-    try{ const r=await fetch(f); const d=await r.json(); all=[...all,...d]; }
-    catch(e){ console.warn('Could not load',f); }
-  }
-  // Load custom questions from localStorage
-  const cq=LS.get('bsq_custom_questions')||[];
-  G.customQ=cq;
-  G.allQ=[...all,...cq];
-  if(G.allQ.length===0){
-    // Fallback
-    G.allQ=[
-      {id:1,level:1,subject:'Math',question:'2+2=?',options:['2','3','4','5'],answer:'4',difficulty:'easy',hint:'Two plus two'},
-      {id:2,level:1,subject:'Science',question:'Our planet?',options:['Mars','Venus','Earth','Jupiter'],answer:'Earth',difficulty:'easy',hint:'Third from Sun'},
-    ];
-  }
-}
-
-function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-
-/* ═══════════════════════════════════════════════════
-   SCREEN BUILDERS
-   ═══════════════════════════════════════════════════ */
-
-/* ── HOME ────────────────────────────────────────────────── */
-function buildHome(){
-  const prog=loadProgress(); G.progress=prog;
-  const rs=$('resume-section');
-  if(prog){
-    rs.classList.remove('hidden');
-    $('rc-name').textContent=`${prog.avatarEmoji||'🧑‍🚀'} ${prog.name}`;
-    const t=getTitle(prog.xp||0);
-    $('rc-stats').textContent=`${t.icon} ${t.title} · ${prog.xp||0} XP · Level ${prog.currentLevel||1}`;
-  } else rs.classList.add('hidden');
+/* HOME */
+function buildHome() {
+  G.progress = loadProgress();
+  const p = G.progress;
+  const strip = $('resume-strip');
+  if (p) {
+    strip.classList.remove('hidden');
+    $('rs-ava').textContent  = p.avatarEmoji||'🧑‍🚀';
+    $('rs-name').textContent = p.name;
+    const t = getTitle(p.xp||0);
+    $('rs-meta').textContent = `${t.i} ${t.t} · ${p.xp||0} XP · Class ${p.lastCls||1} · ${cap(p.lastSubj||'')}`;
+    $('btn-resume').classList.toggle('hidden', !p.lastCls || !p.lastSubj);
+  } else strip.classList.add('hidden');
   show('screen-home');
 }
 
-/* ── SETUP ───────────────────────────────────────────────── */
-function buildSetup(){
-  const prog=loadProgress();
-  if(prog){ $('player-name').value=prog.name; G.player={name:prog.name,avatarId:prog.avatarId,avatarEmoji:prog.avatarEmoji}; }
-  buildAvatarGrid();
+/* SETUP */
+function buildSetup() {
+  const p = loadProgress();
+  if (p) {
+    $('inp-name').value = p.name;
+    G.player = {name:p.name, avatarId:p.avatarId, avatarEmoji:p.avatarEmoji};
+  }
+  renderAvatarGrid('av-grid', p?.avatarId, (id,em) => {
+    if (G.player) { G.player.avatarId=id; G.player.avatarEmoji=em; }
+  });
   show('screen-setup');
 }
 
-function buildAvatarGrid(){
-  const grid=$('avatar-grid'); grid.innerHTML='';
-  AVATARS.forEach(av=>{
-    const item=document.createElement('div');
-    item.className='av-item'; item.dataset.id=av.id;
-    if(G.player&&G.player.avatarId===av.id) item.classList.add('selected');
-    item.innerHTML=`<span class="av-emoji">${av.e}</span><span class="av-name">${av.n}</span>`;
-    item.addEventListener('click',()=>{ $$('.av-item').forEach(e=>e.classList.remove('selected')); item.classList.add('selected'); });
-    grid.appendChild(item);
+function renderAvatarGrid(gridId, sel, onPick) {
+  const grid=$(gridId); grid.innerHTML='';
+  AVATARS.forEach(av => {
+    const el=document.createElement('div');
+    el.className='av-item'+(av.id===sel?' picked':'');
+    el.innerHTML=`<span class="av-e">${av.e}</span><span class="av-n">${av.n}</span>`;
+    el.addEventListener('click',()=>{
+      grid.querySelectorAll('.av-item').forEach(x=>x.classList.remove('picked'));
+      el.classList.add('picked'); onPick(av.id, av.e);
+    });
+    grid.appendChild(el);
   });
 }
 
-function setupContinue(){
-  const name=$('player-name').value.trim();
-  if(!name){toast('Please enter your name!','t-err');return;}
-  const sel=document.querySelector('.av-item.selected');
-  if(!sel){toast('Choose an avatar!','t-err');return;}
-  const av=AVATARS.find(a=>a.id===sel.dataset.id);
-  G.player={name,avatarId:av.id,avatarEmoji:av.e};
-  buildModeSelect();
+function onSetupNext() {
+  const name=$('inp-name').value.trim();
+  if (!name) { toast('Apna naam likho!','err'); return; }
+  const sel=document.querySelector('#av-grid .av-item.picked');
+  if (!sel) { toast('Avatar chunno!','err'); return; }
+  const av=AVATARS.find(a=>a.e===sel.querySelector('.av-e').textContent);
+  G.player={name, avatarId:av?.id||'a1', avatarEmoji:av?.e||'🧑‍🚀'};
+  buildClassScreen();
 }
 
-/* ── MODE SELECT ─────────────────────────────────────────── */
-function buildModeSelect(){
+/* CLASS SELECT */
+function buildClassScreen() {
+  const grid=$('class-grid'); grid.innerHTML='';
+  for (let i=1;i<=12;i++) {
+    const c=document.createElement('div');
+    c.className='cls-card'+(G.cls===i?' picked':'');
+    c.innerHTML=`<div class="cls-num">${i}</div><div class="cls-lbl">Class</div>`;
+    c.addEventListener('click',()=>{
+      $$('.cls-card').forEach(x=>x.classList.remove('picked'));
+      c.classList.add('picked'); G.cls=i;
+    });
+    grid.appendChild(c);
+  }
+  show('screen-class');
+}
+
+function onClassNext() {
+  if (!G.cls) { toast('Class chunno!','err'); return; }
+  buildSubjectScreen();
+}
+
+/* SUBJECT SELECT */
+function buildSubjectScreen() {
+  $('subj-cls-lbl').textContent=`Class ${G.cls}`;
+  const grid=$('subj-grid'); grid.innerHTML='';
+  SUBJECTS.forEach(s=>{
+    const c=document.createElement('div');
+    c.className='subj-card'+(G.subject===s.id?' picked':'');
+    c.dataset.s=s.id;
+    c.innerHTML=`<span class="subj-icon">${s.icon}</span><div class="subj-name">${s.name}</div>`;
+    c.addEventListener('click',()=>{
+      $$('.subj-card').forEach(x=>x.classList.remove('picked'));
+      c.classList.add('picked'); G.subject=s.id;
+    });
+    grid.appendChild(c);
+  });
+  show('screen-subj');
+}
+
+function onSubjNext() {
+  if (!G.subject) { toast('Subject chunno!','err'); return; }
+  buildModeScreen();
+}
+
+/* MODE SELECT */
+function buildModeScreen() {
+  $('mode-cls-info').textContent=`Class ${G.cls} · ${cap(G.subject)}`;
   G.mode=null;
-  $$('.mode-card').forEach(c=>c.classList.remove('selected'));
-  $('level-picker').classList.remove('show');
+  $$('.mode-card').forEach(c=>c.classList.remove('picked'));
   $('btn-start').disabled=true;
-  buildSubjectFilter();
-  buildLevelGrid();
   show('screen-mode');
 }
 
-function buildSubjectFilter(){
-  const subjects=['All','Math','Science','History','Geography','English','Coding','Sports'];
-  const wrap=$('subject-filter'); wrap.innerHTML='';
-  subjects.forEach(s=>{
-    const chip=document.createElement('div');
-    chip.className='subj-chip'+(s==='All'?' active':'');
-    chip.textContent=s; chip.dataset.subj=s;
-    chip.addEventListener('click',()=>{
-      $$('.subj-chip').forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active');
-    });
-    wrap.appendChild(chip);
-  });
-}
-
-function buildLevelGrid(){
-  const prog=loadProgress(), completed=prog?(prog.completedLevels||[]):[];
-  const grid=$('level-grid'); grid.innerHTML='';
-  Object.entries(LEVEL_CONFIG).forEach(([lvl,qs])=>{
-    const n=parseInt(lvl);
-    const isLocked=n>1&&!completed.includes(n-1);
-    const isCompleted=completed.includes(n);
-    const btn=document.createElement('div');
-    btn.className='lv-btn'+(isLocked?' locked':'')+(isCompleted?' completed':'');
-    btn.innerHTML=`<div class="lv-num">L${n}</div><div class="lv-qs">${qs}Q</div><div class="lv-icon">${isLocked?'🔒':isCompleted?'✅':'▶'}</div>`;
-    if(!isLocked) btn.addEventListener('click',()=>{ $$('.lv-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); G.level=n; });
-    grid.appendChild(btn);
-  });
-}
-
-function selectMode(mode){
-  G.mode=mode;
-  $$('.mode-card').forEach(c=>c.classList.toggle('selected',c.dataset.mode===mode));
-  $('level-picker').classList.toggle('show',mode==='level');
+function pickMode(m) {
+  G.mode=m;
+  $$('.mode-card').forEach(c=>c.classList.toggle('picked', c.dataset.m===m));
   $('btn-start').disabled=false;
 }
 
-/* ── START GAME ──────────────────────────────────────────── */
-function startGame(){
-  if(!G.mode){toast('Pick a mode!','t-err');return;}
-  G.score={correct:0,wrong:0,xp:0};
-  G.sessionXP=0; G.currentIdx=0; G.answered=false;
-  G.streak=0; G.bestStreak=0; G.reviewData=[];
+/* ════════════════════════════════════════════════════════
+   START GAME
+   ════════════════════════════════════════════════════════ */
+async function startGame() {
+  if (!G.mode) { toast('Mode chunno!','err'); return; }
+  $('btn-start').textContent='⏳ Loading…'; $('btn-start').disabled=true;
+
+  G.score={ok:0,ng:0}; G.sesXP=0; G.idx=0;
+  G.answered=false; G.streak=0; G.bestStr=0; G.review=[];
   G.hintUsed=false;
-  G.lifelines={fifty:true,skip:true,extratime:true};
-  G.activePowerups={doublexp:false,shield:false,extratime:false};
+  G.ll={fifty:true,skip:true,etime:true};
+  G.apu={dbl:false,shield:false,etime:false};
 
-  // Subject filter
-  const selSubj=document.querySelector('.subj-chip.active');
-  const subjFilter=selSubj?selSubj.dataset.subj:'All';
-
-  let pool=G.allQ;
-  if(subjFilter!=='All') pool=pool.filter(q=>q.subject===subjFilter);
-
-  if(G.mode==='free'||G.mode==='timer'){
-    G.questions=shuffle(pool).slice(0,FREE_COUNT);
-  } else if(G.mode==='level'){
-    let lpool=shuffle(pool.filter(q=>q.level===G.level)).slice(0,LEVEL_CONFIG[G.level]);
-    if(lpool.length<LEVEL_CONFIG[G.level]){
-      const extra=shuffle(pool.filter(q=>q.level!==G.level)).slice(0,LEVEL_CONFIG[G.level]-lpool.length);
-      lpool=[...lpool,...extra];
-    }
-    G.questions=lpool;
-  } else if(G.mode==='daily'){
-    G.questions=shuffle(pool).slice(0,15);
-  } else if(G.mode==='custom'){
-    G.questions=shuffle(pool).slice(0,FREE_COUNT);
+  const pool=shuffle(await fetchQs(G.cls, G.subject));
+  if (!pool.length) {
+    toast(`Class ${G.cls} ${cap(G.subject)} ke questions nahi mile!`,'err');
+    $('btn-start').textContent='⚡ Start Quiz'; $('btn-start').disabled=false;
+    return;
   }
+  G.qs = G.mode==='all' ? pool : pool.slice(0,Math.min(FREE_COUNT,pool.length));
 
-  if(G.questions.length===0){ toast('No questions found for this filter!','t-err'); return; }
-
-  buildQuizHUD();
-  loadQuestion();
-  show('screen-quiz');
+  $('btn-start').textContent='⚡ Start Quiz'; $('btn-start').disabled=false;
+  buildHUD(); nextQ(); show('screen-quiz');
 }
 
-/* ── MULTIPLAYER START ───────────────────────────────────── */
-function startMultiplayer(){
-  const p2name=$('mp-p2-name').value.trim()||'Player 2';
-  const sel=document.querySelector('.mp-av.selected');
-  const p2av=sel?sel.dataset.emoji:'🤖';
-  G.mp={active:true,p2name,p2avatar:p2av,p1score:0,p2score:0,turn:1};
-  G.mode='free';
-  G.score={correct:0,wrong:0,xp:0};
-  G.sessionXP=0; G.currentIdx=0; G.answered=false;
-  G.streak=0; G.bestStreak=0; G.reviewData=[];
-  G.lifelines={fifty:true,skip:true,extratime:true};
-  G.questions=shuffle(G.allQ).slice(0,10);
-
-  $('mp-p1-name-hud').textContent=G.player.name;
-  $('mp-p1-ava-hud').textContent=G.player.avatarEmoji;
-  $('mp-p2-name-hud').textContent=p2name;
-  $('mp-p2-ava-hud').textContent=p2av;
-  updateMPScores();
-  buildQuizHUD();
-  loadQuestion();
-  show('screen-quiz');
+/* HUD */
+function buildHUD() {
+  $('hud-ava').textContent   = G.player.avatarEmoji;
+  $('hud-name').textContent  = G.player.name;
+  $('hud-meta').textContent  = `Class ${G.cls} · ${cap(G.subject)}`;
+  $('hud-mode-tag').textContent = G.mode==='free'?'∞ Free':G.mode==='timer'?'⏱ Timer':'📚 Full Set';
+  $('timer-ring').style.display = G.mode==='timer' ? 'block' : 'none';
+  if (!G.mp.on) $('mp-mini').classList.remove('on');
+  refreshXP(); renderPUBar();
 }
 
-function updateMPScores(){
-  if(!G.mp.active) return;
-  $('mp-s1').textContent=G.mp.p1score;
-  $('mp-s2').textContent=G.mp.p2score;
-  $('mp-turn-indicator').textContent=G.mp.turn===1?`${G.player.avatarEmoji} ${G.player.name}'s turn`:`${G.mp.p2avatar} ${G.mp.p2name}'s turn`;
-  $('mp-hud').classList.remove('hidden');
-}
-
-/* ── QUIZ HUD ────────────────────────────────────────────── */
-function buildQuizHUD(){
-  $('hud-ava').textContent=G.player.avatarEmoji;
-  $('hud-name').textContent=G.player.name;
-  updateHUDXP();
-  updateProgress();
-  $('hud-mode').textContent=
-    G.mode==='free'?'∞ Free Play':G.mode==='timer'?'⏱ Timer':
-    G.mode==='level'?`⚔ Level ${G.level}`:G.mode==='daily'?'📅 Daily':'🎮 Custom';
-  $('timer-ring').style.display=G.mode==='timer'?'block':'none';
-  if(!G.mp.active) $('mp-hud').classList.add('hidden');
-  renderPowerupBar();
-}
-
-function updateHUDXP(){
-  const prog=loadProgress(), base=prog?prog.xp:0;
-  const total=base+G.sessionXP;
-  $('hud-xp-val').textContent=total+' XP';
+function refreshXP() {
+  const p=loadProgress(), base=p?p.xp:0, total=base+G.sesXP;
+  $('hud-xp').textContent   = `${total} XP`;
   const t=getTitle(total);
-  $('hud-title').textContent=`${t.icon} ${t.title}`;
-  $('hud-streak').textContent=`🔥 ${G.streak}x`;
-  $('hud-streak').classList.toggle('show',G.streak>=2);
+  $('hud-title').textContent = `${t.i} ${t.t}`;
+  $('hud-streak').textContent=`🔥 ${G.streak}×`;
+  $('hud-streak').classList.toggle('on', G.streak>=2);
 }
 
-function updateProgress(){
-  const total=G.questions.length, curr=G.currentIdx;
-  const pct=Math.round((curr/total)*100);
+function refreshProg() {
+  const pct=G.qs.length>0?Math.round(G.idx/G.qs.length*100):0;
   $('prog-fill').style.width=pct+'%';
-  $('prog-text').innerHTML=`Q <span>${Math.min(curr+1,total)}</span> / <span>${total}</span>`;
+  $('prog-txt').innerHTML=`Q <b>${Math.min(G.idx+1,G.qs.length)}</b> / <b>${G.qs.length}</b>`;
 }
 
-/* ── LOAD QUESTION ───────────────────────────────────────── */
-function loadQuestion(){
-  if(G.currentIdx>=G.questions.length){ endRound(); return; }
+/* QUESTION */
+function nextQ() {
+  if (G.idx>=G.qs.length) { endRound(); return; }
   G.answered=false; G.hintUsed=false;
-  clearTimer();
-  updateProgress();
+  clearTimer(); refreshProg();
 
-  const q=G.questions[G.currentIdx];
-  $('q-subject').textContent=q.subject||'General';
-  $('q-diff').textContent=q.difficulty||'medium';
-  $('q-diff').className='q-diff '+(q.difficulty||'medium');
-  $('q-num-label').textContent=`#${G.currentIdx+1}`;
-  $('q-text').textContent=q.question;
-  $('hint-box').classList.remove('show');
-  $('hint-box').textContent='';
-  $('btn-hint').disabled=!q.hint;
+  const q=G.qs[G.idx];
+  $('q-subj-tag').textContent  = q.subject||cap(G.subject);
+  $('q-diff-tag').textContent  = q.difficulty||'easy';
+  $('q-diff-tag').className    = `q-tag q-diff-tag ${q.difficulty||'easy'}`;
+  $('q-topic-tag').textContent = q.topic||'';
+  $('q-topic-tag').style.display = q.topic?'inline-block':'none';
+  $('q-num-tag').textContent   = `#${G.idx+1}`;
+  $('q-text').textContent      = q.question;
+  $('hint-box').classList.remove('on'); $('hint-box').textContent='';
+  $('btn-hint').classList.toggle('used', !q.hint);
 
-  // Reset lifeline UI
-  $('ll-fifty').classList.toggle('used',!G.lifelines.fifty);
-  $('ll-skip').classList.toggle('used',!G.lifelines.skip);
-  $('ll-extratime').classList.toggle('used',!G.lifelines.extratime);
+  $('ll-fifty').classList.toggle('used',!G.ll.fifty);
+  $('ll-skip').classList.toggle('used',!G.ll.skip);
+  $('ll-etime').classList.toggle('used',!G.ll.etime);
 
-  // Options
   const grid=$('opts-grid'); grid.innerHTML='';
   const labels=['A','B','C','D'];
-  const opts=shuffle(q.options.map(o=>({text:o})));
-  opts.forEach((opt,i)=>{
+  shuffle(q.options.slice()).forEach((opt,i)=>{
     const btn=document.createElement('button');
-    btn.className='opt-btn';
-    btn.innerHTML=`<span class="opt-lbl">${labels[i]}</span><span class="opt-txt">${opt.text}</span>`;
-    btn.addEventListener('click',()=>handleAnswer(btn,opt.text,q.answer,q));
+    btn.className='opt';
+    btn.innerHTML=`<span class="opt-lbl">${labels[i]}</span><span class="opt-txt">${esc(opt)}</span>`;
+    btn.addEventListener('click',()=>onAnswer(btn,opt,q.answer,q));
     grid.appendChild(btn);
   });
 
-  // Animation reset
   const card=$('q-card');
   card.style.animation='none'; void card.offsetWidth; card.style.animation='';
 
-  if(G.mode==='timer') startTimer();
+  if (G.mode==='timer') startTimer();
 }
 
-/* ── HANDLE ANSWER ───────────────────────────────────────── */
-function handleAnswer(btn, chosen, correct, q){
-  if(G.answered) return;
-  G.answered=true;
-  clearTimer();
+/* ANSWER */
+function onAnswer(btn, chosen, correct, q) {
+  if (G.answered) return;
+  G.answered=true; clearTimer();
 
-  const isCorrect=chosen===correct;
-  let xpDelta=isCorrect?XP_CORRECT:XP_WRONG;
+  const ok=(chosen===correct);
+  let xp=ok?XP_OK:XP_NG;
 
-  // Shield power-up
-  if(!isCorrect&&G.activePowerups.shield){ xpDelta=0; G.activePowerups.shield=false; toast('🛡️ Shield blocked XP loss!','t-gold'); }
-  // Double XP power-up
-  if(isCorrect&&G.activePowerups.doublexp){ xpDelta*=2; G.activePowerups.doublexp=false; toast('⚡ Double XP! +'+xpDelta+' XP','t-gold'); }
+  if (!ok && G.apu.shield) { xp=0; G.apu.shield=false; toast('🛡️ Shield ne XP loss roka!','gold'); }
+  if (ok  && G.apu.dbl)   { xp*=2; G.apu.dbl=false;    toast(`⚡ Double XP! +${xp}`,'gold'); }
 
-  if(isCorrect){
-    G.score.correct++; G.streak++; G.bestStreak=Math.max(G.bestStreak,G.streak);
-    btn.classList.add('correct');
-    playSound('correct');
-    showXPPopup(`+${xpDelta} XP`,true);
-    if(G.streak>1) updateHUDXP();
-    if(G.streak===3||G.streak===5||G.streak===10){ playSound('streak'); showStreakBurst(G.streak); }
+  if (ok) {
+    G.score.ok++; G.streak++; G.bestStr=Math.max(G.bestStr,G.streak);
+    btn.classList.add('correct'); snd('correct');
+    showXPPop(`+${xp} XP`,true);
+    if (G.streak===3||G.streak===5||G.streak===10) { snd('streak'); showStreakBurst(G.streak); }
   } else {
-    G.score.wrong++; G.streak=0;
-    btn.classList.add('wrong');
-    playSound('wrong');
-    if(xpDelta!==0) showXPPopup(`${xpDelta} XP`,false);
-    // Highlight correct
-    $$('.opt-btn').forEach(b=>{ if(b.querySelector('.opt-txt').textContent===correct) b.classList.add('correct'); });
+    G.score.ng++; G.streak=0;
+    btn.classList.add('wrong'); snd('wrong');
+    if (xp!==0) showXPPop(`${xp} XP`,false);
+    $$('.opt').forEach(b=>{ if(b.querySelector('.opt-txt').textContent===correct) b.classList.add('correct'); });
   }
 
-  G.sessionXP=Math.max(0,G.sessionXP+xpDelta);
-  G.score.xp=G.sessionXP;
-  updateHUDXP();
+  G.sesXP=Math.max(0,G.sesXP+xp); refreshXP();
 
-  // Multiplayer
-  if(G.mp.active){
-    if(G.mp.turn===1) G.mp.p1score+=isCorrect?1:0;
-    else G.mp.p2score+=isCorrect?1:0;
-    updateMPScores();
+  if (G.mp.on) {
+    if (G.mp.turn===1) G.mp.s1+=ok?1:0; else G.mp.s2+=ok?1:0;
+    $('mp-s1').textContent=G.mp.s1; $('mp-s2').textContent=G.mp.s2;
+    G.mp.turn=G.mp.turn===1?2:1;
+    $('mp-turn-lbl').textContent=G.mp.turn===1?`${G.player.avatarEmoji} ${G.player.name} ki baari`:`${G.mp.p2a} ${G.mp.p2n} ki baari`;
   }
 
-  // Review data
-  G.reviewData.push({question:q.question, chosen, correct, wasCorrect:isCorrect, subject:q.subject});
-
-  $$('.opt-btn').forEach(b=>b.disabled=true);
-  setTimeout(()=>{ G.currentIdx++; loadQuestion(); },1500);
+  G.review.push({q:q.question, chosen, correct, wasOk:ok, subj:q.subject||G.subject});
+  $$('.opt').forEach(b=>b.disabled=true);
+  setTimeout(()=>{ G.idx++; nextQ(); },1500);
 }
 
-/* ── TIMER ───────────────────────────────────────────────── */
-const CIRC=2*Math.PI*24;
-function startTimer(){
-  G.timerVal=G.activePowerups.extratime?TIMER_SECS+10:TIMER_SECS;
-  if(G.activePowerups.extratime) G.activePowerups.extratime=false;
-  updateTimerRing(G.timerVal,G.timerVal);
-  const ring=$('timer-ring');
-  ring.className='timer-ring';
+/* TIMER */
+const CIRC=2*Math.PI*21;
+function startTimer() {
+  G.timerVal=G.apu.etime?TIMER_SEC+10:TIMER_SEC;
+  if (G.apu.etime) G.apu.etime=false;
+  setRing(G.timerVal,TIMER_SEC); $('timer-ring').className='timer-ring';
+
   G.timer=setInterval(()=>{
     G.timerVal--;
-    updateTimerRing(G.timerVal,TIMER_SECS);
-    ring.className='timer-ring'+(G.timerVal<=5?' danger':G.timerVal<=10?' warning':'');
-    if(G.timerVal<=0){
+    setRing(G.timerVal,TIMER_SEC);
+    $('timer-ring').className='timer-ring'+(G.timerVal<=5?' danger':G.timerVal<=10?' warn':'');
+
+    if (G.timerVal<=0) {
       clearTimer();
-      if(!G.answered){
+      if (!G.answered) {
         G.answered=true;
-        const q=G.questions[G.currentIdx];
-        $$('.opt-btn').forEach(b=>{ b.disabled=true; if(b.querySelector('.opt-txt').textContent===q.answer) b.classList.add('correct'); });
-        G.score.wrong++; G.streak=0;
-        G.sessionXP=Math.max(0,G.sessionXP+XP_WRONG);
-        G.reviewData.push({question:q.question,chosen:'(timeout)',correct:q.answer,wasCorrect:false,subject:q.subject});
-        updateHUDXP();
-        showXPPopup('⏱ -5',false);
-        toast('Time\'s up!','t-err');
-        setTimeout(()=>{ G.currentIdx++; loadQuestion(); },1500);
+        const q=G.qs[G.idx];
+        $$('.opt').forEach(b=>{b.disabled=true; if(b.querySelector('.opt-txt').textContent===q.answer) b.classList.add('correct');});
+        G.score.ng++; G.streak=0;
+        G.sesXP=Math.max(0,G.sesXP+XP_NG);
+        G.review.push({q:q.question,chosen:'(timeout)',correct:q.answer,wasOk:false,subj:q.subject||G.subject});
+        refreshXP(); showXPPop('⏱ -5 XP',false); toast('Time out!','err');
+        setTimeout(()=>{G.idx++;nextQ();},1500);
       }
     }
   },1000);
 }
-function updateTimerRing(val,max){
-  const fg=$('timer-fg');
-  const pct=Math.max(0,val/max);
-  fg.style.strokeDashoffset=CIRC*(1-pct);
-  $('timer-num').textContent=val>0?val:0;
-}
-function clearTimer(){ if(G.timer){clearInterval(G.timer);G.timer=null;} }
 
-/* ── LIFELINES ───────────────────────────────────────────── */
-function useFiftyFifty(){
-  if(!G.lifelines.fifty||G.answered) return;
-  G.lifelines.fifty=false;
-  const q=G.questions[G.currentIdx];
-  let removed=0;
-  $$('.opt-btn').forEach(btn=>{
-    if(removed<2 && btn.querySelector('.opt-txt').textContent!==q.answer){
-      btn.classList.add('hidden-50'); removed++;
-    }
-  });
-  $('ll-fifty').classList.add('used');
-  toast('50:50 used — 2 wrong answers removed!','t-info');
+function setRing(val,max) {
+  $('tr-fg').style.strokeDashoffset=CIRC*(1-Math.max(0,val)/max);
+  $('tr-num').textContent=Math.max(0,val);
 }
+function clearTimer() { if(G.timer){clearInterval(G.timer);G.timer=null;} }
 
-function useSkip(){
-  if(!G.lifelines.skip||G.answered) return;
-  G.lifelines.skip=false;
-  clearTimer();
-  $('ll-skip').classList.add('used');
-  toast('⏭ Question skipped!','t-info');
-  G.currentIdx++;
-  loadQuestion();
+/* LIFELINES */
+function onFifty() {
+  if(!G.ll.fifty||G.answered) return;
+  G.ll.fifty=false;
+  const cor=G.qs[G.idx].answer; let rem=0;
+  $$('.opt').forEach(b=>{ if(rem<2&&b.querySelector('.opt-txt').textContent!==cor){b.classList.add('dim50');rem++;} });
+  $('ll-fifty').classList.add('used'); toast('50:50 — 2 galat options hataaye!','info');
 }
-
-function useExtraTime(){
-  if(!G.lifelines.extratime||G.answered||G.mode!=='timer') return;
-  G.lifelines.extratime=false;
-  G.timerVal=Math.min(G.timerVal+10,TIMER_SECS+10);
-  updateTimerRing(G.timerVal,TIMER_SECS);
-  $('ll-extratime').classList.add('used');
-  toast('+10 seconds added!','t-gold');
+function onSkip() {
+  if(!G.ll.skip||G.answered) return;
+  G.ll.skip=false; clearTimer(); $('ll-skip').classList.add('used');
+  toast('⏭ Question skip kiya!','info'); G.idx++; nextQ();
+}
+function onETime() {
+  if(!G.ll.etime||G.answered||G.mode!=='timer') return;
+  G.ll.etime=false;
+  G.timerVal=Math.min(G.timerVal+10,TIMER_SEC+10); setRing(G.timerVal,TIMER_SEC);
+  $('ll-etime').classList.add('used'); toast('+10 seconds mila!','gold');
+}
+function onHint() {
+  if(G.hintUsed||G.answered) return;
+  const q=G.qs[G.idx];
+  if(!q?.hint){toast('Is question ka hint nahi hai.','info');return;}
+  G.hintUsed=true; $('hint-box').textContent='💡 '+q.hint; $('hint-box').classList.add('on');
+  G.sesXP=Math.max(0,G.sesXP-3); refreshXP(); toast('Hint dekha (−3 XP)','info');
 }
 
-/* ── HINT ────────────────────────────────────────────────── */
-function showHint(){
-  if(G.hintUsed) return;
-  const q=G.questions[G.currentIdx];
-  if(!q.hint) return;
-  G.hintUsed=true;
-  $('hint-box').textContent='💡 Hint: '+q.hint;
-  $('hint-box').classList.add('show');
-  // Small XP cost for hint
-  G.sessionXP=Math.max(0,G.sessionXP-3);
-  updateHUDXP();
-  toast('Hint shown (-3 XP)','t-info');
-}
-
-/* ── POWER-UPS ───────────────────────────────────────────── */
-function renderPowerupBar(){
-  const bar=$('powerup-bar'); bar.innerHTML='';
-  const pus=[
-    {id:'doublexp',icon:'⚡',label:'2x XP',count:G.powerups.doublexp},
-    {id:'shield',  icon:'🛡️',label:'Shield',count:G.powerups.shield},
-    {id:'extratime',icon:'⏰',label:'+Time',count:G.powerups.extratime},
-  ];
-  pus.forEach(pu=>{
-    const btn=document.createElement('div');
-    btn.className='pu-btn'+(pu.count<=0?' pu-empty':'');
-    btn.innerHTML=`${pu.icon} ${pu.label} <span class="pu-count">${pu.count}</span>`;
-    btn.addEventListener('click',()=>activatePowerup(pu.id));
-    bar.appendChild(btn);
+/* POWER-UPS */
+function renderPUBar() {
+  const bar=$('pu-bar'); bar.innerHTML='';
+  [{id:'dbl',icon:'⚡',lbl:'2× XP'},{id:'shield',icon:'🛡️',lbl:'Shield'},{id:'etime',icon:'⏰',lbl:'+Time'}].forEach(p=>{
+    const el=document.createElement('div');
+    el.className='act-pill'+(G.pu[p.id]<=0?' used':'');
+    el.innerHTML=`${p.icon} ${p.lbl} <span class="act-badge">${G.pu[p.id]}</span>`;
+    el.addEventListener('click',()=>activatePU(p.id)); bar.appendChild(el);
   });
 }
-
-function activatePowerup(id){
-  if(G.powerups[id]<=0){ toast('No '+id+' power-ups left!','t-err'); return; }
-  if(G.activePowerups[id]){ toast('Already active!','t-info'); return; }
-  G.powerups[id]--;
-  G.activePowerups[id]=true;
-  renderPowerupBar();
-  const msgs={doublexp:'⚡ Double XP active for next correct!',shield:'🛡️ Shield active — next wrong won\'t lose XP!',extratime:'⏰ Extra Time active for next question!'};
-  toast(msgs[id],'t-gold');
+function activatePU(id) {
+  if(G.pu[id]<=0){toast('Power-up khatam!','err');return;}
+  if(G.apu[id]){toast('Pehle se active hai!','info');return;}
+  G.pu[id]--; G.apu[id]=true; renderPUBar();
+  const msgs={dbl:'⚡ Double XP active!',shield:'🛡️ Shield active!',etime:'⏰ Extra Time ready!'};
+  toast(msgs[id],'gold');
 }
 
-/* ── XP POPUP ────────────────────────────────────────────── */
-function showXPPopup(msg,ok){
-  const el=$('xp-popup');
-  el.textContent=msg; el.className='xp-popup '+(ok?'show-ok':'show-ng');
-  setTimeout(()=>{ el.className='xp-popup'; },950);
+function showXPPop(msg,ok) {
+  const el=$('xp-pop'); el.textContent=msg;
+  el.className='xp-pop '+(ok?'ok':'ng'); // wait then remove class via timeout
+  setTimeout(()=>el.className='xp-pop',950);
+}
+function showStreakBurst(n) {
+  $('sb-inner').textContent=`🔥 ${n}× STREAK!`;
+  const w=$('streak-burst'); w.className='streak-burst on';
+  setTimeout(()=>w.className='streak-burst',1100);
 }
 
-/* ── STREAK BURST ────────────────────────────────────────── */
-function showStreakBurst(n){
-  const el=$('streak-burst-inner');
-  el.textContent=`🔥 ${n}x STREAK!`;
-  const wrap=$('streak-burst');
-  wrap.className='streak-burst show';
-  setTimeout(()=>{ wrap.className='streak-burst'; },1100);
-}
-
-/* ── END ROUND ───────────────────────────────────────────── */
-function endRound(){
+/* ════════════════════════════════════════════════════════
+   END ROUND
+   ════════════════════════════════════════════════════════ */
+function endRound() {
   clearTimer();
-
-  // Multiplayer: different end flow
-  if(G.mp.active){ endMultiplayer(); return; }
-
-  // Level completion
-  if(G.mode==='level'){
-    const prog=loadProgress()||{};
-    const completed=prog.completedLevels||[];
-    if(!completed.includes(G.level)){ completed.push(G.level); playSound('level'); }
-    prog.completedLevels=completed;
-    LS.set('bsq_prog',{...prog,completedLevels:completed});
-    if(G.score.correct===G.questions.length) launchConfetti();
-  }
-  if(G.mode==='daily'){
-    const prog=loadProgress()||{};
-    prog.dailyCompleted=(prog.dailyCompleted||0)+1;
-    LS.set('bsq_prog',prog);
-  }
-
-  saveProgress();
-  saveToLB();
-  buildResults();
-  show('screen-result');
+  if (G.mp.on) { endMP(); return; }
+  saveProgress(); saveToLB(); buildResults(); show('screen-result');
+}
+function endMP() {
+  G.mp.on=false;
+  const p=loadProgress()||{}; p.multiPlayed=(p.multiPlayed||0)+1; LS.set('bsq_prog',p);
+  buildMPResult(); show('screen-mp-result');
 }
 
-function endMultiplayer(){
-  G.mp.active=false;
-  const prog=loadProgress()||{};
-  prog.multiPlayed=(prog.multiPlayed||0)+1;
-  LS.set('bsq_prog',prog);
-  buildMPResult();
-  show('screen-mp-result');
-}
+/* RESULTS */
+function buildResults() {
+  const total=G.qs.length, ok=G.score.ok, ng=G.score.ng;
+  const pct=total>0?Math.round(ok/total*100):0;
 
-function buildMPResult(){
-  const p1=G.mp.p1score, p2=G.mp.p2score;
-  $('mp-res-p1-ava').textContent=G.player.avatarEmoji;
-  $('mp-res-p1-name').textContent=G.player.name;
-  $('mp-res-p1-score').textContent=p1;
-  $('mp-res-p2-ava').textContent=G.mp.p2avatar;
-  $('mp-res-p2-name').textContent=G.mp.p2name;
-  $('mp-res-p2-score').textContent=p2;
-  let winner;
-  if(p1>p2) winner=`🏆 ${G.player.name} Wins!`;
-  else if(p2>p1) winner=`🏆 ${G.mp.p2name} Wins!`;
-  else winner='🤝 It\'s a Tie!';
-  $('mp-winner-text').textContent=winner;
-  if(p1!==p2) launchConfetti();
-}
+  let grade,gc,msg;
+  if(pct>=90){grade='S';gc='rg-s';msg='🏆 Zabardast! Ek dum genius!'; if(pct===100)confetti();}
+  else if(pct>=75){grade='A';gc='rg-a';msg='⭐ Bahut achha! Kya performance!';}
+  else if(pct>=60){grade='B';gc='rg-b';msg='✨ Achha kiya! Aur mehnat karo!';}
+  else if(pct>=45){grade='C';gc='rg-c';msg='💪 Theek hai! Practice karte raho!';}
+  else{grade='D';gc='rg-d';msg='🔄 Haar mat maano! Phir try karo!';}
 
-/* ── RESULTS ─────────────────────────────────────────────── */
-function buildResults(){
-  const total=G.questions.length, correct=G.score.correct, wrong=G.score.wrong;
-  const xp=G.sessionXP, pct=total>0?Math.round((correct/total)*100):0;
-  let grade,gClass,msg;
-  if(pct>=90){grade='S';gClass='gs';msg='🏆 Legendary! Absolute genius!';if(pct===100)launchConfetti();}
-  else if(pct>=75){grade='A';gClass='ga';msg='⭐ Excellent! You crushed it!';}
-  else if(pct>=60){grade='B';gClass='gb';msg='✨ Great job! Keep it up!';}
-  else if(pct>=45){grade='C';gClass='gc';msg='💪 Good effort! Keep practising!';}
-  else{grade='D';gClass='gd';msg='🔄 Keep trying! You\'ll improve!';}
+  if(pct>=90) snd('level');
 
-  $('res-ava').textContent=G.player.avatarEmoji;
-  $('res-grade').textContent=grade; $('res-grade').className='result-grade '+gClass;
-  $('res-msg').textContent=msg;
-  $('res-player').textContent=G.player.name;
-  $('rs-correct').textContent=correct; $('rs-wrong').textContent=wrong;
-  $('rs-xp').textContent='+'+xp; $('rs-pct').textContent=pct+'%';
-  $('rs-streak').textContent=G.bestStreak; $('rs-total').textContent=total;
+  $('res-ava').textContent    = G.player.avatarEmoji;
+  $('res-grade').textContent  = grade; $('res-grade').className='res-grade '+gc;
+  $('res-player').textContent = G.player.name;
+  $('res-msg').textContent    = msg;
+  $('res-info').textContent   = `Class ${G.cls} · ${cap(G.subject)} · ${G.mode==='free'?'Free Play':G.mode==='timer'?'Timer Mode':'Full Set'}`;
+
+  $('rs-ok').textContent   = ok;
+  $('rs-ng').textContent   = ng;
+  $('rs-xp').textContent   = '+'+G.sesXP;
+  $('rs-pct').textContent  = pct+'%';
+  $('rs-str').textContent  = G.bestStr;
+  $('rs-tot').textContent  = total;
 
   const prog=loadProgress();
-  $('res-total-xp').textContent=(prog?prog.xp:xp)+' XP';
-  const t=getTitle(prog?prog.xp:xp);
-  $('res-title-disp').textContent=`${t.icon} ${t.title}`;
+  $('res-txp').textContent   = (prog?prog.xp:G.sesXP)+' XP total';
+  const t=getTitle(prog?prog.xp:G.sesXP);
+  $('res-title').textContent = `${t.i} ${t.t}`;
 
-  const badge=$('level-badge');
-  if(G.mode==='level'){ badge.classList.remove('hidden'); badge.textContent=`✅ Level ${G.level} Complete!`; }
-  else badge.classList.add('hidden');
-
-  const nextBtn=$('btn-next-level');
-  if(G.mode==='level'&&G.level<10){ nextBtn.classList.remove('hidden'); nextBtn.textContent=`▶ Level ${G.level+1}`; }
-  else nextBtn.classList.add('hidden');
-
-  buildReviewList();
-  buildShareCard(pct,xp);
-
-  // Achievement check
-  if(prog) checkAchievements(prog,{wrong,total,correct});
+  buildReview(); buildShareCard(pct,G.sesXP);
+  if(prog) checkAchs(prog,{wrong:ng,total,ok});
 }
 
-function buildReviewList(){
-  const list=$('review-list'); list.innerHTML='';
-  G.reviewData.forEach((r,i)=>{
-    const item=document.createElement('div');
-    item.className='review-item '+(r.wasCorrect?'ri-ok':'ri-ng');
-    item.innerHTML=`
-      <div class="review-q"><strong>Q${i+1}:</strong> ${escHTML(r.question)}</div>
-      <div class="review-ans">
-        Your answer: <span class="${r.wasCorrect?'ra-ok':'ra-ng'}">${escHTML(r.chosen)}</span>
-        ${!r.wasCorrect?`&nbsp;|&nbsp; Correct: <span class="ra-correct">${escHTML(r.correct)}</span>`:''}
-      </div>`;
-    list.appendChild(item);
+function buildReview() {
+  const list=$('rev-list'); list.innerHTML='';
+  G.review.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className='rev-item '+(r.wasOk?'ok':'bad');
+    d.innerHTML=`<div class="rev-q"><b>Q${i+1}:</b> ${esc(r.q)}</div>
+      <div class="rev-a">Tumhara jawab: <span class="${r.wasOk?'ra-ok':'ra-bad'}">${esc(r.chosen)}</span>
+      ${!r.wasOk?`&nbsp;·&nbsp; Sahi jawab: <span class="ra-cor">${esc(r.correct)}</span>`:''}</div>`;
+    list.appendChild(d);
   });
 }
 
-function buildShareCard(pct,xp){
-  $('share-pct').textContent=pct+'%';
-  $('share-xp').textContent='+'+xp+' XP';
-  $('share-name').textContent=G.player.avatarEmoji+' '+G.player.name;
+function buildShareCard(pct,xp) {
+  $('sh-pct').textContent  = pct+'%';
+  $('sh-name').textContent = `${G.player.avatarEmoji} ${G.player.name}`;
+  $('sh-info').textContent = `Class ${G.cls} · ${cap(G.subject)}`;
+  $('sh-xp').textContent   = `+${xp} XP`;
 }
 
-function shareScore(){
-  const text=`I scored ${$('share-pct').textContent} on BrainStorm Quiz and earned ${$('share-xp').textContent}! Can you beat me? 🧠⚡`;
-  if(navigator.share){ navigator.share({title:'BrainStorm Quiz',text}).catch(()=>{}); }
-  else { navigator.clipboard.writeText(text).then(()=>toast('Score copied to clipboard!','t-info')); }
+function onShare() {
+  const text=`Maine BrainQuiz mein ${$('sh-pct').textContent} score kiya (Class ${G.cls} · ${cap(G.subject)}) aur ${$('sh-xp').textContent} kamaya! Beat kar ke dikha! 🧠⚡`;
+  if(navigator.share) navigator.share({title:'BrainQuiz',text}).catch(()=>{});
+  else navigator.clipboard.writeText(text).then(()=>toast('Score copy hua!','info'));
 }
 
-/* ── LEADERBOARD ─────────────────────────────────────────── */
-function buildLeaderboard(){
-  renderLB('all');
-  show('screen-lb');
-}
-function renderLB(filter){
+/* LEADERBOARD */
+function buildLB() { renderLB('all'); show('screen-lb'); }
+function renderLB(filter) {
   let lb=getLB();
   if(filter!=='all') lb=lb.filter(e=>e.mode===filter);
   const list=$('lb-list');
-  if(!lb.length){ list.innerHTML='<div class="lb-empty">No scores yet. Play a game first! 🎮</div>'; return; }
+  if(!lb.length){list.innerHTML='<div class="lb-empty">Koi score nahi hai. Pehle quiz khelo! 🎮</div>';return;}
   list.innerHTML='';
   lb.forEach((e,i)=>{
-    const rank=i+1, rk=rank<=3?['🥇','🥈','🥉'][rank-1]:'#'+rank;
-    const rClass=rank<=3?`rr${rank}`:'rrn';
-    const item=document.createElement('div');
-    item.className='lb-item'+(rank<=3?` r${rank}`:'');
-    item.style.animationDelay=(i*.05)+'s';
-    item.innerHTML=`
-      <div class="lb-rank ${rClass}">${rk}</div>
+    const r=i+1, medal=r<=3?['🥇','🥈','🥉'][r-1]:`#${r}`, rc=r<=3?`rk${r}`:'rkn';
+    const row=document.createElement('div');
+    row.className='lb-row'+(r<=3?` r${r}`:''); row.style.animationDelay=(i*.05)+'s';
+    row.innerHTML=`<div class="lb-rank ${rc}">${medal}</div>
       <div class="lb-ava">${e.avatarEmoji||'🧑‍🚀'}</div>
-      <div class="lb-info">
-        <div class="lb-name">${escHTML(e.name)}</div>
-        <div class="lb-details">${e.correct}/${e.total} · ${capFirst(e.mode)} · ${e.date}</div>
-      </div>
-      <div class="lb-xp-wrap">
-        <div class="lb-xp">${e.xp}</div>
-        <div class="lb-xp-lbl">XP</div>
-      </div>`;
-    list.appendChild(item);
+      <div class="lb-info"><div class="lb-name">${esc(e.name)}</div>
+        <div class="lb-sub">Class ${e.cls} · ${cap(e.subj)} · ${e.ok}/${e.total} · ${e.date}</div></div>
+      <div class="lb-xp-w"><div class="lb-xp-v">${e.xp}</div><div class="lb-xp-l">XP</div></div>`;
+    list.appendChild(row);
   });
 }
 
-/* ── STATS ───────────────────────────────────────────────── */
-function buildStats(){
-  const prog=loadProgress()||{};
-  $('stat-total-xp').textContent=prog.xp||0;
-  $('stat-total-q').textContent=prog.totalQuestions||0;
-  $('stat-total-correct').textContent=prog.correctAnswers||0;
-  $('stat-best-streak').textContent=prog.bestStreak||0;
-  $('stat-levels').textContent=(prog.completedLevels||[]).length;
-  $('stat-daily').textContent=prog.dailyCompleted||0;
+/* STATS */
+function buildStats() {
+  const p=loadProgress()||{};
+  $('st-xp').textContent  = p.xp||0;   $('st-q').textContent   = p.totalQ||0;
+  $('st-ok').textContent  = p.correctA||0; $('st-str').textContent = p.bestStreak||0;
+  $('st-cls').textContent = p.maxClass||0;  $('st-sbj').textContent = (p.subjsPlayed||[]).length;
 
-  // Subject bars
-  const ss=prog.subjectStats||{};
-  const barWrap=$('subj-bars'); barWrap.innerHTML='';
-  const colors={Math:'#00f5ff',Science:'#39ff14',History:'#ffd700',Geography:'#b44dff',English:'#ff2d78',Coding:'#ff6b2b',Sports:'#3d8bff'};
-  Object.entries(ss).forEach(([subj,data])=>{
-    const pct=data.total>0?Math.round((data.correct/data.total)*100):0;
-    const row=document.createElement('div'); row.className='subj-bar-row';
-    row.innerHTML=`
-      <div class="subj-bar-label">${subj}</div>
-      <div class="subj-bar-track"><div class="subj-bar-fill" style="width:0%;background:${colors[subj]||'#00f5ff'}"></div></div>
-      <div class="subj-bar-pct">${pct}%</div>`;
-    barWrap.appendChild(row);
-    setTimeout(()=>row.querySelector('.subj-bar-fill').style.width=pct+'%',100);
+  const ss=p.subjectStats||{};
+  const bars=$('stat-bars'); bars.innerHTML='';
+  const COLORS={math:'#4cc9f0',science:'#06d6a0',english:'#80b918',hindi:'#f77f00',computer:'#7b2fff',evs:'#00c49a',gk:'#ffd60a',economics:'#f77f00',space:'#a78bfa','animals-birds':'#f72585'};
+  Object.entries(ss).forEach(([s,d])=>{
+    const pct=d.total>0?Math.round(d.ok/d.total*100):0;
+    const row=document.createElement('div'); row.className='bar-row';
+    row.innerHTML=`<div class="bar-lbl">${cap(s)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%;background:${COLORS[s]||'#4cc9f0'}"></div></div>
+      <div class="bar-pct">${pct}%</div>`;
+    bars.appendChild(row);
+    setTimeout(()=>row.querySelector('.bar-fill').style.width=pct+'%',80);
   });
-  if(!Object.keys(ss).length) barWrap.innerHTML='<div class="text-dim center mt12">Play games to see subject stats!</div>';
+  if(!Object.keys(ss).length) bars.innerHTML='<div class="dim" style="text-align:center;padding:14px">Quiz khelo toh stats dikhenge!</div>';
 
-  // Achievements
-  buildAchievements(prog);
+  const ul=p.achievements||[];
+  const grid=$('ach-grid'); grid.innerHTML='';
+  ACHS.forEach(a=>{
+    const locked=!ul.includes(a.id);
+    const c=document.createElement('div'); c.className='ach-card '+(locked?'locked':'unlocked');
+    c.innerHTML=`<span class="ach-icon">${a.i}</span><div class="ach-name">${a.n}</div>
+      <div class="ach-desc">${a.d}</div>${!locked?'<span class="ach-badge">✅ Unlocked</span>':''}`;
+    grid.appendChild(c);
+  });
   show('screen-stats');
 }
 
-function buildAchievements(prog){
-  const unlocked=prog.achievements||[];
-  const grid=$('achiev-grid'); grid.innerHTML='';
-  ACHIEVEMENTS.forEach(ach=>{
-    const isUnlocked=unlocked.includes(ach.id);
-    const card=document.createElement('div');
-    card.className='ach-card'+(isUnlocked?' unlocked':' locked');
-    card.innerHTML=`
-      <span class="ach-icon">${ach.icon}</span>
-      <div class="ach-name">${ach.name}</div>
-      <div class="ach-desc">${ach.desc}</div>
-      ${isUnlocked?'<span class="ach-unlocked-badge">✅ Unlocked</span>':''}`;
-    grid.appendChild(card);
-  });
+/* MULTIPLAYER */
+function buildMP() {
+  if(!G.player){buildSetup();return;}
+  $('mp-p1-ava').textContent=$('mp-p1-ava').textContent=G.player.avatarEmoji;
+  $('mp-p1-name').textContent=G.player.name;
+  renderAvatarGrid('mp-av-grid',null,(id,em)=>{G.mp.p2a=em;});
+  show('screen-mp');
+}
+async function startMP() {
+  const p2n=$('mp-p2-inp').value.trim()||'Player 2';
+  const sel=document.querySelector('#mp-av-grid .av-item.picked');
+  G.mp={on:true,p2n,p2a:sel?sel.querySelector('.av-e').textContent:'🤖',s1:0,s2:0,turn:1};
+  $('mp-m-p1a').textContent=G.player.avatarEmoji; $('mp-m-p1n').textContent=G.player.name;
+  $('mp-m-p2a').textContent=G.mp.p2a; $('mp-m-p2n').textContent=G.mp.p2n;
+  $('mp-s1').textContent='0'; $('mp-s2').textContent='0';
+  $('mp-mini').classList.add('on');
+  $('mp-turn-lbl').textContent=`${G.player.avatarEmoji} ${G.player.name} ki baari`;
+  G.mode='free'; G.subject=G.subject||'math'; await startGame();
+}
+function buildMPResult() {
+  const p1=G.mp.s1, p2=G.mp.s2;
+  $('mpr-p1a').textContent=G.player.avatarEmoji; $('mpr-p1n').textContent=G.player.name; $('mpr-s1').textContent=p1;
+  $('mpr-p2a').textContent=G.mp.p2a; $('mpr-p2n').textContent=G.mp.p2n; $('mpr-s2').textContent=p2;
+  $('mp-winner').textContent=p1>p2?`🏆 ${G.player.name} Jeeta!`:p2>p1?`🏆 ${G.mp.p2n} Jeeta!`:'🤝 Draw hai!';
+  if(p1!==p2) confetti();
 }
 
-/* ── DAILY CHALLENGE ─────────────────────────────────────── */
-function buildDaily(){
-  const prog=loadProgress()||{};
-  const today=new Date().toLocaleDateString();
-  const lastDaily=prog.lastDailyDate;
-  $('daily-date').textContent='📅 '+today;
-
-  // Countdown to midnight
-  updateDailyCountdown();
-  setInterval(updateDailyCountdown,1000);
-
-  if(lastDaily===today){
-    $('daily-play-area').classList.add('hidden');
-    $('daily-done').classList.remove('hidden');
-    $('daily-done').textContent='✅ Daily challenge completed for today! Come back tomorrow!';
-  } else {
-    $('daily-play-area').classList.remove('hidden');
-    $('daily-done').classList.add('hidden');
-  }
-  show('screen-daily');
-}
-
-function updateDailyCountdown(){
-  const now=new Date(), midnight=new Date();
-  midnight.setHours(24,0,0,0);
-  const diff=midnight-now;
-  const h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
-  const el=$('daily-countdown');
-  if(el) el.innerHTML=`Resets in <span>${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</span>`;
-}
-
-function startDaily(){
-  const prog=loadProgress()||{};
-  prog.lastDailyDate=new Date().toLocaleDateString();
-  LS.set('bsq_prog',prog);
-  G.mode='daily'; G.mp.active=false;
-  G.score={correct:0,wrong:0,xp:0}; G.sessionXP=0;
-  G.currentIdx=0; G.answered=false; G.streak=0; G.bestStreak=0; G.reviewData=[];
-  G.lifelines={fifty:true,skip:true,extratime:true};
-  G.questions=shuffle(G.allQ).slice(0,15);
-  buildQuizHUD(); loadQuestion();
-  show('screen-quiz');
-}
-
-/* ── ADMIN / QUESTION EDITOR ─────────────────────────────── */
-function buildAdmin(){
-  renderEditorList();
-  show('screen-admin');
-}
-
-function renderEditorList(){
-  const list=$('editor-list'); list.innerHTML='';
-  const cq=LS.get('bsq_custom_questions')||[];
-  if(!cq.length){ list.innerHTML='<div class="text-dim center mt12">No custom questions yet.</div>'; return; }
+/* ADMIN */
+function buildAdmin() { renderEdList(); show('screen-admin'); }
+function renderEdList() {
+  const cq=LS.get('bsq_cq')||[], list=$('ed-list');
+  list.innerHTML='';
+  if(!cq.length){list.innerHTML='<div class="dim" style="text-align:center;padding:14px">Koi custom question nahi hai abhi.</div>';return;}
   cq.forEach((q,i)=>{
-    const item=document.createElement('div'); item.className='editor-item';
-    item.innerHTML=`
-      <div class="editor-item-content">
-        <div class="editor-item-q">${escHTML(q.question)}</div>
-        <div class="editor-item-meta">Level ${q.level} · ${q.subject} · ${q.difficulty} · Answer: <strong>${escHTML(q.answer)}</strong></div>
-      </div>
-      <div class="editor-item-actions">
-        <button class="btn btn-danger btn-xs" onclick="deleteCustomQ(${i})">🗑</button>
-      </div>`;
-    list.appendChild(item);
+    const r=document.createElement('div'); r.className='ed-row';
+    r.innerHTML=`<div class="ed-body"><div class="ed-q">${esc(q.question)}</div>
+      <div class="ed-meta">Class ${q.class} · ${cap(q.subject)} · ${q.difficulty} · ✅ ${esc(q.answer)}</div></div>
+      <button class="btn btn-outline btn-xs" onclick="delCQ(${i})">🗑</button>`;
+    list.appendChild(r);
   });
 }
-
-function saveCustomQ(){
-  const qtext=$('cq-question').value.trim();
-  const opts=[$('cq-opt1').value.trim(),$('cq-opt2').value.trim(),$('cq-opt3').value.trim(),$('cq-opt4').value.trim()];
-  const answer=$('cq-answer').value.trim();
-  const subject=$('cq-subject').value;
-  const level=parseInt($('cq-level').value)||1;
-  const difficulty=$('cq-difficulty').value;
-  const hint=$('cq-hint').value.trim();
-
-  if(!qtext||!answer||opts.some(o=>!o)){ toast('Fill all required fields!','t-err'); return; }
-  if(!opts.includes(answer)){ toast('Answer must match one of the options!','t-err'); return; }
-
-  const cq=LS.get('bsq_custom_questions')||[];
-  cq.push({id:Date.now(),level,subject,question:qtext,options:opts,answer,difficulty,hint:hint||''});
-  LS.set('bsq_custom_questions',cq);
-
-  // Update allQ
-  G.allQ=[...G.allQ.filter(q=>!q.id||typeof q.id!=='number'||q.id<1e12),...cq];
-  G.customQ=cq;
-
-  // Track for achievement
-  const prog=loadProgress()||{}; prog.customQAdded=(prog.customQAdded||0)+1; LS.set('bsq_prog',prog);
-
-  toast('✅ Question saved!','t-ok');
-  renderEditorList();
-  // Clear form
-  ['cq-question','cq-opt1','cq-opt2','cq-opt3','cq-opt4','cq-answer','cq-hint'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
+function saveCQ() {
+  const q=$('eq-q').value.trim();
+  const opts=[$('eq-o1').value.trim(),$('eq-o2').value.trim(),$('eq-o3').value.trim(),$('eq-o4').value.trim()];
+  const ans=$('eq-ans').value.trim(), hint=$('eq-hint').value.trim();
+  const cls=parseInt($('eq-cls').value)||1, subj=$('eq-subj').value, diff=$('eq-diff').value;
+  if(!q||!ans||opts.some(o=>!o)){toast('Sab required fields bharo!','err');return;}
+  if(!opts.includes(ans)){toast('Answer kisi option se match karo!','err');return;}
+  const cq=LS.get('bsq_cq')||[];
+  cq.push({id:Date.now(),class:cls,subject:subj,topic:'Custom',question:q,options:opts,answer:ans,difficulty:diff,hint});
+  LS.set('bsq_cq',cq);
+  const p=loadProgress()||{}; p.customAdded=(p.customAdded||0)+1; LS.set('bsq_prog',p);
+  toast('✅ Question save hua!','ok'); renderEdList();
+  ['eq-q','eq-o1','eq-o2','eq-o3','eq-o4','eq-ans','eq-hint'].forEach(id=>$(id)&&($(id).value=''));
+}
+function delCQ(i) {
+  const cq=LS.get('bsq_cq')||[]; cq.splice(i,1); LS.set('bsq_cq',cq);
+  toast('Delete ho gaya','info'); renderEdList();
 }
 
-function deleteCustomQ(idx){
-  const cq=LS.get('bsq_custom_questions')||[];
-  cq.splice(idx,1);
-  LS.set('bsq_custom_questions',cq);
-  G.customQ=cq;
-  toast('Question deleted','t-info');
-  renderEditorList();
+/* THEME / SOUND */
+function toggleSound() {
+  G.sound=!G.sound; LS.set('bsq_snd',G.sound);
+  $('btn-snd').innerHTML=G.sound?'🔊 Sound':'🔇 Sound';
+  toast(G.sound?'Sound ON':'Sound OFF','info');
+}
+function toggleTheme() {
+  G.light=!G.light; document.body.classList.toggle('light',G.light); LS.set('bsq_light',G.light);
+  $('btn-theme').innerHTML=G.light?'🌙 Dark':'☀️ Light';
+}
+function resetAll() {
+  if(!confirm('Sab progress, XP aur achievements delete ho jayenge! Sure ho?')) return;
+  ['bsq_prog','bsq_lb','bsq_cq'].forEach(k=>LS.del(k));
+  G.progress=null; toast('Reset ho gaya!','info'); buildHome();
+}
+function resumeGame() {
+  const p=loadProgress(); if(!p) return;
+  G.player={name:p.name,avatarId:p.avatarId,avatarEmoji:p.avatarEmoji};
+  G.progress=p; G.cls=p.lastCls||1; G.subject=p.lastSubj||'math';
+  buildModeScreen();
 }
 
-/* ── MULTIPLAYER SCREEN ──────────────────────────────────── */
-function buildMultiplayer(){
-  // Build P2 avatar picker
-  const grid=$('mp-av-grid'); grid.innerHTML='';
-  AVATARS.slice(0,16).forEach(av=>{
-    const item=document.createElement('div');
-    item.className='av-item'; item.dataset.emoji=av.e; item.style.cssText='padding:6px';
-    item.innerHTML=`<span style="font-size:1.6rem">${av.e}</span>`;
-    item.addEventListener('click',()=>{ $$('.mp-av').forEach(e=>e.classList.remove('selected')); item.classList.add('selected'); });
-    item.classList.add('mp-av');
-    grid.appendChild(item);
-  });
-  show('screen-multiplayer');
-}
-
-/* ── THEME ───────────────────────────────────────────────── */
-function toggleTheme(){
-  G.themeLight=!G.themeLight;
-  document.body.classList.toggle('theme-light',G.themeLight);
-  LS.set('bsq_theme',G.themeLight);
-  $('btn-theme').textContent=G.themeLight?'🌙':'☀️';
-}
-
-/* ── SOUND ───────────────────────────────────────────────── */
-function toggleSound(){
-  G.soundOn=!G.soundOn;
-  LS.set('bsq_sound',G.soundOn);
-  $('btn-sound').textContent=G.soundOn?'🔊':'🔇';
-  toast(G.soundOn?'Sound ON':'Sound OFF','t-info');
-}
-
-/* ── MODAL ───────────────────────────────────────────────── */
-function openModal(id){ $(id).classList.add('open'); }
-function closeModal(id){ $(id).classList.remove('open'); }
-
-/* ── RESET ───────────────────────────────────────────────── */
-function resetProgress(){
-  if(!confirm('Reset ALL progress, XP, and achievements? This cannot be undone.')) return;
-  ['bsq_prog','bsq_lb','bsq_custom_questions'].forEach(k=>LS.del(k));
-  G.progress=null; G.customQ=[];
-  toast('Progress reset!','t-info');
-  buildHome();
-}
-
-/* ── HELPERS ─────────────────────────────────────────────── */
-function escHTML(str){ const d=document.createElement('div'); d.appendChild(document.createTextNode(str||'')); return d.innerHTML; }
-function capFirst(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):''; }
-
-/* ── EVENT BINDING ───────────────────────────────────────── */
-function bindEvents(){
+/* ════════════════════════════════════════════════════════
+   BIND EVENTS
+   ════════════════════════════════════════════════════════ */
+function bindEvents() {
   // Home
-  $('btn-new-game').addEventListener('click',buildSetup);
-  $('btn-resume').addEventListener('click',resumeGame);
-  $('btn-lb-home').addEventListener('click',buildLeaderboard);
-  $('btn-stats-home').addEventListener('click',buildStats);
-  $('btn-daily-home').addEventListener('click',buildDaily);
-  $('btn-multi-home').addEventListener('click',buildMultiplayer);
-  $('btn-admin-home').addEventListener('click',buildAdmin);
-  $('btn-reset-home').addEventListener('click',resetProgress);
+  $('btn-new').addEventListener('click', buildSetup);
+  $('btn-resume').addEventListener('click', resumeGame);
+  $('btn-lb-h').addEventListener('click', buildLB);
+  $('btn-stats-h').addEventListener('click', buildStats);
+  $('btn-mp-h').addEventListener('click', buildMP);
+  $('btn-admin-h').addEventListener('click', buildAdmin);
+  $('btn-reset-h').addEventListener('click', resetAll);
 
   // Setup
-  $('btn-setup-continue').addEventListener('click',setupContinue);
-  $('btn-setup-back').addEventListener('click',buildHome);
+  $('btn-setup-next').addEventListener('click', onSetupNext);
+  $('btn-setup-back').addEventListener('click', buildHome);
+
+  // Class
+  $('btn-cls-next').addEventListener('click', onClassNext);
+  $('btn-cls-back').addEventListener('click', buildSetup);
+
+  // Subject
+  $('btn-subj-next').addEventListener('click', onSubjNext);
+  $('btn-subj-back').addEventListener('click', buildClassScreen);
 
   // Mode
-  $$('.mode-card').forEach(c=>c.addEventListener('click',()=>selectMode(c.dataset.mode)));
-  $('btn-start').addEventListener('click',startGame);
-  $('btn-mode-back').addEventListener('click',buildSetup);
+  $$('.mode-card').forEach(c=>c.addEventListener('click',()=>pickMode(c.dataset.m)));
+  $('btn-start').addEventListener('click', startGame);
+  $('btn-mode-back').addEventListener('click', buildSubjectScreen);
 
   // Quiz
-  $('btn-quit').addEventListener('click',()=>{ clearTimer(); saveProgress(); buildHome(); });
-  $('btn-hint').addEventListener('click',showHint);
-  $('ll-fifty').addEventListener('click',useFiftyFifty);
-  $('ll-skip').addEventListener('click',useSkip);
-  $('ll-extratime').addEventListener('click',useExtraTime);
+  $('btn-quit').addEventListener('click', ()=>{ clearTimer(); saveProgress(); buildHome(); });
+  $('ll-fifty').addEventListener('click', onFifty);
+  $('ll-skip').addEventListener('click', onSkip);
+  $('ll-etime').addEventListener('click', onETime);
+  $('btn-hint').addEventListener('click', onHint);
 
   // Results
-  $('btn-play-again').addEventListener('click',startGame);
-  $('btn-next-level').addEventListener('click',()=>{ G.level=Math.min(G.level+1,10); startGame(); });
-  $('btn-res-lb').addEventListener('click',buildLeaderboard);
-  $('btn-res-home').addEventListener('click',buildHome);
-  $('btn-share-score').addEventListener('click',shareScore);
+  $('btn-again').addEventListener('click', startGame);
+  $('btn-chg-subj').addEventListener('click', buildSubjectScreen);
+  $('btn-res-lb').addEventListener('click', buildLB);
+  $('btn-res-home').addEventListener('click', buildHome);
+  $('btn-share').addEventListener('click', onShare);
 
   // LB
-  $$('.tab-btn').forEach(b=>b.addEventListener('click',()=>{ $$('.tab-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderLB(b.dataset.f); }));
-  $('btn-lb-back').addEventListener('click',buildHome);
+  $$('.lb-tab').forEach(t=>t.addEventListener('click',()=>{
+    $$('.lb-tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); renderLB(t.dataset.f);
+  }));
+  $('btn-lb-back').addEventListener('click', buildHome);
 
   // Stats
-  $('btn-stats-back').addEventListener('click',buildHome);
+  $('btn-stats-back').addEventListener('click', buildHome);
 
-  // Daily
-  $('btn-daily-start').addEventListener('click',startDaily);
-  $('btn-daily-back').addEventListener('click',buildHome);
-
-  // Multiplayer
-  $('btn-mp-start').addEventListener('click',startMultiplayer);
-  $('btn-mp-back').addEventListener('click',buildHome);
-  $('btn-mp-res-home').addEventListener('click',buildHome);
-  $('btn-mp-res-again').addEventListener('click',buildMultiplayer);
+  // MP
+  $('btn-mp-start').addEventListener('click', startMP);
+  $('btn-mp-back').addEventListener('click', buildHome);
+  $('btn-mpr-again').addEventListener('click', buildMP);
+  $('btn-mpr-home').addEventListener('click', buildHome);
 
   // Admin
-  $('btn-save-q').addEventListener('click',saveCustomQ);
-  $('btn-admin-back').addEventListener('click',buildHome);
+  $('btn-save-q').addEventListener('click', saveCQ);
+  $('btn-admin-back').addEventListener('click', buildHome);
 
   // Toolbar
-  $('btn-sound').addEventListener('click',toggleSound);
-  $('btn-theme').addEventListener('click',toggleTheme);
-
-  // MP Result
+  $('btn-snd').addEventListener('click', toggleSound);
+  $('btn-theme').addEventListener('click', toggleTheme);
 }
 
-function resumeGame(){
-  const prog=loadProgress(); if(!prog) return;
-  G.player={name:prog.name,avatarId:prog.avatarId,avatarEmoji:prog.avatarEmoji};
-  G.progress=prog; G.level=prog.currentLevel||1;
-  G.mode='level';
-  G.score={correct:0,wrong:0,xp:0}; G.sessionXP=0;
-  G.currentIdx=0; G.answered=false; G.streak=0; G.bestStreak=0; G.reviewData=[];
-  G.lifelines={fifty:true,skip:true,extratime:true};
-  G.questions=shuffle(G.allQ.filter(q=>q.level===G.level)).slice(0,LEVEL_CONFIG[G.level]||20);
-  if(!G.questions.length) G.questions=shuffle(G.allQ).slice(0,20);
-  buildQuizHUD(); loadQuestion();
-  show('screen-quiz');
+/* ════════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════════ */
+function init() {
+  const sl=LS.get('bsq_light'); G.light=!!sl;
+  if(G.light) document.body.classList.add('light');
+  $('btn-theme').innerHTML=G.light?'🌙 Dark':'☀️ Light';
+
+  const ss=LS.get('bsq_snd'); G.sound=ss===null?true:ss;
+  $('btn-snd').innerHTML=G.sound?'🔊 Sound':'🔇 Sound';
+
+  initCanvas(); tickClock(); bindEvents(); buildHome();
 }
 
-/* ── INIT ────────────────────────────────────────────────── */
-async function init(){
-  const sv=LS.get('bsq_sound'); G.soundOn=sv===null?true:sv;
-  $('btn-sound').textContent=G.soundOn?'🔊':'🔇';
-  const tv=LS.get('bsq_theme'); G.themeLight=!!tv;
-  if(G.themeLight){ document.body.classList.add('theme-light'); $('btn-theme').textContent='🌙'; }
-
-  initCanvas();
-  await loadQuestions();
-  bindEvents();
-  buildHome();
-}
-
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded', init);
