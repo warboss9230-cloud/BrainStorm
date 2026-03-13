@@ -39,18 +39,16 @@ const LEVELS = [
 // ── Subject Config ──────────────────────────────────────────────────────────
 const SUBJECTS_ALL = [
   { name: 'English',     icon: '📖', classes: [1,2,3,4,5,6,7,8,9,10,11,12] },
-  { name: 'Hindi',       icon: '🇮🇳', classes: [1,2,3,4,5,6,7,8] },
+  { name: 'Hindi',       icon: '🇮🇳', classes: [1,2,3,4,5,6,7,8,9,10,11,12] },
   { name: 'Math',        icon: '🔢', classes: [1,2,3,4,5,6,7,8,9,10,11,12] },
-  { name: 'Science',     icon: '🔬', classes: [3,4,5,6,7,8,9,10] },
-  { name: 'Computer',    icon: '💻', classes: [1,2,3,4,5,6,7,8,9,10,11,12] },
-  { name: 'EVS',         icon: '🌿', classes: [1,2,3,4,5] },
+  { name: 'Science',     icon: '🔬', classes: [3,4,5,6,7,8,9,10,11,12] },
+  { name: 'Computer',    icon: '💻', classes: [3,4,5,6,7,8,9,10,11,12] },
+  { name: 'EVS',         icon: '🌿', classes: [1,2,3,4,5,6,7,8,9,10,11,12] },
   { name: 'GK',          icon: '🌍', classes: [1,2,3,4,5,6,7,8,9,10,11,12] },
-  { name: 'Economics',   icon: '📊', classes: [9,10,11,12] },
-  { name: 'Space',       icon: '🚀', classes: [4,5,6,7,8,9,10,11,12] },
-  { name: 'Animals/Birds',icon:'🦁', classes: [1,2,3,4,5,6] },
-  { name: 'Geography',   icon: '🗺️', classes: [5,6,7,8,9,10,11,12] },
-  { name: 'History',     icon: '🏛️', classes: [5,6,7,8,9,10,11,12] },
-];
+  { name: 'Economics',   icon: '📊', classes: [3,4,5,6,7,8,9,10,11,12] },
+  { name: 'Space',       icon: '🚀', classes: [3,4,5,6,7,8,9,10,11,12] },
+  { name: 'Animals/Birds',icon:'🦁', classes: [1,2,3,4,5,6,7,8,9,10,11,12] },
+  ];
 
 // ── DOM Refs ────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
