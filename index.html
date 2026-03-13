@@ -1,295 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>BrainStorm Quiz 🧠</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800;900&display=swap"/>
-  <link rel="stylesheet" href="css/style.css"/>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BrainStorm Quiz</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<!-- ── Animated Star Canvas ─────────────────────────────── -->
+<canvas id="bg-canvas"></canvas>
 
-<!-- TOP BAR -->
-<header class="top-bar">
-  <button id="btn-top-leaderboard" class="top-bar-btn">🏆 <span class="btn-label">Board</span></button>
-  <div class="top-bar-center">
-    <div class="top-bar-brand">🧠 BrainStorm</div>
-    <div id="live-datetime" class="live-dt"></div>
-  </div>
-  <button id="btn-top-profile" class="top-bar-btn">👤 <span class="btn-label">Profile</span></button>
-</header>
+<!-- ── Sound Toggle (Fixed) ─────────────────────────────── -->
+<div class="sound-toggle" id="sound-btn" title="Toggle Sound">🔊</div>
 
-<div id="toast" class="toast" role="alert" aria-live="polite"></div>
-<button id="back-btn" class="back-btn">← Back</button>
+<!-- ── XP Popup (overlay) ───────────────────────────────── -->
+<div id="xp-popup" class="xp-popup"></div>
 
+<!-- ── Toast Container ──────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     APP ROOT
+     ═══════════════════════════════════════════════════════ -->
 <div id="app">
 
-  <!-- SCREEN: HOME -->
-  <section id="screen-home" class="screen active">
-    <div class="home-hero">
-      <h1 class="brand-logo">🧠 BrainStorm</h1>
-      <p class="brand-tagline">The Ultimate School Quiz Challenge</p>
-    </div>
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 1 — HOME
+       ══════════════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen active">
+    <div class="card" id="screen-home" style="max-width:520px;margin:0 auto;">
 
-    <!-- Resume block (visible when save data exists) -->
-    <div id="resume-card" class="glass-card resume-card" style="display:none;">
-      <div class="resume-top">
-        <span id="resume-avatar" class="resume-av">🧒</span>
-        <div class="resume-info-block">
-          <div id="resume-name" class="resume-pname">Player</div>
-          <div id="resume-info" class="resume-meta">Level 1 • Score 0</div>
-          <div id="resume-time" class="resume-time">Last played: —</div>
+      <div class="logo-area">
+        <span class="logo-icon">🧠</span>
+        <h1 class="game-title">
+          <span class="word1">Brain</span><span class="word2">Storm</span>
+        </h1>
+        <p class="subtitle">⚡ The Ultimate Quiz Challenge ⚡</p>
+      </div>
+
+      <!-- Resume Banner (shown if progress exists) -->
+      <div id="resume-section" class="resume-banner hidden">
+        <span style="font-size:2rem;">⚡</span>
+        <div class="resume-info">
+          <div class="resume-name" id="resume-name">Player</div>
+          <div class="resume-stats" id="resume-stats"></div>
         </div>
+        <button class="btn btn-secondary btn-sm" id="btn-resume">Resume</button>
       </div>
-      <div class="resume-btns">
-        <button id="btn-resume" class="btn btn-primary">▶ Resume Game</button>
-        <button id="btn-reset"  class="btn btn-danger-sm">🗑 Reset</button>
-      </div>
-    </div>
 
-    <!-- New game -->
-    <div class="glass-card">
-      <h2 class="section-title">New Game 🎉</h2>
-      <p class="section-sub">Enter your name to begin your adventure</p>
+      <div class="home-actions">
+        <button class="btn btn-primary btn-lg btn-block" id="btn-new-game">
+          ▶&nbsp; New Game
+        </button>
+        <button class="btn btn-secondary btn-block" id="btn-leaderboard-home">
+          🏆&nbsp; Leaderboard
+        </button>
+        <button class="btn btn-danger btn-sm btn-block" id="btn-reset">
+          🗑 Reset Progress
+        </button>
+      </div>
+
+      <p class="text-center text-dim mt-16" style="font-size:0.72rem;line-height:1.7;">
+        3 Game Modes &nbsp;·&nbsp; 10 Levels &nbsp;·&nbsp; 230+ Questions<br/>
+        XP System &nbsp;·&nbsp; 48 Avatars &nbsp;·&nbsp; Leaderboard
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 2 — PLAYER SETUP
+       ══════════════════════════════════════════════════════ -->
+  <div id="screen-setup" class="screen">
+    <div class="card">
+      <div class="flex-between mb-24">
+        <h2 style="font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--neon-cyan);">
+          👤 Player Setup
+        </h2>
+        <button class="btn btn-secondary btn-sm" id="btn-setup-back">← Back</button>
+      </div>
+
       <div class="input-group">
-        <label for="input-name">Your Name</label>
-        <input type="text" id="input-name" placeholder="e.g. Arjun, Priya…" maxlength="30" autocomplete="off"/>
+        <label>Your Name</label>
+        <input type="text" id="player-name" placeholder="Enter your name…" maxlength="24" autocomplete="off" />
       </div>
-      <button id="btn-start" class="btn btn-primary">🚀 Let's Go!</button>
-    </div>
-  </section>
 
-  <!-- SCREEN: AVATAR SELECTION -->
-  <section id="screen-avatar" class="screen">
-    <h2 class="section-title">Choose Your Avatar 🎭</h2>
-    <p class="section-sub">Pick one — appears on results and leaderboard</p>
-    <div id="avatar-grid" class="avatar-grid"></div>
-    <div style="text-align:center;margin-top:18px;">
-      <button id="btn-avatar-confirm" class="btn btn-primary" disabled style="max-width:280px;">✅ Confirm Avatar</button>
-    </div>
-  </section>
+      <div class="section-title">Choose Your Avatar</div>
+      <div class="avatar-grid" id="avatar-grid"></div>
 
-  <!-- SCREEN: LEVEL MAP -->
-  <section id="screen-levelmap" class="screen">
-    <div class="glass-card lm-header-card">
-      <div class="lm-player-row">
-        <span id="lm-avatar" class="lm-avatar">🧒</span>
-        <div class="lm-player-info">
-          <div id="lm-name"  class="lm-name">Player</div>
-          <div id="lm-stats" class="lm-stats">Score: 0 • 0/0 Correct</div>
+      <button class="btn btn-primary btn-lg btn-block mt-24" id="btn-setup-continue">
+        Continue →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 3 — MODE SELECT
+       ══════════════════════════════════════════════════════ -->
+  <div id="screen-mode" class="screen">
+    <div class="card">
+      <div class="flex-between mb-24">
+        <h2 style="font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--neon-cyan);">
+          🎮 Select Mode
+        </h2>
+        <button class="btn btn-secondary btn-sm" id="btn-mode-back">← Back</button>
+      </div>
+
+      <div class="mode-cards">
+
+        <div class="mode-card" data-mode="free">
+          <span class="mode-icon">🎲</span>
+          <div class="mode-title">Free Play</div>
+          <div class="mode-desc">Random questions from all levels. No time limit. Play at your own pace.</div>
         </div>
-        <div id="lm-total-xp" class="lm-xp-badge">0 XP</div>
-      </div>
-      <div class="lm-prog-wrap">
-        <div class="lm-prog-label">
-          <span>Overall Progress</span>
-          <span id="lm-prog-pct">0%</span>
+
+        <div class="mode-card" data-mode="timer">
+          <span class="mode-icon">⏱</span>
+          <div class="mode-title">Timer Mode</div>
+          <div class="mode-desc">20 seconds per question. Race against the clock for maximum XP.</div>
         </div>
-        <div class="lm-prog-bar"><div id="lm-prog-fill" class="lm-prog-fill" style="width:0%"></div></div>
+
+        <div class="mode-card" data-mode="level">
+          <span class="mode-icon">⚔️</span>
+          <div class="mode-title">Level Mode</div>
+          <div class="mode-desc">10 structured levels. Unlock next level by completing current one.</div>
+        </div>
+
       </div>
+
+      <!-- Level Picker (shown only for Level mode) -->
+      <div class="level-picker" id="level-picker">
+        <div class="section-title">Select Level</div>
+        <div class="level-grid" id="level-grid"></div>
+      </div>
+
+      <button class="btn btn-gold btn-lg btn-block mt-16" id="btn-start-game" disabled>
+        ⚡ Start Game
+      </button>
     </div>
-    <div id="level-grid" class="level-grid"></div>
-  </section>
+  </div>
 
-  <!-- SCREEN: CLASS SELECTION -->
-  <section id="screen-class" class="screen">
-    <h2 class="section-title">Select Your Class 📚</h2>
-    <p class="section-sub" id="class-sub">For Level <span id="class-level-num">1</span></p>
-    <div id="class-grid" class="cards-grid" role="list"></div>
-  </section>
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 4 — QUIZ
+       ══════════════════════════════════════════════════════ -->
+  <div id="screen-quiz" class="screen">
 
-  <!-- SCREEN: SUBJECT SELECTION -->
-  <section id="screen-subject" class="screen">
-    <h2 class="section-title">Pick a Subject 🎨</h2>
-    <p class="section-sub">Class <strong id="subject-class-label">1</strong></p>
-    <div id="subject-grid" class="cards-grid subjects-grid" role="list"></div>
-  </section>
-
-  <!-- SCREEN: MODE SELECTION -->
-  <!-- SCREEN: MODE SELECTION -->
-  <section id="screen-mode" class="screen">
-    <h2 class="section-title">Choose Your Mode 🎮</h2>
-    <p class="section-sub">How do you want to play?</p>
-
-    <style>
-      .mode-grid{display:flex;flex-direction:column;gap:16px;width:100%;max-width:480px;margin:0 auto}
-      .mode-card{background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:22px;padding:22px 20px;cursor:pointer;transition:all 0.25s;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;-webkit-tap-highlight-color:transparent}
-      .mode-card:active{transform:scale(0.96)}
-      .mode-icon{font-size:2.8rem;line-height:1;margin-bottom:2px}
-      .mode-name{font-family:'Baloo 2',sans-serif;font-size:1.25rem;font-weight:900;color:#f0e6ff}
-      .mode-desc{font-size:0.83rem;color:rgba(240,230,255,0.6);line-height:1.55;max-width:300px}
-      .mode-badge{font-size:0.68rem;font-weight:800;padding:4px 14px;border-radius:20px;margin-top:4px;letter-spacing:0.07em;text-transform:uppercase}
-      .mode-free{border-color:rgba(0,230,118,0.5);background:rgba(0,230,118,0.06)}
-      .mode-free .mode-badge{background:rgba(0,230,118,0.18);color:#00e676}
-      .mode-free:active,.mode-free.selected{border-color:#00e676;background:rgba(0,230,118,0.12);box-shadow:0 0 28px rgba(0,230,118,0.25)}
-      .mode-timer{border-color:rgba(255,215,0,0.5);background:rgba(255,215,0,0.06)}
-      .mode-timer .mode-badge{background:rgba(255,215,0,0.18);color:#FFD700}
-      .mode-timer:active,.mode-timer.selected{border-color:#FFD700;background:rgba(255,215,0,0.12);box-shadow:0 0 28px rgba(255,215,0,0.25)}
-      .mode-level{border-color:rgba(179,136,255,0.5);background:rgba(179,136,255,0.06)}
-      .mode-level .mode-badge{background:rgba(179,136,255,0.18);color:#B388FF}
-      .mode-level:active,.mode-level.selected{border-color:#B388FF;background:rgba(179,136,255,0.12);box-shadow:0 0 28px rgba(179,136,255,0.25)}
-      @media(min-width:520px){
-        .mode-grid{flex-direction:row;flex-wrap:wrap;justify-content:center}
-        .mode-card{flex:1;min-width:130px;max-width:180px}
-      }
-      @media(hover:hover){
-        .mode-free:hover{border-color:#00e676;background:rgba(0,230,118,0.12);box-shadow:0 0 28px rgba(0,230,118,0.25)}
-        .mode-timer:hover{border-color:#FFD700;background:rgba(255,215,0,0.12);box-shadow:0 0 28px rgba(255,215,0,0.25)}
-        .mode-level:hover{border-color:#B388FF;background:rgba(179,136,255,0.12);box-shadow:0 0 28px rgba(179,136,255,0.25)}
-      }
-    </style>
-
-    <div class="mode-grid">
-
-      <div class="mode-card mode-free" id="mode-card-free">
-        <div class="mode-icon">🕊️</div>
-        <div class="mode-name">Free Play</div>
-        <div class="mode-desc">No timer, no pressure. Play at your own pace. Perfect for learning!</div>
-        <div class="mode-badge">Relaxed</div>
-      </div>
-
-      <div class="mode-card mode-timer" id="mode-card-timer">
-        <div class="mode-icon">⏱️</div>
-        <div class="mode-name">Timer Mode</div>
-        <div class="mode-desc">20 seconds per question! Answer fast for bonus XP. Beat the clock!</div>
-        <div class="mode-badge">Challenging</div>
-      </div>
-
-      <div class="mode-card mode-level" id="mode-card-level">
-        <div class="mode-icon">📈</div>
-        <div class="mode-name">Level Progress</div>
-        <div class="mode-desc">Earn XP, unlock levels & climb ranks. Track your growth over time!</div>
-        <div class="mode-badge">Progressive</div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SCREEN: QUIZ -->
-  <section id="screen-quiz" class="screen">
-    <nav class="nav-bar">
-      <div class="nav-left">
-        <span id="nav-avatar-small" class="nav-av">🧒</span>
-        <span id="nav-level-label"  class="nav-brand">Level 1</span>
-      </div>
-      <div class="nav-actions">
-        <span class="badge badge-score" id="badge-score">⭐ 0</span>
-        <span class="badge badge-xp"    id="badge-xp">✨ 0 XP</span>
-        <div id="timer-wrap" class="timer-wrap" style="display:none;">
-          <svg width="46" height="46" viewBox="0 0 50 50">
-            <circle class="timer-track" cx="25" cy="25" r="21"/>
-            <circle class="timer-bar"   cx="25" cy="25" r="21" style="stroke-dasharray:131.95;stroke-dashoffset:0;"/>
-          </svg>
-          <span id="timer-text" class="timer-text">20</span>
+    <!-- HUD -->
+    <div class="hud">
+      <div class="hud-player">
+        <span class="hud-avatar" id="hud-avatar">🧑‍🚀</span>
+        <div>
+          <div class="hud-name" id="hud-name">Player</div>
+          <div class="hud-xp" id="hud-xp">XP: <span>0</span></div>
         </div>
       </div>
-    </nav>
 
-    <div class="progress-wrap">
-      <div class="progress-info">
-        <span id="progress-label">Question 1 of 15</span>
-        <span id="progress-pct">0%</span>
+      <div class="hud-center">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-bar-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Question <span>1</span> of <span>20</span></div>
+        <span class="mode-badge" id="hud-mode-badge">Free Play</span>
       </div>
-      <div class="progress-bar">
-        <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+
+      <div class="hud-timer-area">
+        <div class="timer-display" id="timer-display">20</div>
+        <div style="text-align:right;">
+          <button class="btn btn-danger btn-sm" id="btn-quit-quiz">✕ Quit</button>
+        </div>
       </div>
     </div>
 
-    <div class="question-card">
+    <!-- Question Card -->
+    <div class="question-card" id="question-card">
       <div class="question-meta">
-        <span id="question-number"     class="question-number">Q1</span>
-        <span id="question-difficulty" class="difficulty-pill diff-easy">easy</span>
-        <span id="question-subject-tag" class="subject-tag" style="display:none;"></span>
+        <span class="q-subject" id="q-subject">Math</span>
+        <span class="q-difficulty easy" id="q-difficulty">easy</span>
       </div>
-      <p id="question-text" class="question-text"></p>
+      <div class="question-text" id="question-text">
+        Loading question…
+      </div>
     </div>
 
-    <div id="options-grid" class="options-grid" role="group"></div>
-
-    <div class="next-wrap">
-      <button id="btn-next">Next →</button>
+    <!-- Options -->
+    <div class="options-grid" id="options-grid">
+      <!-- Dynamically populated -->
     </div>
-  </section>
 
-  <!-- SCREEN: LEVEL COMPLETE -->
-  <section id="screen-levelup" class="screen">
-    <div class="glass-card levelup-card">
-      <div id="levelup-badge" class="levelup-badge">🎉</div>
-      <h2 id="levelup-title" class="levelup-title">Level Complete!</h2>
-      <p  id="levelup-sub"   class="levelup-sub">You completed Level 1</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 5 — RESULTS
+       ══════════════════════════════════════════════════════ -->
+  <div id="screen-result" class="screen">
+    <div class="card" style="max-width:600px;margin:0 auto;">
+
+      <div id="level-complete-badge" class="level-complete-badge hidden text-center mb-16">
+        ✅ Level Complete!
+      </div>
+
+      <div class="result-hero">
+        <span class="result-avatar-big" id="result-avatar-big">🧑‍🚀</span>
+        <div class="result-grade grade-a" id="result-grade">A</div>
+        <div id="result-player-name" style="font-family:'Orbitron',sans-serif;font-size:0.9rem;color:var(--neon-cyan);margin-top:6px;"></div>
+        <div class="result-message" id="result-message">Great job!</div>
+      </div>
+
       <div class="result-stats">
-        <div class="stat-box stat-score"><span class="stat-num" id="lu-score">0/0</span><span class="stat-label">Score</span></div>
-        <div class="stat-box stat-acc">  <span class="stat-num" id="lu-acc">0%</span>  <span class="stat-label">Accuracy</span></div>
-        <div class="stat-box stat-xp">   <span class="stat-num" id="lu-xp">0</span>    <span class="stat-label">XP Earned</span></div>
-        <div class="stat-box stat-level"><span class="stat-num" id="lu-next">🔓</span> <span class="stat-label">Next Level</span></div>
+        <div class="stat-box">
+          <div class="stat-val green" id="stat-correct">0</div>
+          <div class="stat-label">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val pink" id="stat-wrong">0</div>
+          <div class="stat-label">Wrong</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val gold" id="stat-xp">+0</div>
+          <div class="stat-label">XP Earned</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val cyan" id="stat-score">0%</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-box" style="grid-column:2">
+          <div class="stat-val" style="color:var(--text-main)" id="stat-total">0</div>
+          <div class="stat-label">Total Qs</div>
+        </div>
       </div>
+
       <div class="result-actions">
-        <button id="btn-next-level"  class="btn btn-primary">▶ Play Level <span id="btn-next-num">2</span></button>
-        <button id="btn-levelup-map" class="btn btn-outline">🗺 Level Map</button>
+        <button class="btn btn-primary" id="btn-play-again">🔄 Play Again</button>
+        <button class="btn btn-gold hidden" id="btn-next-level">▶ Next Level</button>
+        <button class="btn btn-secondary" id="btn-go-leaderboard">🏆 Leaderboard</button>
+        <button class="btn btn-danger" id="btn-result-home">🏠 Home</button>
       </div>
+
     </div>
-  </section>
+  </div>
 
-  <!-- SCREEN: RESULT (incomplete) -->
-  <section id="screen-result" class="screen">
-    <div class="glass-card">
-      <span id="result-avatar-emoji" class="result-avatar">😊</span>
-      <div id="result-player" class="result-name">Player</div>
-      <div id="result-meta"   class="result-meta">Level 1 • Class 1 • Math</div>
-      <div class="result-stats">
-        <div class="stat-box stat-score"><span class="stat-num" id="result-score">0/0</span>    <span class="stat-label">Score</span></div>
-        <div class="stat-box stat-xp">  <span class="stat-num" id="result-xp">0</span>          <span class="stat-label">XP Earned</span></div>
-        <div class="stat-box stat-level"><span class="stat-num" id="result-level" style="font-size:1.1rem;">Beginner</span><span class="stat-label">XP Level</span></div>
-        <div class="stat-box stat-acc"> <span class="stat-num" id="result-accuracy">0%</span>   <span class="stat-label">Accuracy</span></div>
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 6 — LEADERBOARD
+       ══════════════════════════════════════════════════════ -->
+  <div id="screen-leaderboard" class="screen">
+    <div class="card" style="max-width:680px;margin:0 auto;">
+
+      <div class="flex-between mb-24">
+        <h2 style="font-family:'Orbitron',sans-serif;font-size:1.2rem;color:var(--neon-gold);">
+          🏆 Leaderboard
+        </h2>
+        <button class="btn btn-secondary btn-sm" id="btn-lb-back">← Home</button>
       </div>
-      <div class="result-actions">
-        <button id="btn-retry"          class="btn btn-primary">🔄 Retry Level</button>
-        <button id="btn-result-map"     class="btn btn-outline">🗺 Level Map</button>
-        <button id="btn-change-subject" class="btn btn-outline">🎨 Change Subject</button>
-        <button id="btn-home"           class="btn btn-danger-sm">🏠 Home</button>
+
+      <!-- Filter Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-filter="all">All Modes</button>
+        <button class="tab-btn" data-filter="free">Free Play</button>
+        <button class="tab-btn" data-filter="timer">Timer</button>
+        <button class="tab-btn" data-filter="level">Level</button>
       </div>
+
+      <div class="leaderboard-list" id="leaderboard-list">
+        <div class="lb-empty">No scores yet. Play a game first!</div>
+      </div>
+
     </div>
-  </section>
+  </div>
 
-  <!-- SCREEN: LEADERBOARD -->
-  <section id="screen-leaderboard" class="screen">
-    <div class="glass-card" style="max-width:560px;">
-      <h2 class="section-title">🏆 Leaderboard</h2>
-      <p class="section-sub">Top 10 Champions</p>
-      <ul id="lb-list" class="lb-list" role="list"></ul>
-      <button id="btn-lb-clear" class="btn btn-danger-sm" style="width:100%;margin-top:8px;">🗑️ Clear All Scores</button>
-    </div>
-  </section>
-
-  <!-- SCREEN: PROFILE -->
-  <section id="screen-profile" class="screen">
-    <div class="glass-card" style="max-width:500px;">
-      <div class="profile-avatar-wrap">
-        <span id="profile-avatar" class="profile-big-avatar">🧒</span>
-      </div>
-      <h2 class="section-title" id="profile-name">Player</h2>
-      <p  class="section-sub"   id="profile-level-label">Beginner • 0 XP</p>
-      <div class="result-stats" style="margin:16px 0;">
-        <div class="stat-box stat-score"><span class="stat-num" id="profile-games">0</span>     <span class="stat-label">Games</span></div>
-        <div class="stat-box stat-xp">  <span class="stat-num" id="profile-best">0</span>       <span class="stat-label">Best Score</span></div>
-        <div class="stat-box stat-acc"> <span class="stat-num" id="profile-accuracy">0%</span>  <span class="stat-label">Avg Accuracy</span></div>
-        <div class="stat-box stat-level"><span class="stat-num" id="profile-total-xp" style="font-size:1.1rem;">0</span><span class="stat-label">Total XP</span></div>
-      </div>
-      <h3 style="color:var(--accent-yellow);margin:12px 0 8px;font-size:0.95rem;">📋 Recent Games</h3>
-      <ul id="profile-history" class="lb-list" style="max-height:220px;overflow-y:auto;"></ul>
-    </div>
-  </section>
-
-  <footer>
-    <span>© 2026 BrainStorm Quiz</span>
-    <span>Educational Learning Platform 🌟</span>
-  </footer>
-
-</div>
+</div><!-- /#app -->
 
 <script src="js/script.js"></script>
 </body>
