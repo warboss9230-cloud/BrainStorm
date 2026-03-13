@@ -104,7 +104,7 @@
   ══════════════════════════════════ -->
   <section id="screen-quiz" class="screen" role="main">
 
-    <!-- Fixed Nav Bar -->
+    <!-- Sticky Nav Bar -->
     <nav class="nav-bar" aria-label="Quiz navigation">
       <span class="nav-brand">🧠 BrainStorm</span>
       <div class="nav-actions">
@@ -112,49 +112,53 @@
       </div>
     </nav>
 
-    <!-- Quiz Header Row -->
-    <div class="quiz-header">
-      <div class="quiz-meta">
-        <span class="badge badge-score" id="badge-score">⭐ 0</span>
-        <span class="badge badge-xp" id="badge-xp">✨ 0 XP</span>
-      </div>
-      <!-- Timer -->
-      <div id="timer-wrap" class="timer-wrap" aria-label="Time remaining" style="display:none;">
-        <svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
-          <circle class="timer-track" cx="30" cy="30" r="26"/>
-          <circle class="timer-bar"   cx="30" cy="30" r="26" style="stroke-dasharray:163.36;stroke-dashoffset:0;"/>
-        </svg>
-        <span id="timer-text" class="timer-text">20</span>
-      </div>
-    </div>
+    <!-- Scrollable quiz content -->
+    <div class="quiz-scroll">
 
-    <!-- Progress Bar -->
-    <div class="progress-wrap">
-      <div class="progress-info">
-        <span id="progress-label">Question 1 of 3</span>
-        <span id="progress-pct"></span>
+      <!-- Header: score + timer -->
+      <div class="quiz-header">
+        <div class="quiz-meta">
+          <span class="badge badge-score" id="badge-score">⭐ 0</span>
+          <span class="badge badge-xp" id="badge-xp">✨ 0 XP</span>
+        </div>
+        <div id="timer-wrap" class="timer-wrap" aria-label="Time remaining" style="display:none;">
+          <svg width="50" height="50" viewBox="0 0 50 50" aria-hidden="true">
+            <circle class="timer-track" cx="25" cy="25" r="21"/>
+            <circle class="timer-bar"   cx="25" cy="25" r="21" style="stroke-dasharray:131.95;stroke-dashoffset:0;"/>
+          </svg>
+          <span id="timer-text" class="timer-text">20</span>
+        </div>
       </div>
-      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-        <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+
+      <!-- Progress Bar -->
+      <div class="progress-wrap">
+        <div class="progress-info">
+          <span id="progress-label">Question 1 of 3</span>
+          <span id="progress-pct"></span>
+        </div>
+        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+          <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- Question Card -->
-    <div class="question-card" role="article">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span id="question-number" class="question-number">Q1</span>
-        <span id="question-difficulty" class="difficulty-pill diff-easy">easy</span>
+      <!-- Question Card -->
+      <div class="question-card" role="article">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span id="question-number" class="question-number">Q1</span>
+          <span id="question-difficulty" class="difficulty-pill diff-easy">easy</span>
+        </div>
+        <p id="question-text" class="question-text"></p>
       </div>
-      <p id="question-text" class="question-text"></p>
-    </div>
 
-    <!-- Options -->
-    <div id="options-grid" class="options-grid" role="group" aria-label="Answer options"></div>
+      <!-- Options -->
+      <div id="options-grid" class="options-grid" role="group" aria-label="Answer options"></div>
 
-    <!-- Next Button -->
-    <div class="next-wrap">
-      <button id="btn-next" aria-label="Next question">Next Question →</button>
-    </div>
+      <!-- Next Button -->
+      <div class="next-wrap">
+        <button id="btn-next" aria-label="Next question">Next Question →</button>
+      </div>
+
+    </div><!-- /.quiz-scroll -->
 
   </section>
 
