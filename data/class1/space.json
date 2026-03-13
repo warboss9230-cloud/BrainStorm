@@ -1,0 +1,126 @@
+{
+  "class": 1,
+  "subject": "Space",
+  "questions": [
+    {
+      "question": "What is at the center of our Solar System?",
+      "options": ["Sun", "Moon", "Earth", "Mars"],
+      "answer": "Sun",
+      "level": "easy"
+    },
+    {
+      "question": "What do we call the natural satellite of the Earth?",
+      "options": ["Moon", "Sun", "Mars", "Venus"],
+      "answer": "Moon",
+      "level": "easy"
+    },
+    {
+      "question": "How many planets are in our Solar System?",
+      "options": ["8", "9", "7", "10"],
+      "answer": "8",
+      "level": "medium"
+    },
+    {
+      "question": "Which planet is closest to the Sun?",
+      "options": ["Mercury", "Venus", "Earth", "Mars"],
+      "answer": "Mercury",
+      "level": "medium"
+    },
+    {
+      "question": "What do we call a person who travels to space?",
+      "options": ["Astronaut", "Pilot", "Driver", "Sailor"],
+      "answer": "Astronaut",
+      "level": "easy"
+    },
+    {
+      "question": "What is the colour of the Sun?",
+      "options": ["Yellow/White", "Red", "Blue", "Green"],
+      "answer": "Yellow/White",
+      "level": "easy"
+    },
+    {
+      "question": "What do we see shining in the sky at night?",
+      "options": ["Stars", "Clouds", "Birds", "Planes"],
+      "answer": "Stars",
+      "level": "easy"
+    },
+    {
+      "question": "Which is the red planet?",
+      "options": ["Mars", "Venus", "Jupiter", "Saturn"],
+      "answer": "Mars",
+      "level": "easy"
+    },
+    {
+      "question": "What is a shooting star actually?",
+      "options": ["A meteor", "A real star", "A planet", "A satellite"],
+      "answer": "A meteor",
+      "level": "hard"
+    },
+    {
+      "question": "Which planet has rings around it?",
+      "options": ["Saturn", "Earth", "Mars", "Venus"],
+      "answer": "Saturn",
+      "level": "medium"
+    },
+    {
+      "question": "What do we call the path a planet takes around the Sun?",
+      "options": ["Orbit", "Road", "Track", "Lane"],
+      "answer": "Orbit",
+      "level": "medium"
+    },
+    {
+      "question": "How many moons does Earth have?",
+      "options": ["1", "2", "0", "3"],
+      "answer": "1",
+      "level": "easy"
+    },
+    {
+      "question": "What vehicle is used to travel to space?",
+      "options": ["Rocket", "Car", "Boat", "Bicycle"],
+      "answer": "Rocket",
+      "level": "easy"
+    },
+    {
+      "question": "Which is the biggest planet in the Solar System?",
+      "options": ["Jupiter", "Saturn", "Earth", "Neptune"],
+      "answer": "Jupiter",
+      "level": "medium"
+    },
+    {
+      "question": "What is the name of our galaxy?",
+      "options": ["Milky Way", "Andromeda", "Orion", "Nebula"],
+      "answer": "Milky Way",
+      "level": "medium"
+    },
+    {
+      "question": "Which planet is known as the Blue Planet?",
+      "options": ["Earth", "Neptune", "Uranus", "Mars"],
+      "answer": "Earth",
+      "level": "medium"
+    },
+    {
+      "question": "How long does Earth take to go around the Sun?",
+      "options": ["1 year", "1 month", "1 day", "1 week"],
+      "answer": "1 year",
+      "level": "easy"
+    },
+    {
+      "question": "What is the Sun made of?",
+      "options": ["Hot gas and fire", "Water", "Ice", "Rock"],
+      "answer": "Hot gas and fire",
+      "level": "medium"
+    },
+    {
+      "question": "What do astronauts wear in space?",
+      "options": ["Space suit", "School uniform", "Rain coat", "Sweater"],
+      "answer": "Space suit",
+      "level": "easy"
+    },
+    {
+      "question": "What is the name of the space station that orbits Earth?",
+      "options": ["ISS", "NASA", "ISRO", "ESA"],
+      "answer": "ISS",
+      "level": "hard"
+    }
+  ]
+}
