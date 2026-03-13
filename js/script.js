@@ -9,7 +9,8 @@ const state = {
   playerName: '',
   selectedClass: null,
   selectedSubject: null,
-  selectedMode: null,   // 'free' | 'timer' | 'level'
+  selectedMode: null,
+  selectedDifficulty: 'all', // 'all' | 'easy' | 'medium' | 'hard'   // 'free' | 'timer' | 'level'
   questions: [],        // filtered & shuffled
   currentIdx: 0,
   score: 0,
@@ -58,6 +59,7 @@ const screens = {
   class:       $('screen-class'),
   subject:     $('screen-subject'),
   mode:        $('screen-mode'),
+  difficulty:  $('screen-difficulty'),
   quiz:        $('screen-quiz'),
   result:      $('screen-result'),
   leaderboard: $('screen-leaderboard'),
@@ -72,7 +74,7 @@ function showScreen(name) {
 
 // ── Back Button ─────────────────────────────────────────────────────────────
 const backBtn = $('back-btn');
-const backMap = { class:'name', subject:'class', mode:'subject', quiz:'mode', result:'name', leaderboard:'name' };
+const backMap = { class:'name', subject:'class', mode:'subject', difficulty:'mode', quiz:'difficulty', result:'name', leaderboard:'name' };
 function updateBackBtn(screen) {
   if (backMap[screen]) {
     backBtn.classList.add('visible');
@@ -211,9 +213,17 @@ function renderSubjects() {
 }
 
 // ── Step 4: Mode Selection ───────────────────────────────────────────────────
-$('mode-free').addEventListener('click',  () => startGame('free'));
-$('mode-timer').addEventListener('click', () => startGame('timer'));
-$('mode-level').addEventListener('click', () => startGame('level'));
+$('mode-free').addEventListener('click',  () => { state.selectedMode = 'free';  showScreen('difficulty'); });
+$('mode-timer').addEventListener('click', () => { state.selectedMode = 'timer'; showScreen('difficulty'); });
+$('mode-level').addEventListener('click', () => { state.selectedMode = 'level'; showScreen('difficulty'); });
+
+// ── Step 5: Difficulty Selection ─────────────────────────────────────────────
+['all','easy','medium','hard'].forEach(diff => {
+  $('diff-' + diff).addEventListener('click', () => {
+    state.selectedDifficulty = diff;
+    startGame(state.selectedMode);
+  });
+});
 
 // ── Load Questions ───────────────────────────────────────────────────────────
 async function loadQuestions() {
@@ -231,30 +241,26 @@ async function loadQuestions() {
     let qs;
 
     if (state.selectedSubject === 'Mix') {
-      // ── Mix mode: pick N questions from EACH available subject ──
       const available = SUBJECTS_ALL.filter(s => s.classes.includes(state.selectedClass));
-      const perSubject = 5; // 5 questions per subject → nice balanced mix
+      const perSubject = 5;
       qs = [];
       available.forEach(subj => {
-        const pool = shuffle(data.questions.filter(q => q.subject === subj.name));
+        let pool = data.questions.filter(q => q.subject === subj.name);
+        if (state.selectedDifficulty !== 'all') pool = pool.filter(q => q.level === state.selectedDifficulty);
+        pool = shuffle(pool);
         qs.push(...pool.slice(0, perSubject));
       });
-      if (qs.length === 0) {
-        showToast('No questions found!', 'wrong-toast');
-        return [];
-      }
+      if (qs.length === 0) { showToast('No questions found!', 'wrong-toast'); return []; }
       if (state.selectedMode === 'level') {
         const order = { easy: 0, medium: 1, hard: 2 };
         qs.sort((a, b) => order[a.level] - order[b.level]);
       } else {
-        qs = shuffle(qs); // interleave subjects randomly
+        qs = shuffle(qs);
       }
     } else {
       qs = data.questions.filter(q => q.subject === state.selectedSubject);
-      if (qs.length === 0) {
-        showToast('No questions found for this subject!', 'wrong-toast');
-        return [];
-      }
+      if (state.selectedDifficulty !== 'all') qs = qs.filter(q => q.level === state.selectedDifficulty);
+      if (qs.length === 0) { showToast('No questions found for this difficulty!', 'wrong-toast'); return []; }
       if (state.selectedMode === 'level') {
         const order = { easy: 0, medium: 1, hard: 2 };
         qs.sort((a, b) => order[a.level] - order[b.level]);
@@ -293,6 +299,9 @@ async function startGame(mode) {
   state.questions = qs;
 
   showScreen('quiz');
+  // Show difficulty in nav
+  const diffEmoji = { all:'🌈', easy:'😊', medium:'🤔', hard:'🔥' };
+  $('nav-level').textContent = `Lv.${state.level} ${diffEmoji[state.selectedDifficulty] || ''}`;
   updateQuizMeta();
   renderQuestion();
 }
@@ -455,7 +464,8 @@ function endGame() {
   $('result-player').textContent = state.playerName;
   const subjectLabel = state.selectedSubject === 'Mix' ? '🎲 Mix All Subjects' : state.selectedSubject;
   const modeLabel = state.selectedMode === 'free' ? 'Free Play' : state.selectedMode === 'timer' ? 'Timer Mode' : 'Level Mode';
-  $('result-meta').textContent = `Class ${state.selectedClass} • ${subjectLabel} • ${modeLabel}`;
+  const diffLabel = state.selectedDifficulty === 'all' ? 'All Levels' : state.selectedDifficulty.charAt(0).toUpperCase() + state.selectedDifficulty.slice(1);
+  $('result-meta').textContent = `Class ${state.selectedClass} • ${subjectLabel} • ${modeLabel} • ${diffLabel}`;
   $('result-score').textContent = `${state.score}/${total}`;
   $('result-xp').textContent = state.xp;
   $('result-level').textContent = getLevelName(state.xp);
