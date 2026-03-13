@@ -1,0 +1,126 @@
+{
+  "class": 1,
+  "subject": "Computer",
+  "questions": [
+    {
+      "question": "What is used to type letters on a computer?",
+      "options": ["Keyboard", "Mouse", "Monitor", "Speaker"],
+      "answer": "Keyboard",
+      "level": "easy"
+    },
+    {
+      "question": "What do we see on a computer screen?",
+      "options": ["Monitor", "CPU", "Mouse", "Printer"],
+      "answer": "Monitor",
+      "level": "easy"
+    },
+    {
+      "question": "Which part of the computer do we click with?",
+      "options": ["Mouse", "Keyboard", "Monitor", "Speaker"],
+      "answer": "Mouse",
+      "level": "easy"
+    },
+    {
+      "question": "What is the brain of the computer called?",
+      "options": ["CPU", "Monitor", "Keyboard", "Mouse"],
+      "answer": "CPU",
+      "level": "medium"
+    },
+    {
+      "question": "What is used to print documents?",
+      "options": ["Printer", "Scanner", "Monitor", "Speaker"],
+      "answer": "Printer",
+      "level": "easy"
+    },
+    {
+      "question": "What button do we press to turn on the computer?",
+      "options": ["Power button", "Enter key", "Space bar", "Delete key"],
+      "answer": "Power button",
+      "level": "easy"
+    },
+    {
+      "question": "Which of these is an input device?",
+      "options": ["Keyboard", "Monitor", "Printer", "Speaker"],
+      "answer": "Keyboard",
+      "level": "medium"
+    },
+    {
+      "question": "What does a computer use to store information?",
+      "options": ["Memory", "Battery", "Bulb", "Fan"],
+      "answer": "Memory",
+      "level": "medium"
+    },
+    {
+      "question": "What is a laptop?",
+      "options": ["A portable computer", "A big TV", "A phone", "A camera"],
+      "answer": "A portable computer",
+      "level": "easy"
+    },
+    {
+      "question": "Which key is the longest key on the keyboard?",
+      "options": ["Space bar", "Enter", "Shift", "Backspace"],
+      "answer": "Space bar",
+      "level": "easy"
+    },
+    {
+      "question": "What sound does a computer make when it starts?",
+      "options": ["Beep", "Moo", "Bark", "Chirp"],
+      "answer": "Beep",
+      "level": "easy"
+    },
+    {
+      "question": "What do we use a computer for?",
+      "options": ["All of these", "Playing games", "Learning", "Drawing"],
+      "answer": "All of these",
+      "level": "easy"
+    },
+    {
+      "question": "Which is an output device?",
+      "options": ["Monitor", "Keyboard", "Mouse", "Scanner"],
+      "answer": "Monitor",
+      "level": "medium"
+    },
+    {
+      "question": "What do we use headphones for on a computer?",
+      "options": ["Listening to sound", "Typing", "Seeing pictures", "Printing"],
+      "answer": "Listening to sound",
+      "level": "easy"
+    },
+    {
+      "question": "What is a computer mouse used to do?",
+      "options": ["Click and select things", "Type words", "Print papers", "Make sounds"],
+      "answer": "Click and select things",
+      "level": "easy"
+    },
+    {
+      "question": "What do we call a small picture on the computer screen?",
+      "options": ["Icon", "Word", "Letter", "Button"],
+      "answer": "Icon",
+      "level": "medium"
+    },
+    {
+      "question": "Which key do we press to delete a letter we just typed?",
+      "options": ["Backspace", "Enter", "Space", "Shift"],
+      "answer": "Backspace",
+      "level": "easy"
+    },
+    {
+      "question": "What colour is a computer cursor usually?",
+      "options": ["White or Black", "Red", "Blue", "Green"],
+      "answer": "White or Black",
+      "level": "easy"
+    },
+    {
+      "question": "Which device is used to scan a picture into the computer?",
+      "options": ["Scanner", "Printer", "Monitor", "Keyboard"],
+      "answer": "Scanner",
+      "level": "medium"
+    },
+    {
+      "question": "What does 'www' stand for in a website address?",
+      "options": ["World Wide Web", "World Wide Window", "Web Wide World", "Wild Wide Web"],
+      "answer": "World Wide Web",
+      "level": "hard"
+    }
+  ]
+}
