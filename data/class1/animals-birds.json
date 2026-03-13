@@ -1,0 +1,126 @@
+{
+  "class": 1,
+  "subject": "Animals/Birds",
+  "questions": [
+    {
+      "question": "Which animal is known as the King of the Jungle?",
+      "options": ["Lion", "Tiger", "Elephant", "Giraffe"],
+      "answer": "Lion",
+      "level": "easy"
+    },
+    {
+      "question": "What do cows give us?",
+      "options": ["Milk", "Eggs", "Honey", "Wool"],
+      "answer": "Milk",
+      "level": "easy"
+    },
+    {
+      "question": "Which bird can talk like humans?",
+      "options": ["Parrot", "Crow", "Eagle", "Sparrow"],
+      "answer": "Parrot",
+      "level": "easy"
+    },
+    {
+      "question": "Which is the fastest land animal?",
+      "options": ["Cheetah", "Horse", "Tiger", "Dog"],
+      "answer": "Cheetah",
+      "level": "medium"
+    },
+    {
+      "question": "What do bees make?",
+      "options": ["Honey", "Milk", "Wool", "Eggs"],
+      "answer": "Honey",
+      "level": "easy"
+    },
+    {
+      "question": "Which animal has a long neck?",
+      "options": ["Giraffe", "Elephant", "Lion", "Dog"],
+      "answer": "Giraffe",
+      "level": "easy"
+    },
+    {
+      "question": "Which bird is the national bird of India?",
+      "options": ["Peacock", "Parrot", "Eagle", "Sparrow"],
+      "answer": "Peacock",
+      "level": "easy"
+    },
+    {
+      "question": "How many legs does a spider have?",
+      "options": ["8", "6", "4", "10"],
+      "answer": "8",
+      "level": "medium"
+    },
+    {
+      "question": "Which animal lives in a den?",
+      "options": ["Lion", "Fish", "Bird", "Rabbit"],
+      "answer": "Lion",
+      "level": "medium"
+    },
+    {
+      "question": "Which bird cannot fly?",
+      "options": ["Penguin", "Eagle", "Sparrow", "Parrot"],
+      "answer": "Penguin",
+      "level": "easy"
+    },
+    {
+      "question": "What do sheep give us?",
+      "options": ["Wool", "Milk", "Eggs", "Honey"],
+      "answer": "Wool",
+      "level": "easy"
+    },
+    {
+      "question": "Which animal is the largest on land?",
+      "options": ["Elephant", "Giraffe", "Hippo", "Rhino"],
+      "answer": "Elephant",
+      "level": "easy"
+    },
+    {
+      "question": "What is the home of a bird called?",
+      "options": ["Nest", "Den", "Burrow", "Stable"],
+      "answer": "Nest",
+      "level": "easy"
+    },
+    {
+      "question": "Which animal is known as man's best friend?",
+      "options": ["Dog", "Cat", "Horse", "Rabbit"],
+      "answer": "Dog",
+      "level": "easy"
+    },
+    {
+      "question": "Which animal hops and lives near ponds?",
+      "options": ["Frog", "Rabbit", "Kangaroo", "Cat"],
+      "answer": "Frog",
+      "level": "easy"
+    },
+    {
+      "question": "What does a caterpillar turn into?",
+      "options": ["Butterfly", "Ant", "Bee", "Fly"],
+      "answer": "Butterfly",
+      "level": "easy"
+    },
+    {
+      "question": "Which animal sleeps in winter (hibernates)?",
+      "options": ["Bear", "Lion", "Dog", "Peacock"],
+      "answer": "Bear",
+      "level": "medium"
+    },
+    {
+      "question": "Which bird is a symbol of peace?",
+      "options": ["Dove", "Eagle", "Crow", "Owl"],
+      "answer": "Dove",
+      "level": "medium"
+    },
+    {
+      "question": "What is the baby of a dog called?",
+      "options": ["Puppy", "Kitten", "Calf", "Cub"],
+      "answer": "Puppy",
+      "level": "easy"
+    },
+    {
+      "question": "Which sea animal has eight arms?",
+      "options": ["Octopus", "Shark", "Dolphin", "Whale"],
+      "answer": "Octopus",
+      "level": "medium"
+    }
+  ]
+}
