@@ -205,17 +205,23 @@ $('mode-level').addEventListener('click', () => startGame('level'));
 // ── Load Questions ───────────────────────────────────────────────────────────
 async function loadQuestions() {
   try {
-    const res = await fetch(`data/class${state.selectedClass}.json`);
-    const data = await res.json();
+    let data = null;
+    // Try embedded data first (works with file://)
+    if (window.QUIZ_DATA && window.QUIZ_DATA[state.selectedClass]) {
+      data = window.QUIZ_DATA[state.selectedClass];
+    } else {
+      // Fallback: fetch from JSON file (works with http://)
+      const res = await fetch(`data/class${state.selectedClass}.json`);
+      data = await res.json();
+    }
     let qs = data.questions.filter(q => q.subject === state.selectedSubject);
     if (qs.length === 0) {
-      // Fallback: use all questions for subject Computer if none found
-      qs = data.questions;
+      showToast('No questions found for this subject!', 'wrong-toast');
+      return [];
     }
     if (state.selectedMode === 'level') {
-      // Sort by difficulty: easy → medium → hard
       const order = { easy: 0, medium: 1, hard: 2 };
-      qs.sort((a,b) => order[a.level] - order[b.level]);
+      qs.sort((a, b) => order[a.level] - order[b.level]);
     } else {
       qs = shuffle(qs);
     }
@@ -363,7 +369,7 @@ function updateTimerUI() {
   if (state.selectedMode !== 'timer') { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
   const pct = state.timeLeft / state.totalTime;
-  const r = 26, circ = 2 * Math.PI * r;
+  const r = 21, circ = 2 * Math.PI * r;
   const bar = document.querySelector('.timer-bar');
   bar.style.strokeDasharray = circ;
   bar.style.strokeDashoffset = circ * (1 - pct);
