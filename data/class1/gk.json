@@ -1,0 +1,126 @@
+{
+  "class": 1,
+  "subject": "GK",
+  "questions": [
+    {
+      "question": "What is the capital of India?",
+      "options": ["New Delhi", "Mumbai", "Kolkata", "Chennai"],
+      "answer": "New Delhi",
+      "level": "easy"
+    },
+    {
+      "question": "How many colours are in a rainbow?",
+      "options": ["7", "5", "6", "8"],
+      "answer": "7",
+      "level": "easy"
+    },
+    {
+      "question": "What is the national animal of India?",
+      "options": ["Tiger", "Lion", "Elephant", "Peacock"],
+      "answer": "Tiger",
+      "level": "easy"
+    },
+    {
+      "question": "What is the national bird of India?",
+      "options": ["Peacock", "Parrot", "Sparrow", "Eagle"],
+      "answer": "Peacock",
+      "level": "easy"
+    },
+    {
+      "question": "Which is the largest planet in our solar system?",
+      "options": ["Jupiter", "Saturn", "Earth", "Mars"],
+      "answer": "Jupiter",
+      "level": "medium"
+    },
+    {
+      "question": "How many continents are there on Earth?",
+      "options": ["7", "5", "6", "8"],
+      "answer": "7",
+      "level": "medium"
+    },
+    {
+      "question": "What is the national flower of India?",
+      "options": ["Lotus", "Rose", "Sunflower", "Jasmine"],
+      "answer": "Lotus",
+      "level": "easy"
+    },
+    {
+      "question": "On which date is Independence Day celebrated in India?",
+      "options": ["15 August", "26 January", "2 October", "25 December"],
+      "answer": "15 August",
+      "level": "easy"
+    },
+    {
+      "question": "Which is the longest river in the world?",
+      "options": ["Nile", "Amazon", "Ganga", "Yamuna"],
+      "answer": "Nile",
+      "level": "medium"
+    },
+    {
+      "question": "What do we call the doctor who treats teeth?",
+      "options": ["Dentist", "Surgeon", "Vet", "Chemist"],
+      "answer": "Dentist",
+      "level": "easy"
+    },
+    {
+      "question": "What is 2 + 2 in Roman numerals?",
+      "options": ["IV", "V", "VI", "III"],
+      "answer": "IV",
+      "level": "hard"
+    },
+    {
+      "question": "Which is the tallest mountain in the world?",
+      "options": ["Mount Everest", "K2", "Kangchenjunga", "Makalu"],
+      "answer": "Mount Everest",
+      "level": "medium"
+    },
+    {
+      "question": "Who wrote our national anthem?",
+      "options": ["Rabindranath Tagore", "Mahatma Gandhi", "Jawaharlal Nehru", "B.R. Ambedkar"],
+      "answer": "Rabindranath Tagore",
+      "level": "medium"
+    },
+    {
+      "question": "What is the currency of India?",
+      "options": ["Rupee", "Dollar", "Euro", "Pound"],
+      "answer": "Rupee",
+      "level": "easy"
+    },
+    {
+      "question": "How many oceans are there on Earth?",
+      "options": ["5", "4", "6", "3"],
+      "answer": "5",
+      "level": "medium"
+    },
+    {
+      "question": "Who is known as the Father of the Nation in India?",
+      "options": ["Mahatma Gandhi", "Nehru", "Subhash Chandra Bose", "Bhagat Singh"],
+      "answer": "Mahatma Gandhi",
+      "level": "easy"
+    },
+    {
+      "question": "What is the colour of the sky on a clear day?",
+      "options": ["Blue", "Red", "Green", "Yellow"],
+      "answer": "Blue",
+      "level": "easy"
+    },
+    {
+      "question": "Which is the smallest continent?",
+      "options": ["Australia", "Europe", "Antarctica", "Asia"],
+      "answer": "Australia",
+      "level": "medium"
+    },
+    {
+      "question": "What is the shape of the Earth?",
+      "options": ["Round (sphere)", "Flat", "Square", "Triangle"],
+      "answer": "Round (sphere)",
+      "level": "easy"
+    },
+    {
+      "question": "Which planet is called the Red Planet?",
+      "options": ["Mars", "Venus", "Jupiter", "Mercury"],
+      "answer": "Mars",
+      "level": "medium"
+    }
+  ]
+}
