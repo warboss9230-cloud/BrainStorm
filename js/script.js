@@ -87,6 +87,7 @@ let state = {
   timerInterval:  null,
   timeLeft:       20,
   mode:           'free',   // 'free' | 'timer'
+  quizMode:       'level',  // 'free' | 'timer' | 'level'  (chosen in mode screen)
 };
 
 // ── PROGRESS (persisted) ──────────────────────────────────────────────────────
@@ -163,12 +164,13 @@ function isLevelCompleted(lvl) {
 }
 
 // ── SCREEN NAVIGATION ─────────────────────────────────────────────────────────
-const SCREENS = ['home','avatar','levelmap','class','subject','quiz','levelup','result','leaderboard','profile'];
+const SCREENS = ['home','avatar','levelmap','class','subject','mode','quiz','levelup','result','leaderboard','profile'];
 const BACK_MAP = {
   avatar:      () => showScreen('home'),
   levelmap:    () => showScreen('home'),
   class:       () => showScreen('levelmap'),
   subject:     () => { showScreen('class'); renderClasses(); },
+  mode:        () => { showScreen('subject'); renderSubjects(); },
   quiz:        () => { clearTimer(); showScreen('levelmap'); },
   levelup:     () => showScreen('levelmap'),
   result:      () => showScreen('levelmap'),
@@ -429,16 +431,41 @@ function renderSubjects() {
   const mixDiv = document.createElement('div');
   mixDiv.className = 'card-item mix-card color-1';
   mixDiv.innerHTML = `<span class="card-icon">🎲</span><span class="card-label">Mix All</span>`;
-  mixDiv.onclick = () => { state.selectedSubject = 'Mix'; startQuiz(); };
+  mixDiv.onclick = () => { state.selectedSubject = 'Mix'; showModeScreen(); };
   grid.appendChild(mixDiv);
 
   SUBJECTS_ALL.forEach((subj, i) => {
     const div = document.createElement('div');
     div.className = `card-item ${colors[(i+1)%6]}`;
     div.innerHTML = `<span class="card-icon">${subj.icon}</span><span class="card-label">${subj.name}</span>`;
-    div.onclick = () => { state.selectedSubject = subj.name; startQuiz(); };
+    div.onclick = () => { state.selectedSubject = subj.name; showModeScreen(); };
     grid.appendChild(div);
   });
+}
+
+// ════════════════════════════════════════════════════════════
+//  SCREEN: MODE SELECTION
+// ════════════════════════════════════════════════════════════
+function showModeScreen() {
+  // Reset selection highlight
+  ['free','timer','level'].forEach(m => {
+    const el = $('mode-card-' + m);
+    if (el) el.classList.remove('selected');
+  });
+  showScreen('mode');
+
+  $('mode-card-free').onclick = () => {
+    state.quizMode = 'free';
+    startQuiz();
+  };
+  $('mode-card-timer').onclick = () => {
+    state.quizMode = 'timer';
+    startQuiz();
+  };
+  $('mode-card-level').onclick = () => {
+    state.quizMode = 'level';
+    startQuiz();
+  };
 }
 
 // ════════════════════════════════════════════════════════════
@@ -529,7 +556,8 @@ async function startQuiz() {
 
   // Update quiz nav
   $('nav-av').textContent        = state.avatar || progress.avatar || '🧒';
-  $('nav-level-label').textContent = `Level ${state.gameLevel} — ${LEVEL_TITLES[state.gameLevel]}`;
+  const modeLabel = state.quizMode === 'free' ? '🕊️ Free' : state.quizMode === 'timer' ? '⏱️ Timer' : '📈 Progress';
+  $('nav-level-label').textContent = `Level ${state.gameLevel} — ${modeLabel}`;
 
   showScreen('quiz');
   updateQuizMeta();
@@ -582,8 +610,8 @@ function renderQuestion() {
 
   $('btn-next').classList.remove('visible');
 
-  // Timer mode for higher levels (level >= 5)
-  if (state.gameLevel >= 5) {
+  // Mode logic
+  if (state.quizMode === 'timer' || (state.quizMode === 'level' && state.gameLevel >= 5)) {
     state.mode = 'timer';
     startTimer();
   } else {
@@ -649,10 +677,13 @@ function finishLevel() {
   progress.totalXP        = (progress.totalXP || 0) + state.sessionXP;
 
   if (passed && !progress.completedLevels.includes(state.gameLevel)) {
-    progress.completedLevels.push(state.gameLevel);
-    // Unlock next level
-    if (state.gameLevel < TOTAL_LEVELS) {
-      progress.currentLevel = state.gameLevel + 1;
+    // Only update level progress in 'level' mode
+    if (state.quizMode === 'level') {
+      progress.completedLevels.push(state.gameLevel);
+      // Unlock next level
+      if (state.gameLevel < TOTAL_LEVELS) {
+        progress.currentLevel = state.gameLevel + 1;
+      }
     }
   }
   saveProgress();
@@ -712,7 +743,7 @@ function showResultScreen(total, accuracy, passed) {
   const pct = state.sessionScore / total;
   $('result-avatar-emoji').textContent = pct >= 0.8 ? '🏆' : pct >= 0.6 ? '🌟' : pct >= 0.4 ? '😊' : '💪';
   $('result-player').textContent       = progress.name || state.playerName;
-  $('result-meta').textContent         = `Level ${state.gameLevel} • Class ${state.selectedClass} • ${state.selectedSubject}`;
+  $('result-meta').textContent         = `Level ${state.gameLevel} • Class ${state.selectedClass} • ${state.selectedSubject} • ${state.quizMode === 'free' ? '🕊️ Free' : state.quizMode === 'timer' ? '⏱️ Timer' : '📈 Progress'}`;
   $('result-score').textContent        = `${state.sessionScore}/${total}`;
   $('result-xp').textContent           = state.sessionXP;
   $('result-level').textContent        = getXPLevelName(progress.totalXP);
