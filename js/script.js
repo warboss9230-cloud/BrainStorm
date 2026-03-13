@@ -184,10 +184,23 @@ function renderSubjects() {
   grid.innerHTML = '';
   $('subject-class-label').textContent = `Class ${state.selectedClass}`;
   const colors = ['color-1','color-2','color-3','color-4','color-5','color-6'];
+
+  // ── Mix All Subjects card (always first) ──
+  const mixDiv = document.createElement('div');
+  mixDiv.className = 'card-item mix-card color-1';
+  mixDiv.innerHTML = `<span class="card-icon">🎲</span><span class="card-label">Mix All</span>`;
+  mixDiv.title = 'Random questions from every subject';
+  mixDiv.addEventListener('click', () => {
+    state.selectedSubject = 'Mix';
+    showScreen('mode');
+  });
+  grid.appendChild(mixDiv);
+
+  // ── Individual subject cards ──
   const available = SUBJECTS_ALL.filter(s => s.classes.includes(state.selectedClass));
   available.forEach((subj, i) => {
     const div = document.createElement('div');
-    div.className = `card-item ${colors[i % 6]}`;
+    div.className = `card-item ${colors[(i + 1) % 6]}`;
     div.innerHTML = `<span class="card-icon">${subj.icon}</span><span class="card-label">${subj.name}</span>`;
     div.addEventListener('click', () => {
       state.selectedSubject = subj.name;
@@ -214,17 +227,42 @@ async function loadQuestions() {
       const res = await fetch(`data/class${state.selectedClass}.json`);
       data = await res.json();
     }
-    let qs = data.questions.filter(q => q.subject === state.selectedSubject);
-    if (qs.length === 0) {
-      showToast('No questions found for this subject!', 'wrong-toast');
-      return [];
-    }
-    if (state.selectedMode === 'level') {
-      const order = { easy: 0, medium: 1, hard: 2 };
-      qs.sort((a, b) => order[a.level] - order[b.level]);
+
+    let qs;
+
+    if (state.selectedSubject === 'Mix') {
+      // ── Mix mode: pick N questions from EACH available subject ──
+      const available = SUBJECTS_ALL.filter(s => s.classes.includes(state.selectedClass));
+      const perSubject = 5; // 5 questions per subject → nice balanced mix
+      qs = [];
+      available.forEach(subj => {
+        const pool = shuffle(data.questions.filter(q => q.subject === subj.name));
+        qs.push(...pool.slice(0, perSubject));
+      });
+      if (qs.length === 0) {
+        showToast('No questions found!', 'wrong-toast');
+        return [];
+      }
+      if (state.selectedMode === 'level') {
+        const order = { easy: 0, medium: 1, hard: 2 };
+        qs.sort((a, b) => order[a.level] - order[b.level]);
+      } else {
+        qs = shuffle(qs); // interleave subjects randomly
+      }
     } else {
-      qs = shuffle(qs);
+      qs = data.questions.filter(q => q.subject === state.selectedSubject);
+      if (qs.length === 0) {
+        showToast('No questions found for this subject!', 'wrong-toast');
+        return [];
+      }
+      if (state.selectedMode === 'level') {
+        const order = { easy: 0, medium: 1, hard: 2 };
+        qs.sort((a, b) => order[a.level] - order[b.level]);
+      } else {
+        qs = shuffle(qs);
+      }
     }
+
     return qs;
   } catch(e) {
     showToast('Could not load questions. Try another subject!', 'wrong-toast');
@@ -278,6 +316,16 @@ function renderQuestion() {
   $('question-difficulty').className = `difficulty-pill ${diffClass}`;
   $('question-difficulty').textContent = q.level;
   $('question-text').textContent = q.question;
+  // Show subject tag in Mix mode
+  const subjTag = $('question-subject-tag');
+  if (state.selectedSubject === 'Mix') {
+    const subjInfo = SUBJECTS_ALL.find(s => s.name === q.subject);
+    const icon = subjInfo ? subjInfo.icon : '📚';
+    subjTag.textContent = `${icon} ${q.subject}`;
+    subjTag.style.display = 'inline-block';
+  } else {
+    subjTag.style.display = 'none';
+  }
 
   // Options — shuffle option order
   const optLetters = ['A','B','C','D'];
@@ -405,7 +453,9 @@ function endGame() {
 
   // Result screen
   $('result-player').textContent = state.playerName;
-  $('result-meta').textContent = `Class ${state.selectedClass} • ${state.selectedSubject} • ${state.selectedMode === 'free' ? 'Free Play' : state.selectedMode === 'timer' ? 'Timer Mode' : 'Level Mode'}`;
+  const subjectLabel = state.selectedSubject === 'Mix' ? '🎲 Mix All Subjects' : state.selectedSubject;
+  const modeLabel = state.selectedMode === 'free' ? 'Free Play' : state.selectedMode === 'timer' ? 'Timer Mode' : 'Level Mode';
+  $('result-meta').textContent = `Class ${state.selectedClass} • ${subjectLabel} • ${modeLabel}`;
   $('result-score').textContent = `${state.score}/${total}`;
   $('result-xp').textContent = state.xp;
   $('result-level').textContent = getLevelName(state.xp);
