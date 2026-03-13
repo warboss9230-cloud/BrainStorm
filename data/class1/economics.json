@@ -1,0 +1,126 @@
+{
+  "class": 1,
+  "subject": "Economics",
+  "questions": [
+    {
+      "question": "What do we use to buy things from a shop?",
+      "options": ["Money", "Stones", "Leaves", "Sand"],
+      "answer": "Money",
+      "level": "easy"
+    },
+    {
+      "question": "Where do people keep their money safe?",
+      "options": ["Bank", "School", "Hospital", "Park"],
+      "answer": "Bank",
+      "level": "easy"
+    },
+    {
+      "question": "What is the smallest coin in India?",
+      "options": ["50 paise", "1 rupee", "25 paise", "10 paise"],
+      "answer": "50 paise",
+      "level": "medium"
+    },
+    {
+      "question": "What do we call the place where we buy vegetables and fruits?",
+      "options": ["Market", "School", "Library", "Temple"],
+      "answer": "Market",
+      "level": "easy"
+    },
+    {
+      "question": "If you have 5 rupees and spend 3 rupees, how much is left?",
+      "options": ["2 rupees", "3 rupees", "4 rupees", "1 rupee"],
+      "answer": "2 rupees",
+      "level": "easy"
+    },
+    {
+      "question": "What do we call money earned by working?",
+      "options": ["Income", "Expense", "Loan", "Savings"],
+      "answer": "Income",
+      "level": "medium"
+    },
+    {
+      "question": "Which of these is a need (something we must have)?",
+      "options": ["Food", "Toy", "Video game", "Sweets"],
+      "answer": "Food",
+      "level": "easy"
+    },
+    {
+      "question": "What do we call things we want but don't really need?",
+      "options": ["Wants", "Needs", "Savings", "Goods"],
+      "answer": "Wants",
+      "level": "medium"
+    },
+    {
+      "question": "What is a shop that sells medicine called?",
+      "options": ["Pharmacy", "Bakery", "Dairy", "Library"],
+      "answer": "Pharmacy",
+      "level": "medium"
+    },
+    {
+      "question": "What do we call saving money for the future?",
+      "options": ["Savings", "Spending", "Wasting", "Borrowing"],
+      "answer": "Savings",
+      "level": "easy"
+    },
+    {
+      "question": "What is a person who grows crops called?",
+      "options": ["Farmer", "Doctor", "Teacher", "Engineer"],
+      "answer": "Farmer",
+      "level": "easy"
+    },
+    {
+      "question": "If a pen costs 5 rupees, how much do 2 pens cost?",
+      "options": ["10 rupees", "5 rupees", "15 rupees", "8 rupees"],
+      "answer": "10 rupees",
+      "level": "easy"
+    },
+    {
+      "question": "What is the symbol for Indian Rupee?",
+      "options": ["₹", "$", "€", "£"],
+      "answer": "₹",
+      "level": "easy"
+    },
+    {
+      "question": "Who makes products in a factory?",
+      "options": ["Worker", "Doctor", "Teacher", "Pilot"],
+      "answer": "Worker",
+      "level": "easy"
+    },
+    {
+      "question": "What do we call the exchange of goods without money?",
+      "options": ["Barter", "Trade", "Gift", "Loan"],
+      "answer": "Barter",
+      "level": "hard"
+    },
+    {
+      "question": "What do we call a person who buys goods from a shop?",
+      "options": ["Customer", "Seller", "Farmer", "Worker"],
+      "answer": "Customer",
+      "level": "easy"
+    },
+    {
+      "question": "What does a baker sell?",
+      "options": ["Bread and cakes", "Milk", "Vegetables", "Medicine"],
+      "answer": "Bread and cakes",
+      "level": "easy"
+    },
+    {
+      "question": "What is a piggy bank used for?",
+      "options": ["Saving coins", "Eating food", "Playing games", "Drawing"],
+      "answer": "Saving coins",
+      "level": "easy"
+    },
+    {
+      "question": "What do we call a place where lots of shops are together?",
+      "options": ["Mall or Market", "School", "Hospital", "Farm"],
+      "answer": "Mall or Market",
+      "level": "easy"
+    },
+    {
+      "question": "If you have 10 rupees and get 5 more, how much do you have?",
+      "options": ["15 rupees", "10 rupees", "5 rupees", "20 rupees"],
+      "answer": "15 rupees",
+      "level": "easy"
+    }
+  ]
+}
