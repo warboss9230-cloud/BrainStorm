@@ -340,7 +340,7 @@ function openMixPanel(){
   });
   updateMixCount();
   // Smooth scroll to panel
-  setTimeout(()=>document.getElementById('mix-panel').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  setTimeout(()=>document.getElementById('mix-panel')?.scrollIntoView({behavior:'smooth', block:'start'}), 50);
 }
 
 function closeMixPanel(){
@@ -501,7 +501,12 @@ function renderQuestion(){
   // Show subject tag in mix mode
   const qtxt = document.getElementById('q-text');
   if(state.isMixMode && q._subjectName){
-    qtxt.innerHTML = `<span class="mix-subj-tag">${q._subjectName}</span>${q.question}`;
+    const tag = document.createElement('span');
+    tag.className = 'mix-subj-tag';
+    tag.textContent = q._subjectName;
+    qtxt.innerHTML = '';
+    qtxt.appendChild(tag);
+    qtxt.appendChild(document.createTextNode(' ' + q.question));
   } else {
     qtxt.textContent = q.question;
   }
@@ -553,10 +558,13 @@ function handleAnswer(btn, chosen, correct){
   state.answered=true;
   clearInterval(state.timerInterval);
 
-  // 🔐 Check against encrypted answer if available
-  const isCorrect = (q._enc && window.checkAnswer)
-    ? window.checkAnswer(chosen, q._enc)
+  // 🔐 Check against encrypted answer
+  const curQ = state.questions[state.currentQ];
+  const isCorrect = (curQ && curQ._enc && window.checkAnswer)
+    ? window.checkAnswer(chosen, curQ._enc)
     : chosen === correct;
+
+  // Highlight correct answer
   document.querySelectorAll('.option-btn').forEach(b=>{
     b.disabled=true;
     if(b.querySelector('span:last-child').textContent===correct) b.classList.add('correct');
@@ -598,12 +606,12 @@ function timeUp(){
   if(state.answered) return;
   state.answered=true;
   state.currentStreak=0; state.player.streak=0;
-  const correct=state.questions[state.currentQ].answer;
+  const curQ2=state.questions[state.currentQ]; const correct=curQ2?curQ2.answer:'';
   document.querySelectorAll('.option-btn').forEach(b=>{
     b.disabled=true;
     if(b.querySelector('span:last-child').textContent===correct) b.classList.add('correct');
   });
-  document.getElementById('feedback-msg').textContent=`⏰ Time's up! ✅ ${correct}`;
+  document.getElementById('feedback-msg').textContent=`⏰ Time's up! ✅ ${correct || ''}`;
   document.getElementById('feedback-msg').style.color='#f7971e';
   state.sessionWrong++;
   if(state.gameMode==='challenge'){
@@ -620,13 +628,15 @@ function useHint(){
   state.hintUsed=true;
   document.getElementById('btn-hint').disabled=true;
   const q=state.questions[state.currentQ];
+  // 🔐 Get real answer (decrypted if encrypted)
+  const realAnswer = (q._enc && window.decryptAnswer) ? window.decryptAnswer(q._enc) : q.answer;
   // Eliminate one wrong answer
   const opts=document.querySelectorAll('.option-btn');
   let eliminated=false;
   opts.forEach(btn=>{
     if(!eliminated){
       const txt=btn.querySelector('span:last-child').textContent;
-      if(txt!==q.answer){
+      if(txt!==realAnswer){
         btn.style.opacity='.35';
         btn.disabled=true;
         eliminated=true;
@@ -819,6 +829,7 @@ function showDashboard(){
 function openDailyChallenge(){
   const today=new Date().toDateString();
   const wrap=document.getElementById('daily-wrap');
+  if(!wrap) return;
   if(state.player.dailyDate===today){
     wrap.innerHTML=`<div class="daily-done-card">
       <span style="font-size:3rem;display:block;margin-bottom:10px">✅</span>
