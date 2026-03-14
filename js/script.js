@@ -399,6 +399,7 @@ async function startMixQuiz(){
   for(const subj of state.mixSubjects){
     try {
       const resp = await fetch(`data/class${state.selectedClass}/${subj.key}.json`);
+      if(!resp.ok) { console.warn(`Could not load ${subj.key} (HTTP ${resp.status})`); continue; }
       const qs = await resp.json();
       // Pick random questions from each subject
       const shuffled = qs.sort(()=>Math.random()-.5).slice(0, perSubj);
@@ -463,15 +464,26 @@ async function startGame(mode, level=1){
 
   const url=`data/class${state.selectedClass}/${state.selectedSubject.key}.json`;
   try {
-    const resp=await fetch(url); let qs=await resp.json();
+    const resp=await fetch(url);
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}: ${url}`);
+    let qs=await resp.json();
     if(mode==='level') qs=qs.filter(q=>q.level===level);
-    if(!qs.length) qs=await (await fetch(url)).json();
+    if(!qs.length){
+      // fallback: load all questions if level filter returns none
+      const resp2=await fetch(url);
+      qs=await resp2.json();
+    }
+    if(!qs.length) throw new Error('No questions found in file.');
     // 🔐 Encrypt answers before storing in memory
     state.questions=qs.sort(()=>Math.random()-.5).map(q=>({
       ...q,
       _enc: window.encryptAnswer ? window.encryptAnswer(q.answer) : null
     }));
-  } catch(e) { alert('Questions load failed. Use a local server.'); return; }
+  } catch(e) {
+    alert(`Failed to load questions for "${state.selectedSubject.name}".\n\nMake sure the file exists at:\n${url}\n\nAlso ensure you are running via a local server (not file://).`);
+    console.error('Question load error:', e);
+    return;
+  }
 
   document.getElementById('quiz-class-label').textContent=`Class ${state.selectedClass}`;
   document.getElementById('quiz-subject-label').textContent=state.selectedSubject.name;
@@ -933,15 +945,15 @@ function init(){
 
   refreshHomeStats();
   updateDatetime(); setInterval(updateDatetime,1000);
+  applyI18n();
+  showScreen('screen-home');
+}
+
 // ===== SAFE HOME NAVIGATION =====
 function goHomeFromModal(modalId) {
   if(modalId) closeModal(modalId);
   document.querySelectorAll(".modal-overlay").forEach(m => m.classList.add("hidden"));
   showScreen("screen-home");
-}
-
-  applyI18n();
-  showScreen('screen-home');
 }
 
 document.addEventListener('DOMContentLoaded',init);
