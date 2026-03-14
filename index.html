@@ -1,518 +1,271 @@
 <!DOCTYPE html>
-<html lang="hi-IN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BrainQuiz · Class 1–12 School Quiz</title>
+  <title>QuizStorm ⚡</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet" />
 </head>
-<body>
+<body class="light">
 
-<!-- Background canvas -->
-<canvas id="canvas-bg"></canvas>
+<!-- ===== SCREEN 1: HOME ===== -->
+<div id="screen-home" class="screen active">
+  <canvas id="bg-canvas"></canvas>
+  <div class="home-content">
+    <div class="logo-area">
+      <div class="logo-icon">⚡</div>
+      <h1 class="logo-text">QuizStorm</h1>
+      <p class="tagline" data-i18n="tagline">Learn · Play · Conquer!</p>
+    </div>
+    <div class="datetime-box" id="datetime"></div>
 
-<!-- Fixed toolbar -->
-<div id="toolbar">
-  <button class="tbtn" id="btn-snd">🔊 Sound</button>
-  <button class="tbtn" id="btn-theme">☀️ Light</button>
+    <!-- Language Bar -->
+    <div class="lang-bar">
+      <span class="lang-label">🌐</span>
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">English</button>
+      <button class="lang-btn" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+      <button class="lang-btn" data-lang="mr" onclick="setLang('mr')">मराठी</button>
+    </div>
+
+    <div class="home-card">
+      <p class="label" data-i18n="chooseAvatar">Choose Your Avatar</p>
+      <div class="avatar-grid" id="avatar-grid"></div>
+      <div class="selected-avatar-preview">
+        <div class="avatar-bubble" id="selected-avatar-display">🧒</div>
+      </div>
+
+      <!-- Quick Stats Row -->
+      <div class="home-stats-row">
+        <div class="home-stat">
+          <span class="hs-val" id="home-streak-val">0</span>
+          <span class="hs-label">🔥 <span data-i18n="streak">Streak</span></span>
+        </div>
+        <div class="home-stat">
+          <span class="hs-val" id="home-xp-val">0</span>
+          <span class="hs-label">⚡ XP</span>
+        </div>
+        <div class="home-stat">
+          <span class="hs-val" id="home-badges-val">0</span>
+          <span class="hs-label">🏅 <span data-i18n="badges">Badges</span></span>
+        </div>
+      </div>
+
+      <div class="name-section">
+        <input type="text" id="player-name" data-i18n-ph="enterName" placeholder="Enter your name..." maxlength="20" autocomplete="off"/>
+      </div>
+      <button class="btn-start" onclick="goToClassSelect()">
+        <span data-i18n="startQuiz">START QUIZ</span> <span class="btn-arrow">→</span>
+      </button>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Theme">🌙</button>
+      <button class="icon-btn" onclick="showScreen('screen-leaderboard')" title="Leaderboard">🏆</button>
+      <button class="icon-btn" onclick="showDashboard()" title="Dashboard">📈</button>
+      <button class="icon-btn" onclick="showBadges()" title="Badges">🏅</button>
+      <button class="icon-btn" onclick="openDailyChallenge()" title="Daily Challenge">🗓️</button>
+    </div>
+  </div>
 </div>
 
-<!-- XP pop -->
-<div id="xp-pop"></div>
-
-<!-- Streak burst -->
-<div id="streak-burst">
-  <div class="sb-inner" id="sb-inner">🔥 3× STREAK!</div>
+<!-- ===== SCREEN 2: CLASS ===== -->
+<div id="screen-class" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
+    <h2 data-i18n="selectClass">Select Class</h2>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="player-info-bar" id="class-player-bar"></div>
+  <div class="class-grid" id="class-grid"></div>
 </div>
 
-<!-- Toasts -->
-<div id="toast-box"></div>
+<!-- ===== SCREEN 3: SUBJECT ===== -->
+<div id="screen-subject" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('screen-class')">← <span data-i18n="back">Back</span></button>
+    <h2 id="subject-screen-title">Select Subject</h2>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="subject-grid" id="subject-grid"></div>
+</div>
 
-<!-- ═══════════════════ APP ═══════════════════ -->
-<div id="app">
-
-  <!-- ░░░ CLOCK BAR (always visible) ░░░ -->
-  <div id="clock-bar">
-    <div class="clk-left">
-      <span class="clk-date">13 Mar 2026</span>
-      <span class="clk-day">FRIDAY</span>
+<!-- ===== SCREEN 4: GAME MODE ===== -->
+<div id="screen-mode" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('screen-subject')">← <span data-i18n="back">Back</span></button>
+    <h2 data-i18n="chooseMode">Choose Game Mode</h2>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="mode-grid">
+    <div class="mode-card" onclick="startGame('free')">
+      <div class="mode-icon">🎮</div>
+      <h3 data-i18n="freePlay">Free Play</h3>
+      <p data-i18n="freePlayDesc">Answer at your own pace. No pressure!</p>
     </div>
-    <div class="clk-time">12:00:00 PM</div>
-    <div class="clk-brand">
-      <span class="brand-name">BrainQuiz</span>
-      <span class="brand-sub">CLASS 1–12 · ALL SUBJECTS</span>
+    <div class="mode-card" onclick="startGame('timer')">
+      <div class="mode-icon">⏱️</div>
+      <h3 data-i18n="timerMode">Timer Mode</h3>
+      <p data-i18n="timerModeDesc">30 seconds per question. Beat the clock!</p>
+    </div>
+    <div class="mode-card" onclick="showLevelSelect()">
+      <div class="mode-icon">🎯</div>
+      <h3 data-i18n="levelMode">Level Mode</h3>
+      <p data-i18n="levelModeDesc">Level 1–10. Rise through the ranks!</p>
+    </div>
+    <div class="mode-card mode-challenge" onclick="startGame('challenge')">
+      <div class="mode-icon">⚔️</div>
+      <h3 data-i18n="challengeMode">Challenge</h3>
+      <p data-i18n="challengeModeDesc">3 ❤️ lives only! Survive till the end!</p>
+      <span class="mode-badge-tag">NEW</span>
     </div>
   </div>
+  <div id="level-picker" class="level-picker hidden">
+    <p data-i18n="selectLevel">Select Level:</p>
+    <div class="level-grid" id="level-grid"></div>
+  </div>
+</div>
 
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  1. HOME                            ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-home" class="screen active">
-    <div class="card card-sm">
-
-      <div class="logo-wrap">
-        <span class="logo-icon">🧠</span>
-        <div class="logo-title">
-          <span class="lt1">Brain</span><span class="lt2">Quiz</span>
-        </div>
-        <div class="logo-sub">The Ultimate School Quiz Game</div>
-        <span class="ver-badge">Class 1–12 · 10 Subjects · Quiz + Multiplayer</span>
-      </div>
-
-      <!-- Resume strip -->
-      <div class="resume-strip hidden" id="resume-strip">
-        <span class="rs-ava" id="rs-ava">🧑‍🚀</span>
-        <div class="rs-info">
-          <div class="rs-name" id="rs-name">Player</div>
-          <div class="rs-meta" id="rs-meta">0 XP</div>
-        </div>
-        <button class="btn btn-green btn-sm hidden" id="btn-resume">▶ Resume</button>
-      </div>
-
-      <div class="home-grid">
-        <button class="btn btn-yellow btn-lg" id="btn-new">▶ Naya Quiz</button>
-        <button class="btn btn-sky btn-lg" id="btn-lb-h">🏆 Leaderboard</button>
-        <button class="btn btn-green" id="btn-stats-h">📊 Meri Stats</button>
-        <button class="btn btn-pink" id="btn-mp-h">👥 Multiplayer</button>
-        <button class="btn btn-lime" id="btn-admin-h">✏️ Q. Editor</button>
-        <button class="btn btn-ghost btn-sm" id="btn-reset-h">🗑 Reset</button>
-      </div>
-
-      <div class="divider"></div>
-      <div class="ctr tiny">
-        Hints · Lifelines · Power-ups · Achievements · XP Titles<br>
-        32 Avatars · Timer Mode · Dark/Light · Question Editor
-      </div>
-
+<!-- ===== SCREEN 5: QUIZ ===== -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-meta">
+      <span id="quiz-class-label">Class 1</span>
+      <span id="quiz-subject-label">Math</span>
+      <span id="quiz-mode-label">Free</span>
     </div>
+    <div class="quiz-live-stats">
+      <div class="lives-row" id="lives-row">❤️❤️❤️</div>
+      <div class="streak-pill" id="streak-pill">🔥 0</div>
+      <div class="xp-display">⚡ <span id="xp-value">0</span></div>
+    </div>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
   </div>
 
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  2. PLAYER SETUP                    ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-setup" class="screen">
-    <div class="card card-md">
-      <div class="flex-bet mb16">
-        <h2 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#4cc9f0">👤 Player Setup</h2>
-        <button class="btn btn-ghost btn-sm" id="btn-setup-back">← Back</button>
-      </div>
-      <div class="field">
-        <label>Tumhara Naam</label>
-        <input id="inp-name" type="text" placeholder="Naam likho…" maxlength="24" autocomplete="off" />
-      </div>
-      <div class="sec-lbl">Avatar Chuno</div>
-      <div class="av-grid" id="av-grid"></div>
-      <button class="btn btn-yellow btn-lg btn-block mt16" id="btn-setup-next">Class Chuno →</button>
-    </div>
+  <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill"></div></div>
+  <div class="timer-bar" id="timer-bar" style="display:none">
+    <div class="timer-fill" id="timer-fill"></div>
+    <span id="timer-text">30</span>
   </div>
 
+  <div class="question-card" id="question-card">
+    <div class="q-top-row">
+      <div class="question-number" id="q-number">Q 1 / 5</div>
+      <div class="q-difficulty" id="q-difficulty"></div>
+    </div>
+    <div class="question-text" id="q-text">Loading...</div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback-message" id="feedback-msg"></div>
+    <div class="quiz-bottom-row">
+      <button class="btn-hint" id="btn-hint" onclick="useHint()">💡 <span data-i18n="hint">Hint</span></button>
+      <button class="btn-next hidden" id="btn-next" onclick="nextQuestion()"><span data-i18n="next">Next</span> →</button>
+    </div>
+    <div class="hint-text hidden" id="hint-text"></div>
+  </div>
+</div>
 
-  <!-- ╔══════════════════════════════════════╗
-       ║  3. CLASS SELECT                    ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-class" class="screen">
-    <div class="card card-md">
-      <div class="flex-bet mb20">
-        <h2 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#4cc9f0">🏫 Apni Class Chuno</h2>
-        <button class="btn btn-ghost btn-sm" id="btn-cls-back">← Back</button>
+<!-- ===== SCREEN 6: RESULTS ===== -->
+<div id="screen-results" class="screen">
+  <div id="confetti-layer"></div>
+  <div class="results-container">
+    <div class="results-avatar" id="results-avatar">🧒</div>
+    <h2 class="results-name" id="results-name">Player</h2>
+    <div class="results-grade" id="results-grade">⭐ Excellent!</div>
+    <div class="results-stats">
+      <div class="stat-box"><span class="stat-num" id="res-correct">0</span><span class="stat-label" data-i18n="correct">Correct</span></div>
+      <div class="stat-box"><span class="stat-num" id="res-wrong">0</span><span class="stat-label" data-i18n="wrong">Wrong</span></div>
+      <div class="stat-box xp-box"><span class="stat-num" id="res-xp">0</span><span class="stat-label">XP</span></div>
+    </div>
+    <div id="streak-result-row" class="streak-result-row hidden"></div>
+    <div id="new-badge-earned" class="new-badge-earned hidden">
+      <div class="nbe-inner">
+        <span class="nbe-glow">🎉</span>
+        <span class="nbe-icon" id="nbe-icon">🏅</span>
+        <div><div class="nbe-title">New Badge!</div><div class="nbe-name" id="nbe-name"></div></div>
       </div>
-      <div class="class-grid" id="class-grid"></div>
-      <button class="btn btn-yellow btn-lg btn-block" id="btn-cls-next">Subject Chuno →</button>
+    </div>
+    <div class="results-total-xp"><span data-i18n="totalXP">Total XP</span>: <strong id="res-total-xp">0</strong></div>
+    <div class="results-actions">
+      <button class="btn-action" onclick="playAgain()">🔄 <span data-i18n="playAgain">Play Again</span></button>
+      <button class="btn-action btn-secondary" onclick="showScreen('screen-home')">🏠 <span data-i18n="home">Home</span></button>
+      <button class="btn-action btn-secondary" onclick="showScreen('screen-leaderboard')">🏆</button>
+      <button class="btn-action btn-secondary" onclick="showBadges()">🏅</button>
     </div>
   </div>
+</div>
 
+<!-- ===== SCREEN 7: LEADERBOARD ===== -->
+<div id="screen-leaderboard" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
+    <h2>🏆 <span data-i18n="leaderboard">Leaderboard</span></h2>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="leaderboard-container" id="leaderboard-list"></div>
+</div>
 
-  <!-- ╔══════════════════════════════════════╗
-       ║  4. SUBJECT SELECT                  ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-subj" class="screen">
-    <div class="card card-lg">
-      <div class="flex-bet mb20">
-        <div>
-          <h2 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#4cc9f0">📚 Subject Chuno</h2>
-          <span id="subj-cls-lbl" style="font-size:.7rem;color:var(--chalk3);font-weight:700">Class 1</span>
-        </div>
-        <button class="btn btn-ghost btn-sm" id="btn-subj-back">← Back</button>
-      </div>
-      <div class="subj-grid" id="subj-grid"></div>
-      <button class="btn btn-yellow btn-lg btn-block" id="btn-subj-next">Mode Chuno →</button>
+<!-- ===== SCREEN 8: BADGES ===== -->
+<div id="screen-badges" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
+    <h2>🏅 <span data-i18n="myBadges">My Badges</span></h2>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="badges-summary" id="badges-summary"></div>
+  <div class="badges-grid" id="badges-grid"></div>
+</div>
+
+<!-- ===== SCREEN 9: DASHBOARD ===== -->
+<div id="screen-dashboard" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
+    <h2>📈 <span data-i18n="dashboard">Dashboard</span></h2>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="dashboard-wrap" id="dashboard-wrap"></div>
+</div>
+
+<!-- ===== SCREEN 10: DAILY CHALLENGE ===== -->
+<div id="screen-daily" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
+    <h2>🗓️ <span data-i18n="dailyChallenge">Daily Challenge</span></h2>
+    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="daily-wrap" id="daily-wrap"></div>
+</div>
+
+<!-- ===== MODAL: GAME OVER ===== -->
+<div id="modal-gameover" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-icon anim-shake">💔</div>
+    <h2 data-i18n="gameOver">Game Over!</h2>
+    <p data-i18n="outOfLives">You ran out of lives!</p>
+    <div class="modal-stats">
+      <div class="mstat">✅ <strong id="go-correct">0</strong> <span data-i18n="correct">Correct</span></div>
+      <div class="mstat">⚡ <strong id="go-xp">0</strong> XP</div>
+      <div class="mstat">🔥 <strong id="go-streak">0</strong> <span data-i18n="streak">Streak</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="retryGame()">🔄 <span data-i18n="tryAgain">Try Again</span></button>
+      <button class="btn-action btn-secondary" onclick="showScreen('screen-home')">🏠</button>
     </div>
   </div>
+</div>
 
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  5. MODE SELECT                     ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-mode" class="screen">
-    <div class="card card-md">
-      <div class="flex-bet mb16">
-        <div>
-          <h2 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#4cc9f0">🎮 Mode Chuno</h2>
-          <div id="mode-cls-info" style="font-size:.7rem;color:var(--chalk3);font-weight:700;margin-top:2px">Class 1 · Math</div>
-        </div>
-        <button class="btn btn-ghost btn-sm" id="btn-mode-back">← Back</button>
-      </div>
-      <div class="mode-row">
-        <div class="mode-card" data-m="free">
-          <span class="mc-icon">🎲</span>
-          <div class="mc-name">Free Play</div>
-          <div class="mc-desc">Random questions, koi time limit nahi. Aaram se khelo.</div>
-        </div>
-        <div class="mode-card" data-m="timer">
-          <span class="mc-icon">⏱</span>
-          <div class="mc-name">Timer Mode</div>
-          <div class="mc-desc">Har question ke liye 20 seconds. Clock ko beat karo!</div>
-        </div>
-        <div class="mode-card" data-m="all">
-          <span class="mc-icon">📚</span>
-          <div class="mc-name">Full Set</div>
-          <div class="mc-desc">Subject ke saare questions answer karo.</div>
-        </div>
-      </div>
-      <button class="btn btn-yellow btn-xl btn-block" id="btn-start" disabled>⚡ Quiz Start Karo!</button>
-    </div>
+<!-- ===== MODAL: BADGE UNLOCKED ===== -->
+<div id="modal-badge" class="modal-overlay hidden">
+  <div class="modal-box badge-modal">
+    <div class="badge-burst">✨</div>
+    <div class="modal-badge-icon" id="modal-badge-icon">🏅</div>
+    <h2>Badge Unlocked!</h2>
+    <div class="modal-badge-name" id="modal-badge-name"></div>
+    <div class="modal-badge-desc" id="modal-badge-desc"></div>
+    <button class="btn-action" onclick="closeModal('modal-badge')">Awesome! 🎉</button>
   </div>
+</div>
 
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  6. QUIZ                            ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-quiz" class="screen">
-
-    <!-- MP mini HUD -->
-    <div class="mp-mini" id="mp-mini">
-      <div class="mp-inner">
-        <div class="mp-col">
-          <span class="mp-ava" id="mp-m-p1a">🧑‍🚀</span>
-          <div class="mp-pname" id="mp-m-p1n">P1</div>
-          <div class="mp-s1" id="mp-s1">0</div>
-        </div>
-        <div style="text-align:center">
-          <div class="mp-vs-lbl">VS</div>
-          <div class="mp-turn" id="mp-turn-lbl"></div>
-        </div>
-        <div class="mp-col">
-          <span class="mp-ava" id="mp-m-p2a">🤖</span>
-          <div class="mp-pname" id="mp-m-p2n">P2</div>
-          <div class="mp-s2" id="mp-s2">0</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- HUD -->
-    <div class="hud">
-      <div class="hud-player">
-        <span class="hud-ava" id="hud-ava">🧑‍🚀</span>
-        <div>
-          <div class="hud-name" id="hud-name">Player</div>
-          <div class="hud-meta" id="hud-meta">Class 1 · Math</div>
-          <div style="display:flex;align-items:center;gap:4px;margin-top:1px">
-            <span class="hud-xp" id="hud-xp">0 XP</span>
-            <span class="hud-streak" id="hud-streak">🔥 0×</span>
-          </div>
-          <div class="hud-title-txt" id="hud-title">🌱 Rookie</div>
-        </div>
-      </div>
-
-      <div class="hud-mid">
-        <div class="prog-bar">
-          <div class="prog-fill" id="prog-fill" style="width:0%"></div>
-        </div>
-        <div class="prog-txt" id="prog-txt">Q <b>1</b> / <b>20</b></div>
-        <span class="mode-tag" id="hud-mode-tag">Free Play</span>
-      </div>
-
-      <div class="hud-right">
-        <!-- Timer ring (only in timer mode) -->
-        <div class="timer-ring" id="timer-ring">
-          <svg width="52" height="52" viewBox="0 0 52 52">
-            <circle class="tr-bg" cx="26" cy="26" r="21"/>
-            <circle class="tr-fg" id="tr-fg" cx="26" cy="26" r="21"
-              style="stroke-dasharray:131.9;stroke-dashoffset:0"/>
-          </svg>
-          <div class="tr-num" id="tr-num">20</div>
-        </div>
-        <button class="btn btn-outline btn-sm" id="btn-quit">✕ Quit</button>
-      </div>
-    </div>
-
-    <!-- Power-ups -->
-    <div class="action-bar" id="pu-bar"></div>
-
-    <!-- Lifelines + Hint -->
-    <div class="action-bar">
-      <div class="act-pill" id="ll-fifty">🎯 50:50</div>
-      <div class="act-pill" id="ll-skip">⏭ Skip</div>
-      <div class="act-pill" id="ll-etime">⏰ +10s <span class="act-cost">sirf timer mein</span></div>
-      <div class="act-pill" id="btn-hint">💡 Hint <span class="act-cost">−3 XP</span></div>
-    </div>
-
-    <!-- Question card -->
-    <div class="q-card" id="q-card">
-      <div class="q-meta">
-        <span class="q-tag q-subj-tag" id="q-subj-tag">Math</span>
-        <span class="q-tag q-diff-tag easy" id="q-diff-tag">easy</span>
-        <span class="q-tag q-topic-tag" id="q-topic-tag" style="display:none"></span>
-        <span class="q-num-tag" id="q-num-tag">#1</span>
-      </div>
-      <div class="q-text" id="q-text">Loading…</div>
-      <div class="hint-box" id="hint-box"></div>
-    </div>
-
-    <!-- Options -->
-    <div class="opts-grid" id="opts-grid"></div>
-
-  </div>
-
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  7. RESULTS                         ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-result" class="screen">
-    <div class="card card-md">
-
-      <div class="res-hero ctr">
-        <span class="res-ava" id="res-ava">🧑‍🚀</span>
-        <div class="res-grade rg-a" id="res-grade">A</div>
-        <div class="res-player" id="res-player">Player</div>
-        <div class="res-msg" id="res-msg">Bahut achha!</div>
-        <div class="res-info" id="res-info">Class 1 · Math · Free Play</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px">
-          <span class="title-pill" id="res-title">🌱 Rookie</span>
-          <span style="font-size:.74rem;color:#ffd60a" id="res-txp">0 XP total</span>
-        </div>
-      </div>
-
-      <div class="stats-grid mt16">
-        <div class="stat-box"><div class="stat-val sg" id="rs-ok">0</div><div class="stat-lbl">Sahi</div></div>
-        <div class="stat-box"><div class="stat-val" style="color:var(--red)" id="rs-ng">0</div><div class="stat-lbl">Galat</div></div>
-        <div class="stat-box"><div class="stat-val sy" id="rs-xp">+0</div><div class="stat-lbl">XP Mila</div></div>
-        <div class="stat-box"><div class="stat-val sc" id="rs-pct">0%</div><div class="stat-lbl">Score</div></div>
-        <div class="stat-box"><div class="stat-val so" id="rs-str">0</div><div class="stat-lbl">Best Streak</div></div>
-        <div class="stat-box"><div class="stat-val" id="rs-tot">0</div><div class="stat-lbl">Total Q</div></div>
-      </div>
-
-      <!-- Share card -->
-      <div class="share-box">
-        <div class="sh-big" id="sh-pct">0%</div>
-        <div class="sh-sub" id="sh-name">Player</div>
-        <div class="sh-sub" id="sh-info">Class 1 · Math</div>
-        <div class="sh-xp" id="sh-xp">+0 XP</div>
-        <div class="sh-btns">
-          <button class="btn btn-sky btn-sm" id="btn-share">📤 Score Share Karo</button>
-        </div>
-      </div>
-
-      <!-- Review -->
-      <div class="sec-lbl">📋 Jawab Review</div>
-      <div class="rev-list" id="rev-list"></div>
-
-      <div class="divider"></div>
-      <div class="res-actions">
-        <button class="btn btn-yellow" id="btn-again">🔄 Phir Khelo</button>
-        <button class="btn btn-sky" id="btn-chg-subj">📚 Subject Badlo</button>
-        <button class="btn btn-green" id="btn-res-lb">🏆 Leaderboard</button>
-        <button class="btn btn-coral" id="btn-res-home">🏠 Home</button>
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  8. LEADERBOARD                     ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-lb" class="screen">
-    <div class="card card-md">
-      <div class="flex-bet mb16">
-        <h2 style="font-family:'Fredoka One',cursive;font-size:1.15rem;color:#ffd60a">🏆 Leaderboard</h2>
-        <button class="btn btn-ghost btn-sm" id="btn-lb-back">← Home</button>
-      </div>
-      <div class="tab-row">
-        <button class="tab-item on lb-tab" data-f="all">Sab</button>
-        <button class="tab-item lb-tab" data-f="free">Free</button>
-        <button class="tab-item lb-tab" data-f="timer">Timer</button>
-        <button class="tab-item lb-tab" data-f="all">Full Set</button>
-      </div>
-      <div class="lb-list" id="lb-list"></div>
-    </div>
-  </div>
-
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  9. STATS + ACHIEVEMENTS            ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-stats" class="screen">
-    <div class="card card-lg">
-      <div class="flex-bet mb20">
-        <h2 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#06d6a0">📊 Meri Progress</h2>
-        <button class="btn btn-ghost btn-sm" id="btn-stats-back">← Home</button>
-      </div>
-
-      <div class="stats-grid mb20">
-        <div class="stat-box"><div class="stat-val sy" id="st-xp">0</div><div class="stat-lbl">Total XP</div></div>
-        <div class="stat-box"><div class="stat-val sc" id="st-q">0</div><div class="stat-lbl">Questions</div></div>
-        <div class="stat-box"><div class="stat-val sg" id="st-ok">0</div><div class="stat-lbl">Sahi Jawab</div></div>
-        <div class="stat-box"><div class="stat-val so" id="st-str">0</div><div class="stat-lbl">Best Streak</div></div>
-        <div class="stat-box"><div class="stat-val" style="color:#7b2fff" id="st-cls">0</div><div class="stat-lbl">Max Class</div></div>
-        <div class="stat-box"><div class="stat-val" id="st-sbj">0</div><div class="stat-lbl">Subjects</div></div>
-      </div>
-
-      <div class="sec-lbl">Subject Accuracy</div>
-      <div id="stat-bars" class="mb20"></div>
-
-      <div class="sec-lbl">🏅 Achievements</div>
-      <div class="ach-grid" id="ach-grid"></div>
-    </div>
-  </div>
-
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  10. MULTIPLAYER SETUP              ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-mp" class="screen">
-    <div class="card card-md">
-      <div class="flex-bet mb16">
-        <h2 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#f72585">👥 2-Player Battle</h2>
-        <button class="btn btn-ghost btn-sm" id="btn-mp-back">← Home</button>
-      </div>
-      <div class="dim mb16">Ek device par dono players baari-baari answers denge!</div>
-
-      <div class="vs-row mb16">
-        <div class="vs-box">
-          <span class="vs-ava" id="mp-p1-ava">🧑‍🚀</span>
-          <div class="vs-name" id="mp-p1-name">Tum</div>
-          <div style="font-size:.62rem;color:#4cc9f0;margin-top:3px;font-weight:700">Player 1</div>
-        </div>
-        <div class="vs-txt">VS</div>
-        <div class="vs-box">
-          <input type="text" id="mp-p2-inp" placeholder="Player 2 ka naam" maxlength="16"
-            style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,214,10,.25);border-radius:var(--r1);padding:7px 10px;color:var(--chalk);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;outline:none;width:100%;text-align:center;margin-bottom:7px"/>
-          <div style="font-size:.62rem;color:#ffd60a;font-weight:700">Player 2</div>
-        </div>
-      </div>
-
-      <div class="sec-lbl">Player 2 Avatar</div>
-      <div class="av-grid" id="mp-av-grid" style="max-height:150px"></div>
-
-      <button class="btn btn-pink btn-lg btn-block mt16" id="btn-mp-start">⚔️ Battle Shuru Karo!</button>
-    </div>
-  </div>
-
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  11. MP RESULT                      ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-mp-result" class="screen">
-    <div class="card card-sm ctr">
-      <div class="winner-head" id="mp-winner">Winner!</div>
-      <div class="vs-row mb20">
-        <div class="vs-box">
-          <span class="vs-ava" id="mpr-p1a">🧑‍🚀</span>
-          <div class="vs-name" id="mpr-p1n">P1</div>
-          <div class="mp-sc-big-a" id="mpr-s1">0</div>
-        </div>
-        <div class="vs-txt">VS</div>
-        <div class="vs-box">
-          <span class="vs-ava" id="mpr-p2a">🤖</span>
-          <div class="vs-name" id="mpr-p2n">P2</div>
-          <div class="mp-sc-big-b" id="mpr-s2">0</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button class="btn btn-yellow" id="btn-mpr-again">🔄 Again</button>
-        <button class="btn btn-coral" id="btn-mpr-home">🏠 Home</button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ╔══════════════════════════════════════╗
-       ║  12. QUESTION EDITOR                ║
-       ╚══════════════════════════════════════╝ -->
-  <div id="screen-admin" class="screen">
-    <div class="card card-lg">
-      <div class="flex-bet mb16">
-        <h2 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#80b918">✏️ Question Editor</h2>
-        <button class="btn btn-ghost btn-sm" id="btn-admin-back">← Home</button>
-      </div>
-
-      <div class="sec-lbl">Naya Question Jodo</div>
-      <div style="background:var(--navy3);border:1.5px solid rgba(255,255,255,.07);border-radius:var(--r3);padding:20px;margin-bottom:18px">
-
-        <div class="field">
-          <label>Question Text *</label>
-          <input id="eq-q" type="text" placeholder="Question likho…" />
-        </div>
-
-        <div class="sec-lbl" style="font-size:.62rem">4 Options (sab zaroori hain) *</div>
-        <div class="opts-2c">
-          <input id="eq-o1" placeholder="Option A" />
-          <input id="eq-o2" placeholder="Option B" />
-          <input id="eq-o3" placeholder="Option C" />
-          <input id="eq-o4" placeholder="Option D" />
-        </div>
-
-        <div class="form-2c mb12">
-          <div class="field" style="margin:0">
-            <label>Sahi Jawab * (option se exactly match karo)</label>
-            <input id="eq-ans" placeholder="jaise: Option A" />
-          </div>
-          <div class="field" style="margin:0">
-            <label>Hint (optional)</label>
-            <input id="eq-hint" placeholder="Chhota sa hint…" />
-          </div>
-        </div>
-
-        <div class="form-2c mb16" style="grid-template-columns:1fr 1fr 1fr">
-          <div class="field" style="margin:0">
-            <label>Class *</label>
-            <select id="eq-cls">
-              <option value="1">Class 1</option><option value="2">Class 2</option>
-              <option value="3">Class 3</option><option value="4">Class 4</option>
-              <option value="5">Class 5</option><option value="6">Class 6</option>
-              <option value="7">Class 7</option><option value="8">Class 8</option>
-              <option value="9">Class 9</option><option value="10">Class 10</option>
-              <option value="11">Class 11</option><option value="12">Class 12</option>
-            </select>
-          </div>
-          <div class="field" style="margin:0">
-            <label>Subject *</label>
-            <select id="eq-subj">
-              <option value="math">Mathematics</option>
-              <option value="science">Science</option>
-              <option value="english">English</option>
-              <option value="hindi">Hindi</option>
-              <option value="computer">Computer</option>
-              <option value="evs">EVS</option>
-              <option value="gk">G.K.</option>
-              <option value="economics">Economics</option>
-              <option value="space">Space</option>
-              <option value="animals-birds">Animals &amp; Birds</option>
-            </select>
-          </div>
-          <div class="field" style="margin:0">
-            <label>Difficulty</label>
-            <select id="eq-diff">
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-        </div>
-
-        <button class="btn btn-lime btn-block" id="btn-save-q">💾 Question Save Karo</button>
-      </div>
-
-      <div class="sec-lbl">Tumhare Custom Questions</div>
-      <div class="ed-list" id="ed-list"></div>
-    </div>
-  </div>
-
-</div><!-- /#app -->
-
+<footer class="site-footer">© QuizStorm 2025 — Learn, Play & Conquer! ⚡</footer>
 <script src="js/script.js"></script>
 </body>
 </html>
