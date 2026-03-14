@@ -85,9 +85,41 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-class')">← <span data-i18n="back">Back</span></button>
     <h2 id="subject-screen-title">Select Subject</h2>
-    
   </div>
+
+  <!-- Subject Grid (single subjects + Mix card at end) -->
   <div class="subject-grid" id="subject-grid"></div>
+
+  <!-- Mix Panel (hidden until Mix card clicked) -->
+  <div id="mix-panel" class="mix-panel hidden">
+    <div class="mix-panel-header">
+      <span class="mix-panel-title">🎲 Mix Subject Quiz</span>
+      <button class="mix-panel-close" onclick="closeMixPanel()">✕</button>
+    </div>
+    <div class="mix-info-bar">
+      <span id="mix-selected-count">0 subjects selected</span>
+      <span class="mix-hint">Min 2, Max 10</span>
+    </div>
+    <div class="subject-grid mix-selectable" id="subject-grid-mix"></div>
+    <div class="mix-options-bar">
+      <div class="mix-q-row">
+        <label>Questions:</label>
+        <select id="mix-q-count" class="mix-select">
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20" selected>20</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
+        </select>
+      </div>
+      <button class="mix-select-all-btn" onclick="toggleSelectAllSubjects()">✅ Select All</button>
+    </div>
+    <div class="mix-start-area">
+      <button class="btn-start mix-start-btn" id="mix-start-btn" onclick="startMixQuiz()" disabled>
+        🎲 Start Mix Quiz →
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== SCREEN 4: GAME MODE ===== -->
