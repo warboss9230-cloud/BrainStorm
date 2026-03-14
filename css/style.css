@@ -360,3 +360,28 @@ body.dark .hint-text { color:#fbbf24; background:rgba(247,151,30,.08); }
   .class-grid{grid-template-columns:repeat(3,1fr);}
   .badges-grid{grid-template-columns:repeat(2,1fr);}
 }
+
+/* ===== GLOBAL FLOATING THEME BUTTON ===== */
+#global-theme-btn {
+  position: fixed;
+  bottom: 68px;
+  right: 16px;
+  z-index: 999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.2s;
+}
+#global-theme-btn:hover {
+  transform: scale(1.15) rotate(20deg);
+  box-shadow: 0 8px 28px rgba(108,99,255,0.35);
+  border-color: var(--accent);
+}
