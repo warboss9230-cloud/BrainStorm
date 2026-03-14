@@ -656,3 +656,10 @@ input, textarea {
   letter-spacing: .5px;
   vertical-align: middle;
 }
+
+/* mix-card base style */
+.mix-card {
+  cursor: pointer;
+  transition: all .22s;
+  position: relative;
+}
