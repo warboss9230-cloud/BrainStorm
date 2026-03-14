@@ -103,6 +103,14 @@ let state = {
   currentStreak:0, lives:3, maxLives:3,
   timerInterval:null, timerSecs:30, answered:false,
   hintUsed:false,
+  // 2-Player state
+  twoPlayer: {
+    active: false,
+    currentPlayerIndex: 0,
+    players: [],       // [{profileIndex, name, avatar, correct, wrong, xp}]
+    questionsPerPlayer: 10,
+    questionsShared: [], // same question set for both
+  },
 };
 
 // ===== AUDIO =====
@@ -906,8 +914,8 @@ function escHtml(s){ const d=document.createElement('div'); d.textContent=s; ret
 function showXPToast(msg){ const t=document.createElement('div'); t.className='xp-toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2100); }
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 
-// ===== GO TO CLASS SELECT =====
-function goToClassSelect(){
+// ===== GO TO CLASS SELECT (overridden below in multiPlayer section) =====
+function _oldGoToClassSelect(){
   const name=document.getElementById('player-name').value.trim();
   if(!name){
     const inp=document.getElementById('player-name');
@@ -921,27 +929,11 @@ function goToClassSelect(){
   renderClassGrid(); showScreen('screen-class');
 }
 
-// ===== INIT =====
+// ===== INIT (base setup, overridden by new DOMContentLoaded below) =====
 function init(){
-  loadStorage(); loadTheme();
-  const savedLang=localStorage.getItem('qs_lang')||'en';
-  currentLang=savedLang;
-  const lused=JSON.parse(localStorage.getItem('qs_langs_used')||'["en"]');
-  state.player.langsUsed=lused.length;
+  // This is called for compatibility; main init is in the new DOMContentLoaded below
+}
 
-  initCanvas(); renderAvatarGrid();
-  if(state.player.name) document.getElementById('player-name').value=state.player.name;
-  document.getElementById('selected-avatar-display').textContent=state.player.avatar;
-
-  setTimeout(()=>{
-    document.querySelectorAll('.avatar-option').forEach(el=>{
-      if(el.textContent===state.player.avatar) el.classList.add('selected');
-    });
-    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===savedLang));
-  },50);
-
-  refreshHomeStats();
-  updateDatetime(); setInterval(updateDatetime,1000);
 // ===== SAFE HOME NAVIGATION =====
 function goHomeFromModal(modalId) {
   if(modalId) closeModal(modalId);
@@ -949,8 +941,547 @@ function goHomeFromModal(modalId) {
   showScreen("screen-home");
 }
 
+// ===== MULTI-PLAYER PROFILES =====
+function getAllProfiles() {
+  try { return JSON.parse(localStorage.getItem('qs_profiles_v2')||'[]'); } catch(e){ return []; }
+}
+function saveAllProfiles(profiles) {
+  localStorage.setItem('qs_profiles_v2', JSON.stringify(profiles));
+}
+function getCurrentProfileIndex() {
+  return parseInt(localStorage.getItem('qs_active_profile')||'0');
+}
+function setCurrentProfileIndex(idx) {
+  localStorage.setItem('qs_active_profile', String(idx));
+}
+function migrateCurrentPlayerToProfiles() {
+  // On first load, save current player as first profile if no profiles exist
+  let profiles = getAllProfiles();
+  if(profiles.length === 0 && state.player.name) {
+    profiles.push({...state.player});
+    saveAllProfiles(profiles);
+  } else if(profiles.length === 0) {
+    // default empty
+    profiles.push({...state.player});
+    saveAllProfiles(profiles);
+  }
+}
+function syncProfileToState(idx) {
+  const profiles = getAllProfiles();
+  if(profiles[idx]) {
+    Object.assign(state.player, profiles[idx]);
+  }
+}
+function syncStateToProfile(idx) {
+  const profiles = getAllProfiles();
+  if(profiles[idx]) {
+    profiles[idx] = {...state.player};
+    saveAllProfiles(profiles);
+  }
+}
+
+// ===== PLAYER SWITCHER BAR RENDER =====
+function renderPlayerSwitcherBar() {
+  const bar = document.getElementById('player-switcher-bar');
+  if(!bar) return;
+  const profiles = getAllProfiles();
+  const activeIdx = getCurrentProfileIndex();
+  bar.innerHTML = '';
+  if(profiles.length <= 1 && !profiles[0]?.name) return;
+  profiles.forEach((p, i) => {
+    if(!p.name) return;
+    const chip = document.createElement('div');
+    chip.className = 'psb-chip' + (i === activeIdx ? ' active-player' : '');
+    chip.innerHTML = `
+      <span class="psb-avatar">${p.avatar||'🧒'}</span>
+      <span>
+        <span style="display:block">${escHtml(p.name)}</span>
+        <span class="psb-xp">⚡${p.xp||0}</span>
+      </span>
+      ${profiles.length > 1 ? `<button class="psb-delete" onclick="deleteProfile(${i},event)" title="Delete">✕</button>` : ''}
+    `;
+    chip.onclick = (e) => {
+      if(e.target.classList.contains('psb-delete')) return;
+      switchToProfile(i);
+    };
+    bar.appendChild(chip);
+  });
+}
+function switchToProfile(idx) {
+  // Save current state to current profile
+  const curIdx = getCurrentProfileIndex();
+  syncStateToProfile(curIdx);
+  // Switch
+  setCurrentProfileIndex(idx);
+  syncProfileToState(idx);
+  saveStorage();
+  // Update UI
+  document.getElementById('player-name').value = state.player.name || '';
+  document.getElementById('selected-avatar-display').textContent = state.player.avatar || '🧒';
+  renderAvatarGrid();
+  refreshHomeStats();
+  renderPlayerSwitcherBar();
+  showXPToast(`👤 ${state.player.name} selected!`);
+}
+function deleteProfile(idx, e) {
+  e && e.stopPropagation();
+  const profiles = getAllProfiles();
+  if(profiles.length <= 1){ showXPToast('❌ Cannot delete last player!'); return; }
+  if(!confirm(`Delete player "${profiles[idx]?.name}"?`)) return;
+  profiles.splice(idx, 1);
+  saveAllProfiles(profiles);
+  let active = getCurrentProfileIndex();
+  if(active >= profiles.length) active = profiles.length - 1;
+  setCurrentProfileIndex(active);
+  syncProfileToState(active);
+  saveStorage();
+  document.getElementById('player-name').value = state.player.name || '';
+  document.getElementById('selected-avatar-display').textContent = state.player.avatar || '🧒';
+  renderAvatarGrid();
+  refreshHomeStats();
+  renderPlayerSwitcherBar();
+}
+
+// ===== ADD PLAYER MODAL =====
+let newPlayerAvatarSelected = AVATARS[0];
+function showAddPlayer() {
+  newPlayerAvatarSelected = AVATARS[0];
+  document.getElementById('new-player-name').value = '';
+  document.getElementById('add-player-msg').textContent = '';
+  // Render avatar grid in modal
+  const grid = document.getElementById('new-player-avatar-grid');
+  if(grid) {
+    grid.innerHTML = '';
+    AVATARS.forEach(av => {
+      const el = document.createElement('div');
+      el.className = 'avatar-option' + (av === newPlayerAvatarSelected ? ' selected' : '');
+      el.textContent = av;
+      el.onclick = () => {
+        newPlayerAvatarSelected = av;
+        document.getElementById('new-player-avatar-selected').textContent = av;
+        grid.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+        el.classList.add('selected');
+      };
+      grid.appendChild(el);
+    });
+  }
+  const disp = document.getElementById('new-player-avatar-selected');
+  if(disp) disp.textContent = newPlayerAvatarSelected;
+  document.getElementById('modal-add-player').classList.remove('hidden');
+}
+function addNewPlayer() {
+  const name = (document.getElementById('new-player-name').value || '').trim();
+  const msg = document.getElementById('add-player-msg');
+  if(!name){ if(msg) msg.textContent = '❌ Please enter a name!'; return; }
+  const profiles = getAllProfiles();
+  if(profiles.find(p => p.name.toLowerCase() === name.toLowerCase())){
+    if(msg) msg.textContent = '❌ Player with this name already exists!'; return;
+  }
+  const newProfile = {
+    name, avatar: newPlayerAvatarSelected,
+    xp:0, highScore:0, streak:0, maxStreak:0,
+    totalGames:0, totalCorrect:0, totalWrong:0, hasPerfect:false,
+    challengeSurvivor:false, dailyCompleted:0, langsUsed:1, earnedBadges:[],
+    history:[], dailyDate:'', dailyXP:0
+  };
+  profiles.push(newProfile);
+  saveAllProfiles(profiles);
+  closeModal('modal-add-player');
+  // Switch to new player
+  const newIdx = profiles.length - 1;
+  setCurrentProfileIndex(newIdx);
+  syncProfileToState(newIdx);
+  saveStorage();
+  document.getElementById('player-name').value = name;
+  document.getElementById('selected-avatar-display').textContent = newPlayerAvatarSelected;
+  renderAvatarGrid();
+  refreshHomeStats();
+  renderPlayerSwitcherBar();
+  showXPToast(`👤 ${name} added! Welcome!`);
+}
+
+// ===== 2-PLAYER SETUP =====
+function show2PlayerSetup() {
+  const profiles = getAllProfiles().filter(p => p.name);
+  const p1sel = document.getElementById('twop-p1-select');
+  const p2sel = document.getElementById('twop-p2-select');
+  if(!p1sel || !p2sel) return;
+  p1sel.innerHTML = '';
+  p2sel.innerHTML = '';
+  if(profiles.length < 2) {
+    document.getElementById('twop-msg').textContent = '❌ Kam se kam 2 players chahiye! Pehle "Add Player" se player add karein.';
+    document.getElementById('modal-2player').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('twop-msg').textContent = '';
+  profiles.forEach((p, i) => {
+    const o1 = document.createElement('option'); o1.value = i; o1.textContent = `${p.avatar} ${p.name} (⚡${p.xp} XP)`;
+    const o2 = document.createElement('option'); o2.value = i; o2.textContent = `${p.avatar} ${p.name} (⚡${p.xp} XP)`;
+    p1sel.appendChild(o1);
+    p2sel.appendChild(o2);
+  });
+  // Default p1 = 0, p2 = 1
+  p1sel.value = '0';
+  p2sel.value = profiles.length > 1 ? '1' : '0';
+  document.getElementById('modal-2player').classList.remove('hidden');
+}
+
+function start2PlayerGame() {
+  const profiles = getAllProfiles().filter(p => p.name);
+  const p1idx = parseInt(document.getElementById('twop-p1-select').value);
+  const p2idx = parseInt(document.getElementById('twop-p2-select').value);
+  const qCount = parseInt(document.getElementById('twop-q-count').value) || 10;
+  const msg = document.getElementById('twop-msg');
+  if(p1idx === p2idx){ if(msg) msg.textContent = '❌ Alag alag players select karein!'; return; }
+  if(msg) msg.textContent = '';
+
+  // Map to full profiles (within original array)
+  const allProfiles = getAllProfiles();
+  const fullP1Idx = allProfiles.findIndex(p => p.name === profiles[p1idx].name);
+  const fullP2Idx = allProfiles.findIndex(p => p.name === profiles[p2idx].name);
+
+  state.twoPlayer.active = true;
+  state.twoPlayer.currentPlayerIndex = 0;
+  state.twoPlayer.questionsPerPlayer = qCount;
+  state.twoPlayer.players = [
+    { profileIndex: fullP1Idx, name: allProfiles[fullP1Idx].name, avatar: allProfiles[fullP1Idx].avatar, correct: 0, wrong: 0, xp: 0 },
+    { profileIndex: fullP2Idx, name: allProfiles[fullP2Idx].name, avatar: allProfiles[fullP2Idx].avatar, correct: 0, wrong: 0, xp: 0 },
+  ];
+  closeModal('modal-2player');
+  // Go to class select, then mode, then quiz will detect 2player
+  // Switch to player 1 profile for their turn
+  setCurrentProfileIndex(fullP1Idx);
+  syncProfileToState(fullP1Idx);
+  state.player.name = allProfiles[fullP1Idx].name;
+  document.getElementById('player-name').value = state.player.name;
+  renderClassGrid();
+  showScreen('screen-class');
+}
+
+// Override goToClassSelect to support 2player flow
+function goToClassSelect(){
+  if(state.twoPlayer.active) {
+    // In 2player mode — go straight to class
+    const name = state.player.name || document.getElementById('player-name').value.trim();
+    if(!name){ showXPToast('❌ Player name missing!'); return; }
+    state.player.name = name;
+    saveStorage();
+    const bar = document.getElementById('class-player-bar');
+    if(bar) bar.innerHTML = `${state.player.avatar} <strong>${escHtml(name)}</strong> &nbsp;|&nbsp; ⚡ ${state.player.xp} XP &nbsp;|&nbsp; 🔥 ${state.player.maxStreak} best streak`;
+    renderClassGrid(); showScreen('screen-class');
+    return;
+  }
+  const name=document.getElementById('player-name').value.trim();
+  if(!name){
+    const inp=document.getElementById('player-name');
+    inp.focus(); inp.style.borderColor='#ef4444'; inp.style.boxShadow='0 0 0 4px rgba(239,68,68,.15)';
+    setTimeout(()=>{ inp.style.borderColor=''; inp.style.boxShadow=''; },1500);
+    return;
+  }
+  state.player.name=name; saveStorage();
+  // Sync to profile
+  const curIdx = getCurrentProfileIndex();
+  syncStateToProfile(curIdx);
+  renderPlayerSwitcherBar();
+  const bar=document.getElementById('class-player-bar');
+  if(bar) bar.innerHTML=`${state.player.avatar} <strong>${escHtml(name)}</strong> &nbsp;|&nbsp; ⚡ ${state.player.xp} XP &nbsp;|&nbsp; 🔥 ${state.player.maxStreak} best streak`;
+  renderClassGrid(); showScreen('screen-class');
+}
+
+// ===== 2-PLAYER: TURN SWITCH MODAL =====
+function showTurnSwitchModal(nextPlayerIdx) {
+  const tp = state.twoPlayer;
+  const prev = tp.players[nextPlayerIdx === 0 ? 1 : 0];
+  const next = tp.players[nextPlayerIdx];
+  document.getElementById('turn-switch-avatar').textContent = next.avatar;
+  document.getElementById('turn-switch-name').textContent = `${next.name}'s Turn!`;
+  document.getElementById('turn-switch-msg').textContent = `Phone ${next.name} ko do!`;
+  const scoreEl = document.getElementById('turn-switch-p1-score');
+  if(scoreEl) scoreEl.textContent = `${prev.avatar} ${prev.name}: ✅${prev.correct} correct, ⚡+${prev.xp} XP`;
+  document.getElementById('modal-turn-switch').classList.remove('hidden');
+}
+
+function startNextPlayerTurn() {
+  closeModal('modal-turn-switch');
+  const tp = state.twoPlayer;
+  const pIdx = tp.currentPlayerIndex;
+  const p = tp.players[pIdx];
+  // Switch profile to next player
+  setCurrentProfileIndex(p.profileIndex);
+  syncProfileToState(p.profileIndex);
+  saveStorage();
+  // Reset session for this player
+  state.currentQ = 0; state.sessionCorrect = 0; state.sessionWrong = 0; state.sessionXP = 0;
+  state.currentStreak = 0; state.answered = false; state.hintUsed = false;
+  state.lives = 999; state.maxLives = 999;
+  clearInterval(state.timerInterval);
+  // Use shared question set
+  state.questions = tp.questionsShared.slice(0, tp.questionsPerPlayer);
+  // Update header
+  document.getElementById('quiz-class-label').textContent = `Class ${state.selectedClass}`;
+  document.getElementById('quiz-subject-label').textContent = state.selectedSubject.name;
+  document.getElementById('quiz-mode-label').textContent = '⚔️ 2P';
+  updateTurnBanner();
+  updateQuizLiveStats();
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function updateTurnBanner() {
+  const banner = document.getElementById('twop-turn-banner');
+  if(!banner) return;
+  if(!state.twoPlayer.active) { banner.classList.add('hidden'); return; }
+  const pIdx = state.twoPlayer.currentPlayerIndex;
+  const p = state.twoPlayer.players[pIdx];
+  banner.classList.remove('hidden', 'p1-turn', 'p2-turn');
+  banner.classList.add(pIdx === 0 ? 'p1-turn' : 'p2-turn');
+  banner.textContent = `${p.avatar} ${p.name}'s Turn (${pIdx+1}/2)`;
+}
+
+// ===== OVERRIDE saveStorage to also sync profiles =====
+const _origSaveStorage = saveStorage;
+
+// ===== OVERRIDE endGame for 2-player =====
+const _origEndGame = endGame;
+function endGame(){
+  clearInterval(state.timerInterval);
+  if(window.stopSessionTimer) window.stopSessionTimer();
+  if(window.setQuizActive) window.setQuizActive(false);
+
+  const tp = state.twoPlayer;
+
+  if(tp.active) {
+    // Save this player's score
+    const pIdx = tp.currentPlayerIndex;
+    tp.players[pIdx].correct = state.sessionCorrect;
+    tp.players[pIdx].wrong = state.sessionWrong;
+    tp.players[pIdx].xp = state.sessionXP;
+
+    if(pIdx === 0) {
+      // Player 1 done — switch to Player 2
+      tp.currentPlayerIndex = 1;
+      showTurnSwitchModal(1);
+      return;
+    } else {
+      // Both done — show final results
+      show2PlayerFinalResults();
+      return;
+    }
+  }
+
+  // Normal single-player endGame
+  if(state.sessionCorrect===state.questions.length && state.questions.length>0) state.player.hasPerfect=true;
+  if(state.gameMode==='challenge' && state.lives>=2) state.player.challengeSurvivor=true;
+  state.player.totalGames++;
+  state.player.totalCorrect+=state.sessionCorrect;
+  state.player.totalWrong+=state.sessionWrong;
+  if(state.player.xp>state.player.highScore) state.player.highScore=state.player.xp;
+  if(!state.player.history) state.player.history=[];
+  state.player.history.unshift({
+    date:new Date().toLocaleDateString('en-IN'),
+    class:state.selectedClass,
+    subject:state.selectedSubject.name,
+    correct:state.sessionCorrect,
+    total:state.questions.length,
+    xp:state.sessionXP
+  });
+  state.player.history=state.player.history.slice(0,20);
+  saveStorage();
+  // Sync to profile
+  syncStateToProfile(getCurrentProfileIndex());
+  saveLeaderboard();
+  const newBadge=checkBadges();
+  const total=state.questions.length;
+  const pct=total>0?(state.sessionCorrect/total)*100:0;
+  const grade=GRADES.find(g=>pct>=g.min)||GRADES[GRADES.length-1];
+  document.getElementById('results-avatar').textContent=state.player.avatar;
+  document.getElementById('results-name').textContent=state.player.name||'Player';
+  document.getElementById('results-grade').textContent=grade.label;
+  document.getElementById('res-correct').textContent=state.sessionCorrect;
+  document.getElementById('res-wrong').textContent=state.sessionWrong;
+  document.getElementById('res-xp').textContent=(state.sessionXP>=0?'+':'')+state.sessionXP;
+  document.getElementById('res-total-xp').textContent=state.player.xp;
+  const sr=document.getElementById('streak-result-row');
+  if(state.currentStreak>=3){ sr.classList.remove('hidden'); sr.textContent=`🔥 ${state.currentStreak} Streak! Amazing!`; } else sr.classList.add('hidden');
+  const nbe=document.getElementById('new-badge-earned');
+  if(newBadge){ nbe.classList.remove('hidden'); document.getElementById('nbe-icon').textContent=newBadge.icon; document.getElementById('nbe-name').textContent=newBadge.name; }
+  else nbe.classList.add('hidden');
+  // Hide 2player panel in normal mode
+  const twopPanel = document.getElementById('twop-results-panel');
+  if(twopPanel) twopPanel.classList.add('hidden');
+  showScreen('screen-results');
+  if(pct>=70) launchConfetti();
+}
+
+function show2PlayerFinalResults() {
+  const tp = state.twoPlayer;
+  const p1 = tp.players[0];
+  const p2 = tp.players[1];
+  const total = tp.questionsPerPlayer;
+
+  // Determine winner
+  let winnerText, p1Class, p2Class;
+  if(p1.correct > p2.correct) {
+    winnerText = `🏆 ${p1.name} Jeet Gaya! ${p1.avatar}`;
+    p1Class = 'winner'; p2Class = 'loser';
+  } else if(p2.correct > p1.correct) {
+    winnerText = `🏆 ${p2.name} Jeet Gaya! ${p2.avatar}`;
+    p1Class = 'loser'; p2Class = 'winner';
+  } else {
+    winnerText = `🤝 Tie! Dono barabar hain!`;
+    p1Class = 'draw'; p2Class = 'draw';
+  }
+
+  // Update both player profiles with XP
+  [p1, p2].forEach(p => {
+    const allProfiles = getAllProfiles();
+    const profile = allProfiles[p.profileIndex];
+    if(profile) {
+      profile.xp = Math.max(0, (profile.xp || 0) + p.xp);
+      profile.totalGames = (profile.totalGames || 0) + 1;
+      profile.totalCorrect = (profile.totalCorrect || 0) + p.correct;
+      profile.totalWrong = (profile.totalWrong || 0) + p.wrong;
+      allProfiles[p.profileIndex] = profile;
+      saveAllProfiles(allProfiles);
+    }
+  });
+
+  // Show results screen with 2-player panel
+  document.getElementById('results-avatar').textContent = '⚔️';
+  document.getElementById('results-name').textContent = '2 Player Battle!';
+  document.getElementById('results-grade').textContent = winnerText;
+  document.getElementById('res-correct').textContent = p1.correct + p2.correct;
+  document.getElementById('res-wrong').textContent = p1.wrong + p2.wrong;
+  document.getElementById('res-xp').textContent = `${p1.xp>=0?'+':''}${p1.xp}`;
+  document.getElementById('res-total-xp').textContent = p1.xp + p2.xp;
+
+  const twopPanel = document.getElementById('twop-results-panel');
+  if(twopPanel) {
+    twopPanel.classList.remove('hidden');
+    twopPanel.innerHTML = `
+      <h3>⚔️ Battle Results</h3>
+      <div class="twop-score-row">
+        <div class="twop-score-card ${p1Class}">
+          <span class="twop-card-avatar">${p1.avatar}</span>
+          <div class="twop-card-name">${escHtml(p1.name)}</div>
+          <span class="twop-card-score">${p1.correct}/${total}</span>
+          <div class="twop-card-detail">⚡${p1.xp>=0?'+':''}${p1.xp} XP</div>
+        </div>
+        <div class="twop-score-card ${p2Class}">
+          <span class="twop-card-avatar">${p2.avatar}</span>
+          <div class="twop-card-name">${escHtml(p2.name)}</div>
+          <span class="twop-card-score">${p2.correct}/${total}</span>
+          <div class="twop-card-detail">⚡${p2.xp>=0?'+':''}${p2.xp} XP</div>
+        </div>
+      </div>
+      <div class="twop-winner-banner">${winnerText}</div>
+    `;
+  }
+
+  // Reset 2player state
+  tp.active = false; tp.currentPlayerIndex = 0; tp.players = [];
+
+  // Switch back to original player (player 1's profile)
+  setCurrentProfileIndex(p1.profileIndex);
+  syncProfileToState(p1.profileIndex);
+
+  document.getElementById('streak-result-row').classList.add('hidden');
+  document.getElementById('new-badge-earned').classList.add('hidden');
+  showScreen('screen-results');
+  launchConfetti();
+}
+
+// ===== OVERRIDE startGame for 2-player =====
+const _orig_startGame = window.startGame;
+
+async function startGame(mode, level=1){
+  state.gameMode=mode; state.selectedLevel=level;
+  state.currentQ=0; state.sessionCorrect=0; state.sessionWrong=0; state.sessionXP=0;
+  state.currentStreak=0; state.answered=false; state.hintUsed=false;
+  clearInterval(state.timerInterval);
+  state.lives = (mode==='challenge') ? 3 : 999;
+  state.maxLives = state.lives;
+
+  const url=`data/class${state.selectedClass}/${state.selectedSubject.key}.json`;
+  try {
+    const resp=await fetch(url);
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}: ${url}`);
+    let qs=await resp.json();
+    if(mode==='level') qs=qs.filter(q=>q.level===level);
+    if(!qs.length){
+      const resp2=await fetch(url);
+      qs=await resp2.json();
+    }
+    if(!qs.length) throw new Error('No questions found in file.');
+    qs = qs.sort(()=>Math.random()-.5).map(q=>({
+      ...q,
+      _enc: window.encryptAnswer ? window.encryptAnswer(q.answer) : null
+    }));
+
+    if(state.twoPlayer.active) {
+      // Store shared questions for both players
+      state.twoPlayer.questionsShared = qs;
+      state.questions = qs.slice(0, state.twoPlayer.questionsPerPlayer);
+      // Override mode to free for 2player
+      state.gameMode = 'free';
+    } else {
+      state.questions = qs;
+    }
+  } catch(e) {
+    alert(`Failed to load questions for "${state.selectedSubject.name}".\n\nMake sure the file exists at:\n${url}\n\nAlso ensure you are running via a local server (not file://).`);
+    console.error('Question load error:', e);
+    return;
+  }
+
+  document.getElementById('quiz-class-label').textContent=`Class ${state.selectedClass}`;
+  document.getElementById('quiz-subject-label').textContent=state.selectedSubject.name;
+  document.getElementById('quiz-mode-label').textContent=
+    state.twoPlayer.active ? '⚔️ 2P' :
+    mode==='free'?'🎮 Free': mode==='timer'?'⏱️ Timer': mode==='challenge'?'⚔️ Challenge':`🎯 L${level}`;
+
+  updateTurnBanner();
+  updateQuizLiveStats();
+  if(window.startSessionTimer) window.startSessionTimer();
+  if(window.setQuizActive) window.setQuizActive(true);
+  if(window.resetTabCount) window.resetTabCount();
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+// ===== OVERRIDE init to load profiles =====
+const _origInit = init;
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Load theme first
+  loadTheme();
+  const savedLang = localStorage.getItem('qs_lang') || 'en';
+  currentLang = savedLang;
+  const lused = JSON.parse(localStorage.getItem('qs_langs_used') || '["en"]');
+
+  // Load profiles system
+  loadStorage(); // loads into state.player from old key
+  migrateCurrentPlayerToProfiles(); // ensure profile exists
+  const activeIdx = getCurrentProfileIndex();
+  syncProfileToState(activeIdx); // load active profile into state.player
+  state.player.langsUsed = lused.length;
+
+  loadTheme();
+  initCanvas(); renderAvatarGrid();
+  if(state.player.name) document.getElementById('player-name').value = state.player.name;
+  document.getElementById('selected-avatar-display').textContent = state.player.avatar;
+
+  setTimeout(() => {
+    document.querySelectorAll('.avatar-option').forEach(el => {
+      if(el.textContent === state.player.avatar) el.classList.add('selected');
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === savedLang));
+  }, 50);
+
+  refreshHomeStats();
+  renderPlayerSwitcherBar();
+  updateDatetime(); setInterval(updateDatetime, 1000);
   applyI18n();
   showScreen('screen-home');
-}
+});
 
 document.addEventListener('DOMContentLoaded',init);
