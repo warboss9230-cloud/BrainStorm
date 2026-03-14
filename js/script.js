@@ -234,16 +234,19 @@ function initCanvas() {
 }
 
 // ===== THEME =====
+function syncThemeBtn(){
+  const dark=document.body.classList.contains('dark');
+  const btn=document.getElementById('global-theme-btn');
+  if(btn) btn.textContent=dark?'☀️':'🌙';
+}
 function toggleTheme(){
   document.body.classList.toggle('dark');
-  const d=document.body.classList.contains('dark');
-  document.querySelectorAll('#theme-toggle').forEach(b=>b.textContent=d?'☀️':'🌙');
-  localStorage.setItem('qs_theme',d?'dark':'light');
+  localStorage.setItem('qs_theme',document.body.classList.contains('dark')?'dark':'light');
+  syncThemeBtn();
 }
 function loadTheme(){
-  const t=localStorage.getItem('qs_theme');
-  if(t==='dark') document.body.classList.add('dark');
-  document.querySelectorAll('#theme-toggle').forEach(b=>b.textContent=t==='dark'?'☀️':'🌙');
+  if(localStorage.getItem('qs_theme')==='dark') document.body.classList.add('dark');
+  syncThemeBtn();
 }
 
 // ===== AVATAR =====
