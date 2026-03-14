@@ -13,27 +13,20 @@
 <div id="screen-home" class="screen active">
   <canvas id="bg-canvas"></canvas>
   <div class="home-content">
-
-    <!-- TOP NAV BAR -->
-    <div class="home-topbar">
-      <div class="home-topbar-left">
-        <button class="icon-btn" onclick="showScreen('screen-leaderboard')" title="Leaderboard">🏆</button>
-        <button class="icon-btn" onclick="showDashboard()" title="Dashboard">📈</button>
-        <button class="icon-btn" onclick="showBadges()" title="Badges">🏅</button>
-        <button class="icon-btn" onclick="openDailyChallenge()" title="Daily Challenge">🗓️</button>
-      </div>
-      <div class="home-topbar-right">
-        <button class="topbar-special-btn mail-btn" onclick="showMailLogin()" title="Login with Email">✉️ Login</button>
-        <button class="topbar-special-btn add-btn" onclick="showAddPlayer()" title="Add Player">➕ Player</button>
-      </div>
-    </div>
-
     <div class="logo-area">
       <div class="logo-icon">⚡</div>
       <h1 class="logo-text">QuizStorm</h1>
       <p class="tagline" data-i18n="tagline">Learn · Play · Conquer!</p>
     </div>
     <div class="datetime-box" id="datetime"></div>
+
+    <!-- ===== TOP ACTIONS (moved above name) ===== -->
+    <div class="top-actions">
+      <button class="icon-btn" onclick="showScreen('screen-leaderboard')" title="Leaderboard">🏆</button>
+      <button class="icon-btn" onclick="showDashboard()" title="Dashboard">📈</button>
+      <button class="icon-btn" onclick="showBadges()" title="Badges">🏅</button>
+      <button class="icon-btn" onclick="openDailyChallenge()" title="Daily Challenge">🗓️</button>
+    </div>
 
     <!-- Language Bar -->
     <div class="lang-bar">
@@ -43,8 +36,8 @@
       <button class="lang-btn" data-lang="mr" onclick="setLang('mr')">मराठी</button>
     </div>
 
-    <!-- Player Switcher -->
-    <div class="player-switcher" id="player-switcher"></div>
+    <!-- ===== PLAYER SWITCHER ===== -->
+    <div class="player-switcher-bar" id="player-switcher-bar"></div>
 
     <div class="home-card">
       <p class="label" data-i18n="chooseAvatar">Choose Your Avatar</p>
@@ -75,42 +68,20 @@
       <button class="btn-start" onclick="goToClassSelect()">
         <span data-i18n="startQuiz">START QUIZ</span> <span class="btn-arrow">→</span>
       </button>
+
+      <!-- ===== ADD PLAYER + 2-PLAYER BUTTONS ===== -->
+      <div class="home-extra-btns">
+        <button class="home-extra-btn add-player-btn" onclick="showAddPlayer()">
+          <span class="heb-icon">👤➕</span>
+          <span class="heb-label">Add Player</span>
+        </button>
+        <button class="home-extra-btn twoplayer-btn" onclick="show2PlayerSetup()">
+          <span class="heb-icon">⚔️</span>
+          <span class="heb-label">2 Player</span>
+        </button>
+      </div>
     </div>
 
-  </div>
-</div>
-
-<!-- ===== MODAL: ADD PLAYER ===== -->
-<div id="modal-add-player" class="modal-overlay hidden">
-  <div class="modal-box">
-    <div class="modal-icon">👤</div>
-    <h2>Add New Player</h2>
-    <p>Create a new player profile to switch between players</p>
-    <input type="text" id="new-player-name" placeholder="Enter player name..." maxlength="20" autocomplete="off"
-      style="width:100%;padding:12px 16px;border-radius:12px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;background:var(--surface2);color:var(--text);outline:none;margin-bottom:14px;display:block;"/>
-    <div class="modal-actions">
-      <button class="btn-action" onclick="addNewPlayer()">✅ Create Player</button>
-      <button class="btn-action btn-secondary" onclick="closeModal('modal-add-player')">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== MODAL: MAIL LOGIN ===== -->
-<div id="modal-mail-login" class="modal-overlay hidden">
-  <div class="modal-box">
-    <div class="modal-icon">✉️</div>
-    <h2>Email Login</h2>
-    <p>Sign in to sync your progress</p>
-    <input type="email" id="login-email" placeholder="Enter your email..." autocomplete="email"
-      style="width:100%;padding:12px 16px;border-radius:12px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;background:var(--surface2);color:var(--text);outline:none;margin-bottom:10px;display:block;"/>
-    <input type="password" id="login-password" placeholder="Enter password..."
-      style="width:100%;padding:12px 16px;border-radius:12px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;background:var(--surface2);color:var(--text);outline:none;margin-bottom:14px;display:block;"/>
-    <div class="modal-actions" style="flex-direction:column;gap:8px;">
-      <button class="btn-action" style="width:100%" onclick="doMailLogin()">🚀 Login</button>
-      <button class="btn-action" style="width:100%;background:linear-gradient(135deg,#10b981,#059669)" onclick="doMailRegister()">✨ Register</button>
-      <button class="btn-action btn-secondary" style="width:100%" onclick="closeModal('modal-mail-login')">Cancel</button>
-    </div>
-    <div id="mail-login-msg" style="margin-top:10px;font-size:.82rem;font-weight:700;text-align:center;min-height:18px;color:var(--accent);"></div>
   </div>
 </div>
 
@@ -119,7 +90,6 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2 data-i18n="selectClass">Select Class</h2>
-    
   </div>
   <div class="player-info-bar" id="class-player-bar"></div>
   <div class="class-grid" id="class-grid"></div>
@@ -131,11 +101,7 @@
     <button class="back-btn" onclick="showScreen('screen-class')">← <span data-i18n="back">Back</span></button>
     <h2 id="subject-screen-title">Select Subject</h2>
   </div>
-
-  <!-- Subject Grid (single subjects + Mix card at end) -->
   <div class="subject-grid" id="subject-grid"></div>
-
-  <!-- Mix Panel (hidden until Mix card clicked) -->
   <div id="mix-panel" class="mix-panel hidden">
     <div class="mix-panel-header">
       <span class="mix-panel-title">🎲 Mix Subject Quiz</span>
@@ -172,7 +138,6 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-subject')">← <span data-i18n="back">Back</span></button>
     <h2 data-i18n="chooseMode">Choose Game Mode</h2>
-    
   </div>
   <div class="mode-grid">
     <div class="mode-card" onclick="startGame('free')">
@@ -211,12 +176,13 @@
       <span id="quiz-subject-label">Math</span>
       <span id="quiz-mode-label">Free</span>
     </div>
+    <!-- 2-Player turn indicator -->
+    <div id="twop-turn-banner" class="twop-turn-banner hidden"></div>
     <div class="quiz-live-stats">
       <div class="lives-row" id="lives-row">❤️❤️❤️</div>
       <div class="streak-pill" id="streak-pill">🔥 0</div>
       <div class="xp-display">⚡ <span id="xp-value">0</span></div>
     </div>
-    
   </div>
 
   <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill"></div></div>
@@ -262,6 +228,8 @@
       </div>
     </div>
     <div class="results-total-xp"><span data-i18n="totalXP">Total XP</span>: <strong id="res-total-xp">0</strong></div>
+    <!-- 2-Player results panel -->
+    <div id="twop-results-panel" class="twop-results-panel hidden"></div>
     <div class="results-actions">
       <button class="btn-action" onclick="playAgain()">🔄 <span data-i18n="playAgain">Play Again</span></button>
       <button class="btn-action btn-secondary" onclick="showScreen('screen-home')">🏠 <span data-i18n="home">Home</span></button>
@@ -276,7 +244,6 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>🏆 <span data-i18n="leaderboard">Leaderboard</span></h2>
-    
   </div>
   <div class="leaderboard-container" id="leaderboard-list"></div>
 </div>
@@ -286,7 +253,6 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>🏅 <span data-i18n="myBadges">My Badges</span></h2>
-    
   </div>
   <div class="badges-summary" id="badges-summary"></div>
   <div class="badges-grid" id="badges-grid"></div>
@@ -297,7 +263,6 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>📈 <span data-i18n="dashboard">Dashboard</span></h2>
-    
   </div>
   <div class="dashboard-wrap" id="dashboard-wrap"></div>
 </div>
@@ -307,9 +272,71 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>🗓️ <span data-i18n="dailyChallenge">Daily Challenge</span></h2>
-    
   </div>
   <div class="daily-wrap" id="daily-wrap"></div>
+</div>
+
+<!-- ===== MODAL: ADD PLAYER ===== -->
+<div id="modal-add-player" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-icon">👤</div>
+    <h2>Add New Player</h2>
+    <p>Ek naya player profile banayein</p>
+    <div id="new-player-avatar-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;"></div>
+    <div id="new-player-avatar-selected" style="text-align:center;font-size:2rem;margin-bottom:10px;">🧒</div>
+    <input type="text" id="new-player-name" placeholder="Player ka naam..." maxlength="20" autocomplete="off"
+      style="width:100%;padding:12px 16px;border-radius:12px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;background:var(--surface2);color:var(--text);outline:none;margin-bottom:14px;display:block;-webkit-user-select:text;user-select:text;"/>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="addNewPlayer()">✅ Create Player</button>
+      <button class="btn-action btn-secondary" onclick="closeModal('modal-add-player')">Cancel</button>
+    </div>
+    <div id="add-player-msg" style="margin-top:8px;font-size:.82rem;font-weight:700;text-align:center;color:var(--accent);min-height:18px;"></div>
+  </div>
+</div>
+
+<!-- ===== MODAL: 2-PLAYER SETUP ===== -->
+<div id="modal-2player" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-icon">⚔️</div>
+    <h2>2 Player Mode</h2>
+    <p>Dono players turn-by-turn khelenge!</p>
+
+    <div style="margin-bottom:12px;">
+      <div style="font-size:.75rem;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🔵 Player 1</div>
+      <select id="twop-p1-select" style="width:100%;padding:10px 12px;border-radius:12px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;"></select>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:.75rem;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🔴 Player 2</div>
+      <select id="twop-p2-select" style="width:100%;padding:10px 12px;border-radius:12px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;"></select>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:.75rem;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">📝 Questions per player</div>
+      <select id="twop-q-count" style="width:100%;padding:10px 12px;border-radius:12px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;">
+        <option value="5">5 Questions</option>
+        <option value="10" selected>10 Questions</option>
+        <option value="15">15 Questions</option>
+        <option value="20">20 Questions</option>
+      </select>
+    </div>
+    <div id="twop-msg" style="font-size:.82rem;font-weight:700;text-align:center;color:#ef4444;min-height:18px;margin-bottom:10px;"></div>
+    <div class="modal-actions">
+      <button class="btn-action" onclick="start2PlayerGame()">⚔️ Start Battle!</button>
+      <button class="btn-action btn-secondary" onclick="closeModal('modal-2player')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: 2-PLAYER TURN SWITCH ===== -->
+<div id="modal-turn-switch" class="modal-overlay hidden">
+  <div class="modal-box" style="text-align:center;">
+    <div class="modal-icon" id="turn-switch-avatar">🧒</div>
+    <h2 id="turn-switch-name">Player 2's Turn!</h2>
+    <p id="turn-switch-msg">Pass the phone to Player 2</p>
+    <div id="turn-switch-p1-score" style="background:var(--surface2);border-radius:12px;padding:10px;margin-bottom:14px;font-size:.9rem;font-weight:700;color:var(--text2);"></div>
+    <button class="btn-action" onclick="startNextPlayerTurn()">
+      ▶️ I'm Ready!
+    </button>
+  </div>
 </div>
 
 <!-- ===== MODAL: GAME OVER ===== -->
@@ -342,7 +369,7 @@
   </div>
 </div>
 
-<!-- ===== GLOBAL FLOATING THEME BUTTON (visible on ALL pages) ===== -->
+<!-- ===== GLOBAL FLOATING THEME BUTTON ===== -->
 <button id="global-theme-btn" onclick="toggleTheme()" title="Toggle Light/Dark Mode">🌙</button>
 
 <footer class="site-footer">© QuizStorm 2025 — Learn, Play & Conquer! ⚡</footer>
