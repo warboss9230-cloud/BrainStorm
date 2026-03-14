@@ -1,126 +1,97 @@
-{
-  "class": 1,
-  "subject": "Hindi",
-  "questions": [
-    {
-      "question": "हिंदी वर्णमाला का पहला अक्षर कौन सा है?",
-      "options": ["अ", "आ", "इ", "क"],
-      "answer": "अ",
-      "level": "easy"
-    },
-    {
-      "question": "'क' के बाद कौन सा अक्षर आता है?",
-      "options": ["ख", "ग", "घ", "च"],
-      "answer": "ख",
-      "level": "easy"
-    },
-    {
-      "question": "हिंदी में 'Apple' को क्या कहते हैं?",
-      "options": ["सेब", "आम", "केला", "अंगूर"],
-      "answer": "सेब",
-      "level": "easy"
-    },
-    {
-      "question": "'गाय' का बच्चा क्या कहलाता है?",
-      "options": ["बछड़ा", "बकरी", "मेमना", "पिल्ला"],
-      "answer": "बछड़ा",
-      "level": "easy"
-    },
-    {
-      "question": "हिंदी में 'Sun' को क्या कहते हैं?",
-      "options": ["सूरज", "चाँद", "तारा", "आकाश"],
-      "answer": "सूरज",
-      "level": "easy"
-    },
-    {
-      "question": "निम्न में से कौन सा फल है?",
-      "options": ["आम", "गाय", "कुर्सी", "किताब"],
-      "answer": "आम",
-      "level": "easy"
-    },
-    {
-      "question": "हिंदी वर्णमाला में कितने स्वर होते हैं?",
-      "options": ["11", "10", "12", "13"],
-      "answer": "11",
-      "level": "medium"
-    },
-    {
-      "question": "'बड़ा' का विलोम शब्द क्या है?",
-      "options": ["छोटा", "मोटा", "लंबा", "भारी"],
-      "answer": "छोटा",
-      "level": "easy"
-    },
-    {
-      "question": "'कमल' में कितने अक्षर हैं?",
-      "options": ["3", "2", "4", "5"],
-      "answer": "3",
-      "level": "easy"
-    },
-    {
-      "question": "हिंदी में 'Water' को क्या कहते हैं?",
-      "options": ["पानी", "हवा", "मिट्टी", "आग"],
-      "answer": "पानी",
-      "level": "easy"
-    },
-    {
-      "question": "निम्न में से कौन सा जानवर है?",
-      "options": ["शेर", "गुलाब", "किताब", "पेंसिल"],
-      "answer": "शेर",
-      "level": "easy"
-    },
-    {
-      "question": "'दिन' का विलोम शब्द क्या है?",
-      "options": ["रात", "सुबह", "दोपहर", "शाम"],
-      "answer": "रात",
-      "level": "easy"
-    },
-    {
-      "question": "हिंदी में 'School' को क्या कहते हैं?",
-      "options": ["विद्यालय", "अस्पताल", "बाज़ार", "मंदिर"],
-      "answer": "विद्यालय",
-      "level": "medium"
-    },
-    {
-      "question": "'राम' किस भाषा का नाम है?",
-      "options": ["हिंदी", "English", "Urdu", "Tamil"],
-      "answer": "हिंदी",
-      "level": "easy"
-    },
-    {
-      "question": "निम्न में से कौन सा रंग है?",
-      "options": ["लाल", "बिल्ली", "पेड़", "नदी"],
-      "answer": "लाल",
-      "level": "easy"
-    },
-    {
-      "question": "'आ' की मात्रा से कौन सा शब्द बनता है?",
-      "options": ["माला", "मिल", "मुकुट", "मेला"],
-      "answer": "माला",
-      "level": "medium"
-    },
-    {
-      "question": "हिंदी में 'Mother' को क्या कहते हैं?",
-      "options": ["माँ", "पिता", "दादी", "नानी"],
-      "answer": "माँ",
-      "level": "easy"
-    },
-    {
-      "question": "हिंदी में 'Book' को क्या कहते हैं?",
-      "options": ["किताब", "कापी", "पेन", "थैला"],
-      "answer": "किताब",
-      "level": "easy"
-    },
-    {
-      "question": "'च' अक्षर से कौन सा शब्द शुरू होता है?",
-      "options": ["चाँद", "कमल", "बादल", "पानी"],
-      "answer": "चाँद",
-      "level": "easy"
-    },
-    {
-      "question": "हिंदी में 'Father' को क्या कहते हैं?",
-      "options": ["पिता", "माँ", "भाई", "बहन"],
-      "answer": "पिता",
-      "level": "easy"
-    }
-  ]
-}
+[
+{"id":1,"subject":"Hindi","question":"अ से क्या होता है?","option1":"अनार","option2":"कमल","option3":"घर","option4":"फल","answer":"अनार","level":1},
+{"id":2,"subject":"Hindi","question":"आ से क्या होता है?","option1":"आम","option2":"कमल","option3":"फल","option4":"घर","answer":"आम","level":1},
+{"id":3,"subject":"Hindi","question":"इ से क्या होता है?","option1":"इमली","option2":"अनार","option3":"फल","option4":"घर","answer":"इमली","level":1},
+{"id":4,"subject":"Hindi","question":"उ से क्या होता है?","option1":"उल्लू","option2":"आम","option3":"कमल","option4":"फल","answer":"उल्लू","level":1},
+{"id":5,"subject":"Hindi","question":"ए से क्या होता है?","option1":"एड़ी","option2":"घर","option3":"कमल","option4":"फल","answer":"एड़ी","level":1},
+
+{"id":6,"subject":"Hindi","question":"क से क्या होता है?","option1":"कमल","option2":"फल","option3":"घर","option4":"नदी","answer":"कमल","level":1},
+{"id":7,"subject":"Hindi","question":"ख से क्या होता है?","option1":"खरगोश","option2":"कमल","option3":"फल","option4":"घर","answer":"खरगोश","level":1},
+{"id":8,"subject":"Hindi","question":"ग से क्या होता है?","option1":"गाय","option2":"घर","option3":"कमल","option4":"फल","answer":"गाय","level":1},
+{"id":9,"subject":"Hindi","question":"घ से क्या होता है?","option1":"घर","option2":"गाय","option3":"फल","option4":"कमल","answer":"घर","level":1},
+{"id":10,"subject":"Hindi","question":"च से क्या होता है?","option1":"चम्मच","option2":"कमल","option3":"घर","option4":"फल","answer":"चम्मच","level":1},
+
+{"id":11,"subject":"Hindi","question":"ज से क्या होता है?","option1":"जहाज","option2":"घर","option3":"फल","option4":"कमल","answer":"जहाज","level":1},
+{"id":12,"subject":"Hindi","question":"ट से क्या होता है?","option1":"टमाटर","option2":"फल","option3":"घर","option4":"कमल","answer":"टमाटर","level":1},
+{"id":13,"subject":"Hindi","question":"त से क्या होता है?","option1":"तरबूज","option2":"कमल","option3":"घर","option4":"फल","answer":"तरबूज","level":1},
+{"id":14,"subject":"Hindi","question":"द से क्या होता है?","option1":"दरवाजा","option2":"कमल","option3":"फल","option4":"घर","answer":"दरवाजा","level":1},
+{"id":15,"subject":"Hindi","question":"न से क्या होता है?","option1":"नल","option2":"कमल","option3":"घर","option4":"फल","answer":"नल","level":1},
+
+{"id":16,"subject":"Hindi","question":"प से क्या होता है?","option1":"पतंग","option2":"घर","option3":"फल","option4":"कमल","answer":"पतंग","level":1},
+{"id":17,"subject":"Hindi","question":"फ से क्या होता है?","option1":"फल","option2":"घर","option3":"कमल","option4":"नदी","answer":"फल","level":1},
+{"id":18,"subject":"Hindi","question":"ब से क्या होता है?","option1":"बकरी","option2":"कमल","option3":"घर","option4":"फल","answer":"बकरी","level":1},
+{"id":19,"subject":"Hindi","question":"म से क्या होता है?","option1":"मछली","option2":"घर","option3":"कमल","option4":"फल","answer":"मछली","level":1},
+{"id":20,"subject":"Hindi","question":"र से क्या होता है?","option1":"रस","option2":"कमल","option3":"घर","option4":"फल","answer":"रस","level":1},
+
+{"id":21,"subject":"Hindi","question":"ल से क्या होता है?","option1":"लड्डू","option2":"कमल","option3":"घर","option4":"फल","answer":"लड्डू","level":1},
+{"id":22,"subject":"Hindi","question":"व से क्या होता है?","option1":"वन","option2":"कमल","option3":"घर","option4":"फल","answer":"वन","level":1},
+{"id":23,"subject":"Hindi","question":"श से क्या होता है?","option1":"शेर","option2":"घर","option3":"कमल","option4":"फल","answer":"शेर","level":1},
+{"id":24,"subject":"Hindi","question":"स से क्या होता है?","option1":"सूरज","option2":"घर","option3":"कमल","option4":"फल","answer":"सूरज","level":1},
+{"id":25,"subject":"Hindi","question":"ह से क्या होता है?","option1":"हाथी","option2":"घर","option3":"कमल","option4":"फल","answer":"हाथी","level":1},
+
+{"id":26,"subject":"Hindi","question":"सूरज कहाँ चमकता है?","option1":"आसमान","option2":"पानी","option3":"जमीन","option4":"घर","answer":"आसमान","level":1},
+{"id":27,"subject":"Hindi","question":"मछली कहाँ रहती है?","option1":"पानी","option2":"आसमान","option3":"जंगल","option4":"घर","answer":"पानी","level":1},
+{"id":28,"subject":"Hindi","question":"शेर कहाँ रहता है?","option1":"जंगल","option2":"पानी","option3":"आसमान","option4":"घर","answer":"जंगल","level":1},
+{"id":29,"subject":"Hindi","question":"गाय क्या देती है?","option1":"दूध","option2":"फल","option3":"पानी","option4":"चावल","answer":"दूध","level":1},
+{"id":30,"subject":"Hindi","question":"हम क्या पीते हैं?","option1":"पानी","option2":"पत्थर","option3":"लकड़ी","option4":"रेत","answer":"पानी","level":1},
+
+{"id":31,"subject":"Hindi","question":"पेड़ पर क्या उगता है?","option1":"फल","option2":"पत्थर","option3":"रेत","option4":"पानी","answer":"फल","level":1},
+{"id":32,"subject":"Hindi","question":"आसमान में क्या चमकता है?","option1":"तारे","option2":"पत्थर","option3":"पेड़","option4":"घर","answer":"तारे","level":1},
+{"id":33,"subject":"Hindi","question":"हम किससे देखते हैं?","option1":"आँख","option2":"कान","option3":"नाक","option4":"हाथ","answer":"आँख","level":1},
+{"id":34,"subject":"Hindi","question":"हम किससे सुनते हैं?","option1":"कान","option2":"आँख","option3":"नाक","option4":"हाथ","answer":"कान","level":1},
+{"id":35,"subject":"Hindi","question":"हम किससे सूंघते हैं?","option1":"नाक","option2":"कान","option3":"आँख","option4":"हाथ","answer":"नाक","level":1},
+
+{"id":36,"subject":"Hindi","question":"हम किससे चलते हैं?","option1":"पैर","option2":"हाथ","option3":"आँख","option4":"कान","answer":"पैर","level":1},
+{"id":37,"subject":"Hindi","question":"हम किससे पकड़ते हैं?","option1":"हाथ","option2":"पैर","option3":"आँख","option4":"कान","answer":"हाथ","level":1},
+{"id":38,"subject":"Hindi","question":"दिन में क्या निकलता है?","option1":"सूरज","option2":"चाँद","option3":"तारे","option4":"बादल","answer":"सूरज","level":1},
+{"id":39,"subject":"Hindi","question":"रात में क्या दिखता है?","option1":"चाँद","option2":"सूरज","option3":"पेड़","option4":"घर","answer":"चाँद","level":1},
+{"id":40,"subject":"Hindi","question":"इंद्रधनुष कब दिखता है?","option1":"बारिश के बाद","option2":"सुबह","option3":"दोपहर","option4":"रात","answer":"बारिश के बाद","level":1},
+
+{"id":41,"subject":"Hindi","question":"गाय का बच्चा क्या कहलाता है?","option1":"बछड़ा","option2":"बकरी","option3":"घोड़ा","option4":"कुत्ता","answer":"बछड़ा","level":1},
+{"id":42,"subject":"Hindi","question":"मुर्गी क्या देती है?","option1":"अंडा","option2":"दूध","option3":"फल","option4":"पानी","answer":"अंडा","level":1},
+{"id":43,"subject":"Hindi","question":"शेर को क्या कहते हैं?","option1":"जंगल का राजा","option2":"पानी का राजा","option3":"आसमान का राजा","option4":"घर का राजा","answer":"जंगल का राजा","level":1},
+{"id":44,"subject":"Hindi","question":"पेड़ हमें क्या देते हैं?","option1":"हवा","option2":"पत्थर","option3":"रेत","option4":"लोहे","answer":"हवा","level":1},
+{"id":45,"subject":"Hindi","question":"हाथी कैसा जानवर है?","option1":"बड़ा","option2":"छोटा","option3":"पतला","option4":"हल्का","answer":"बड़ा","level":1},
+
+{"id":46,"subject":"Hindi","question":"चींटी कैसी होती है?","option1":"छोटी","option2":"बड़ी","option3":"लंबी","option4":"मोटी","answer":"छोटी","level":1},
+{"id":47,"subject":"Hindi","question":"हम कहाँ रहते हैं?","option1":"घर","option2":"पानी","option3":"पेड़","option4":"आसमान","answer":"घर","level":1},
+{"id":48,"subject":"Hindi","question":"सूरज हमें क्या देता है?","option1":"रोशनी","option2":"पानी","option3":"रेत","option4":"पत्थर","answer":"रोशनी","level":1},
+{"id":49,"subject":"Hindi","question":"पेड़ का रंग क्या होता है?","option1":"हरा","option2":"नीला","option3":"काला","option4":"सफेद","answer":"हरा","level":1},
+{"id":50,"subject":"Hindi","question":"आम कैसा फल है?","option1":"मीठा","option2":"कड़वा","option3":"खट्टा","option4":"तीखा","answer":"मीठा","level":1},
+
+{"id":51,"subject":"Hindi","question":"गाजर कहाँ उगती है?","option1":"मिट्टी में","option2":"आसमान में","option3":"पानी में","option4":"घर में","answer":"मिट्टी में","level":1},
+{"id":52,"subject":"Hindi","question":"सूरज कैसा होता है?","option1":"गरम","option2":"ठंडा","option3":"गीला","option4":"नरम","answer":"गरम","level":1},
+{"id":53,"subject":"Hindi","question":"बादल कहाँ होते हैं?","option1":"आसमान में","option2":"जमीन पर","option3":"पानी में","option4":"घर में","answer":"आसमान में","level":1},
+{"id":54,"subject":"Hindi","question":"बारिश में क्या गिरता है?","option1":"पानी","option2":"रेत","option3":"पत्थर","option4":"धूल","answer":"पानी","level":1},
+{"id":55,"subject":"Hindi","question":"नदी में क्या बहता है?","option1":"पानी","option2":"रेत","option3":"पत्थर","option4":"पेड़","answer":"पानी","level":1},
+
+{"id":56,"subject":"Hindi","question":"साइकिल में कितने पहिए होते हैं?","option1":"2","option2":"3","option3":"4","option4":"5","answer":"2","level":1},
+{"id":57,"subject":"Hindi","question":"कार कहाँ चलती है?","option1":"सड़क","option2":"पानी","option3":"आसमान","option4":"पेड़","answer":"सड़क","level":1},
+{"id":58,"subject":"Hindi","question":"हवाई जहाज कहाँ उड़ता है?","option1":"आसमान","option2":"पानी","option3":"सड़क","option4":"जंगल","answer":"आसमान","level":1},
+{"id":59,"subject":"Hindi","question":"नाव कहाँ चलती है?","option1":"पानी","option2":"सड़क","option3":"आसमान","option4":"जंगल","answer":"पानी","level":1},
+{"id":60,"subject":"Hindi","question":"ट्रेन कहाँ चलती है?","option1":"पटरी","option2":"पानी","option3":"आसमान","option4":"जंगल","answer":"पटरी","level":1},
+
+{"id":61,"subject":"Hindi","question":"फूल कैसे होते हैं?","option1":"सुंदर","option2":"काले","option3":"कठोर","option4":"सूखे","answer":"सुंदर","level":1},
+{"id":62,"subject":"Hindi","question":"पेड़ कहाँ उगते हैं?","option1":"मिट्टी में","option2":"आसमान में","option3":"पानी में","option4":"घर में","answer":"मिट्टी में","level":1},
+{"id":63,"subject":"Hindi","question":"तितली के पंख कैसे होते हैं?","option1":"रंगीन","option2":"काले","option3":"सफेद","option4":"भूरे","answer":"रंगीन","level":1},
+{"id":64,"subject":"Hindi","question":"मधुमक्खी क्या बनाती है?","option1":"शहद","option2":"दूध","option3":"पानी","option4":"रस","answer":"शहद","level":1},
+{"id":65,"subject":"Hindi","question":"मछली कैसे चलती है?","option1":"तैरती है","option2":"दौड़ती है","option3":"उड़ती है","option4":"कूदती है","answer":"तैरती है","level":1},
+
+{"id":66,"subject":"Hindi","question":"पक्षी क्या करते हैं?","option1":"उड़ते हैं","option2":"तैरते हैं","option3":"दौड़ते हैं","option4":"सोते हैं","answer":"उड़ते हैं","level":1},
+{"id":67,"subject":"Hindi","question":"सूरज का रंग क्या है?","option1":"पीला","option2":"नीला","option3":"काला","option4":"हरा","answer":"पीला","level":1},
+{"id":68,"subject":"Hindi","question":"आकाश का रंग क्या है?","option1":"नीला","option2":"लाल","option3":"हरा","option4":"काला","answer":"नीला","level":1},
+{"id":69,"subject":"Hindi","question":"पेड़ हमें क्या देते हैं?","option1":"फल","option2":"पत्थर","option3":"रेत","option4":"धूल","answer":"फल","level":1},
+{"id":70,"subject":"Hindi","question":"हम स्कूल क्यों जाते हैं?","option1":"पढ़ने","option2":"सोने","option3":"खेलने","option4":"रोने","answer":"पढ़ने","level":1},
+
+{"id":71,"subject":"Hindi","question":"माँ हमें क्या देती है?","option1":"प्यार","option2":"पत्थर","option3":"रेत","option4":"धूल","answer":"प्यार","level":1},
+{"id":72,"subject":"Hindi","question":"पानी कैसा होता है?","option1":"तरल","option2":"कठोर","option3":"सूखा","option4":"भारी","answer":"तरल","level":1},
+{"id":73,"subject":"Hindi","question":"हवा हमें क्या देती है?","option1":"सांस","option2":"पत्थर","option3":"रेत","option4":"धूल","answer":"सांस","level":1},
+{"id":74,"subject":"Hindi","question":"किताब से क्या मिलता है?","option1":"ज्ञान","option2":"धूल","option3":"रेत","option4":"पत्थर","answer":"ज्ञान","level":1},
+{"id":75,"subject":"Hindi","question":"पेड़ का तना कैसा होता है?","option1":"मजबूत","option2":"नरम","option3":"गीला","option4":"छोटा","answer":"मजबूत","level":1},
+
+{"id":76,"subject":"Hindi","question":"पत्ते किस रंग के होते हैं?","option1":"हरे","option2":"नीले","option3":"लाल","option4":"काले","answer":"हरे","level":1},
+{"id":77,"subject":"Hindi","question":"सूरज कहाँ निकलता है?","option1":"पूर्व","option2":"पश्चिम","option3":"उत्तर","option4":"दक्षिण","answer":"पूर्व","level":1},
+{"id":78,"subject":"Hindi","question":"सूरज कहाँ डूबता है?","option1":"पश्चिम","option2":"पूर्व","option3":"उत्तर","option4":"दक्षिण","answer":"पश्चिम","level":1},
+{"id":79,"subject":"Hindi","question":"हम रात में क्या करते हैं?","option1":"सोते हैं","option2":"उड़ते हैं","option3":"तैरते हैं","option4":"कूदते हैं","answer":"सोते हैं","level":1},
+{"id":80,"subject":"Hindi","question":"हम दिन में क्या करते हैं?","option1":"काम","option2":"सोते","option3":"रोते","option4":"छिपते","answer":"काम","level":1}
+]
