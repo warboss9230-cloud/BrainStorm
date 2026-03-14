@@ -4,8 +4,8 @@
 const AVATARS = [
   '🧒','👦','👧','🧑‍🎓','👨‍🎓','👩‍🎓','🦸','🦹','🧙','🥷',
   '👨‍💻','👩‍💻','👨‍🚀','👩‍🚀','🤖','👾','😎','🦄','🎭','🃏'
-
 ];
+
 const SUBJECTS = [
   {key:'math',      name:'Math',            icon:'🔢', cls:'subj-math'},
   {key:'science',   name:'Science',         icon:'🔬', cls:'subj-science'},
@@ -143,12 +143,17 @@ function playBeep(type) {
 // ===== STORAGE =====
 function loadStorage() {
   try {
-    const s = JSON.parse(localStorage.getItem('qs_player_v2')||'{}');
+    // 🔐 Use secure storage with tamper detection
+    const s = window.loadSecureStorage ? window.loadSecureStorage() : JSON.parse(localStorage.getItem('qs_player_v2')||'{}');
     if(s) Object.assign(state.player, s);
   } catch(e){}
 }
 function saveStorage() {
-  try { localStorage.setItem('qs_player_v2', JSON.stringify(state.player)); } catch(e){}
+  try {
+    // 🔐 Use secure storage with checksum
+    if(window.saveSecureStorage) window.saveSecureStorage(state.player);
+    else localStorage.setItem('qs_player_v2', JSON.stringify(state.player));
+  } catch(e){}
 }
 function getLeaderboard() {
   try { return JSON.parse(localStorage.getItem('qs_lb_v2')||'[]'); } catch(e){ return []; }
@@ -330,7 +335,11 @@ async function startGame(mode, level=1){
     const resp=await fetch(url); let qs=await resp.json();
     if(mode==='level') qs=qs.filter(q=>q.level===level);
     if(!qs.length) qs=await (await fetch(url)).json();
-    state.questions=qs.sort(()=>Math.random()-.5);
+    // 🔐 Encrypt answers before storing in memory
+    state.questions=qs.sort(()=>Math.random()-.5).map(q=>({
+      ...q,
+      _enc: window.encryptAnswer ? window.encryptAnswer(q.answer) : null
+    }));
   } catch(e) { alert('Questions load failed. Use a local server.'); return; }
 
   document.getElementById('quiz-class-label').textContent=`Class ${state.selectedClass}`;
@@ -339,6 +348,10 @@ async function startGame(mode, level=1){
     mode==='free'?'🎮 Free': mode==='timer'?'⏱️ Timer': mode==='challenge'?'⚔️ Challenge':`🎯 L${level}`;
 
   updateQuizLiveStats();
+  // 🔐 Security hooks
+  if(window.startSessionTimer) window.startSessionTimer();
+  if(window.setQuizActive) window.setQuizActive(true);
+  if(window.resetTabCount) window.resetTabCount();
   showScreen('screen-quiz');
   renderQuestion();
 }
@@ -403,7 +416,10 @@ function handleAnswer(btn, chosen, correct){
   state.answered=true;
   clearInterval(state.timerInterval);
 
-  const isCorrect=chosen===correct;
+  // 🔐 Check against encrypted answer if available
+  const isCorrect = (q._enc && window.checkAnswer)
+    ? window.checkAnswer(chosen, q._enc)
+    : chosen === correct;
   document.querySelectorAll('.option-btn').forEach(b=>{
     b.disabled=true;
     if(b.querySelector('span:last-child').textContent===correct) b.classList.add('correct');
@@ -521,6 +537,9 @@ function retryGame(){ closeModal('modal-gameover'); startGame(state.gameMode,sta
 // ===== END GAME =====
 function endGame(){
   clearInterval(state.timerInterval);
+  // 🔐 Security: stop quiz tracking
+  if(window.stopSessionTimer) window.stopSessionTimer();
+  if(window.setQuizActive) window.setQuizActive(false);
   // Check perfect score
   if(state.sessionCorrect===state.questions.length && state.questions.length>0) state.player.hasPerfect=true;
   // Challenge survivor
@@ -766,6 +785,13 @@ function init(){
 
   refreshHomeStats();
   updateDatetime(); setInterval(updateDatetime,1000);
+// ===== SAFE HOME NAVIGATION =====
+function goHomeFromModal(modalId) {
+  if(modalId) closeModal(modalId);
+  document.querySelectorAll(".modal-overlay").forEach(m => m.classList.add("hidden"));
+  showScreen("screen-home");
+}
+
   applyI18n();
   showScreen('screen-home');
 }
