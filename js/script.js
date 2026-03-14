@@ -97,7 +97,7 @@ let state = {
            totalGames:0, totalCorrect:0, totalWrong:0, hasPerfect:false,
            challengeSurvivor:false, dailyCompleted:0, langsUsed:1, earnedBadges:[],
            history:[], dailyDate:'', dailyXP:0},
-  selectedClass:1, selectedSubject:null, gameMode:'free', selectedLevel:1,
+  selectedClass:1, selectedSubject:null, mixSubjects:[], isMixMode:false, gameMode:'free', selectedLevel:1,
   questions:[], currentQ:0,
   sessionCorrect:0, sessionWrong:0, sessionXP:0,
   currentStreak:0, lives:3, maxLives:3,
@@ -299,13 +299,144 @@ function selectClass(cls){
 // ===== SUBJECT SELECT =====
 function renderSubjectGrid(){
   const g=document.getElementById('subject-grid'); g.innerHTML='';
+
+  // Regular subject cards
   SUBJECTS.forEach(subj=>{
     const card=document.createElement('div');
     card.className=`subject-card ${subj.cls}`;
     card.innerHTML=`<span class="subj-icon">${subj.icon}</span><span class="subj-name">${subj.name}</span>`;
-    card.onclick=()=>{ state.selectedSubject=subj; document.getElementById('level-picker').classList.add('hidden'); showScreen('screen-mode'); };
+    card.onclick=()=>{ state.selectedSubject=subj; state.isMixMode=false; document.getElementById('level-picker').classList.add('hidden'); showScreen('screen-mode'); };
     g.appendChild(card);
   });
+
+  // 🎲 Special MIX card at the end
+  const mixCard=document.createElement('div');
+  mixCard.className='subject-card subj-mix mix-open-card';
+  mixCard.innerHTML=`<span class="subj-icon">🎲</span><span class="subj-name">Mix Quiz</span><span class="mix-badge-tag">NEW</span>`;
+  mixCard.onclick=()=>openMixPanel();
+  g.appendChild(mixCard);
+
+  // Build mix selector grid
+  const mg=document.getElementById('subject-grid-mix'); if(!mg) return; mg.innerHTML='';
+  state.mixSubjects=[];
+  SUBJECTS.forEach(subj=>{
+    const card=document.createElement('div');
+    card.className=`subject-card ${subj.cls} mix-card`;
+    card.dataset.key=subj.key;
+    card.innerHTML=`<span class="subj-icon">${subj.icon}</span><span class="subj-name">${subj.name}</span><span class="mix-check hidden">✅</span>`;
+    card.onclick=()=>toggleMixSubject(card, subj);
+    mg.appendChild(card);
+  });
+  updateMixCount();
+}
+
+function openMixPanel(){
+  document.getElementById('mix-panel').classList.remove('hidden');
+  // Reset selections
+  state.mixSubjects=[];
+  document.querySelectorAll('#subject-grid-mix .mix-card').forEach(c=>{
+    c.classList.remove('mix-selected');
+    const ch=c.querySelector('.mix-check'); if(ch) ch.classList.add('hidden');
+  });
+  updateMixCount();
+  // Smooth scroll to panel
+  setTimeout(()=>document.getElementById('mix-panel').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+}
+
+function closeMixPanel(){
+  document.getElementById('mix-panel').classList.add('hidden');
+}
+
+function switchSubjectTab(){}  // kept for compatibility
+
+function toggleMixSubject(card, subj){
+  const idx=state.mixSubjects.findIndex(s=>s.key===subj.key);
+  const check=card.querySelector('.mix-check');
+  if(idx>=0){
+    state.mixSubjects.splice(idx,1);
+    card.classList.remove('mix-selected');
+    if(check) check.classList.add('hidden');
+  } else {
+    state.mixSubjects.push(subj);
+    card.classList.add('mix-selected');
+    if(check) check.classList.remove('hidden');
+  }
+  updateMixCount();
+}
+
+function toggleSelectAllSubjects(){
+  const allSelected = state.mixSubjects.length === SUBJECTS.length;
+  state.mixSubjects = allSelected ? [] : [...SUBJECTS];
+  document.querySelectorAll('#subject-grid-mix .mix-card').forEach((card,i)=>{
+    const check=card.querySelector('.mix-check');
+    if(allSelected){
+      card.classList.remove('mix-selected');
+      if(check) check.classList.add('hidden');
+    } else {
+      card.classList.add('mix-selected');
+      if(check) check.classList.remove('hidden');
+    }
+  });
+  const btn=document.querySelector('.mix-select-all-btn');
+  if(btn) btn.textContent = allSelected ? '✅ Select All' : '❌ Deselect All';
+  updateMixCount();
+}
+
+function updateMixCount(){
+  const c=state.mixSubjects.length;
+  const el=document.getElementById('mix-selected-count');
+  if(el) el.textContent=`${c} subject${c!==1?'s':''} selected`;
+  const btn=document.getElementById('mix-start-btn');
+  if(btn) btn.disabled = c < 2;
+}
+
+async function startMixQuiz(){
+  if(state.mixSubjects.length < 2){ alert('Please select at least 2 subjects!'); return; }
+  const totalQ = parseInt(document.getElementById('mix-q-count').value) || 20;
+  const perSubj = Math.ceil(totalQ / state.mixSubjects.length);
+
+  let allQuestions = [];
+  for(const subj of state.mixSubjects){
+    try {
+      const resp = await fetch(`data/class${state.selectedClass}/${subj.key}.json`);
+      const qs = await resp.json();
+      // Pick random questions from each subject
+      const shuffled = qs.sort(()=>Math.random()-.5).slice(0, perSubj);
+      shuffled.forEach(q => q._subjectName = subj.name); // tag with subject
+      allQuestions.push(...shuffled);
+    } catch(e){ console.warn('Could not load', subj.key); }
+  }
+
+  if(!allQuestions.length){ alert('No questions loaded!'); return; }
+
+  // Shuffle all mixed questions
+  allQuestions = allQuestions.sort(()=>Math.random()-.5).slice(0, totalQ);
+
+  // Set state for mix mode
+  state.isMixMode = true;
+  state.selectedSubject = { key:'mix', name:'Mix', icon:'🎲', cls:'subj-mix' };
+  state.gameMode = 'free';
+  state.currentQ = 0; state.sessionCorrect = 0; state.sessionWrong = 0; state.sessionXP = 0;
+  state.currentStreak = 0; state.answered = false; state.hintUsed = false;
+  state.lives = 999; state.maxLives = 999;
+  clearInterval(state.timerInterval);
+
+  // Encrypt answers
+  state.questions = allQuestions.map(q=>({
+    ...q,
+    _enc: window.encryptAnswer ? window.encryptAnswer(q.answer) : null
+  }));
+
+  document.getElementById('quiz-class-label').textContent=`Class ${state.selectedClass}`;
+  document.getElementById('quiz-subject-label').textContent=`🎲 Mix (${state.mixSubjects.length} subj)`;
+  document.getElementById('quiz-mode-label').textContent='🎲 Mix Mode';
+
+  updateQuizLiveStats();
+  if(window.startSessionTimer) window.startSessionTimer();
+  if(window.setQuizActive) window.setQuizActive(true);
+  if(window.resetTabCount) window.resetTabCount();
+  showScreen('screen-quiz');
+  renderQuestion();
 }
 
 // ===== MODE =====
@@ -367,7 +498,13 @@ function renderQuestion(){
     ((state.currentQ/state.questions.length)*100)+'%';
   document.getElementById('q-number').textContent=
     `Q ${state.currentQ+1} / ${state.questions.length}`;
-  document.getElementById('q-text').textContent=q.question;
+  // Show subject tag in mix mode
+  const qtxt = document.getElementById('q-text');
+  if(state.isMixMode && q._subjectName){
+    qtxt.innerHTML = `<span class="mix-subj-tag">${q._subjectName}</span>${q.question}`;
+  } else {
+    qtxt.textContent = q.question;
+  }
 
   // Difficulty
   const diff=document.getElementById('q-difficulty');
