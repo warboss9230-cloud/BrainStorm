@@ -60,7 +60,7 @@
     </div>
 
     <div class="top-actions">
-      <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Theme">🌙</button>
+      
       <button class="icon-btn" onclick="showScreen('screen-leaderboard')" title="Leaderboard">🏆</button>
       <button class="icon-btn" onclick="showDashboard()" title="Dashboard">📈</button>
       <button class="icon-btn" onclick="showBadges()" title="Badges">🏅</button>
@@ -74,7 +74,7 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2 data-i18n="selectClass">Select Class</h2>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
   <div class="player-info-bar" id="class-player-bar"></div>
   <div class="class-grid" id="class-grid"></div>
@@ -85,7 +85,7 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-class')">← <span data-i18n="back">Back</span></button>
     <h2 id="subject-screen-title">Select Subject</h2>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
   <div class="subject-grid" id="subject-grid"></div>
 </div>
@@ -95,7 +95,7 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-subject')">← <span data-i18n="back">Back</span></button>
     <h2 data-i18n="chooseMode">Choose Game Mode</h2>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
   <div class="mode-grid">
     <div class="mode-card" onclick="startGame('free')">
@@ -139,7 +139,7 @@
       <div class="streak-pill" id="streak-pill">🔥 0</div>
       <div class="xp-display">⚡ <span id="xp-value">0</span></div>
     </div>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
 
   <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill"></div></div>
@@ -199,7 +199,7 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>🏆 <span data-i18n="leaderboard">Leaderboard</span></h2>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
   <div class="leaderboard-container" id="leaderboard-list"></div>
 </div>
@@ -209,7 +209,7 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>🏅 <span data-i18n="myBadges">My Badges</span></h2>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
   <div class="badges-summary" id="badges-summary"></div>
   <div class="badges-grid" id="badges-grid"></div>
@@ -220,7 +220,7 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>📈 <span data-i18n="dashboard">Dashboard</span></h2>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
   <div class="dashboard-wrap" id="dashboard-wrap"></div>
 </div>
@@ -230,7 +230,7 @@
   <div class="screen-header">
     <button class="back-btn" onclick="showScreen('screen-home')">← <span data-i18n="back">Back</span></button>
     <h2>🗓️ <span data-i18n="dailyChallenge">Daily Challenge</span></h2>
-    <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    
   </div>
   <div class="daily-wrap" id="daily-wrap"></div>
 </div>
@@ -264,6 +264,9 @@
     <button class="btn-action" onclick="closeModal('modal-badge')">Awesome! 🎉</button>
   </div>
 </div>
+
+<!-- ===== GLOBAL FLOATING THEME BUTTON (visible on ALL pages) ===== -->
+<button id="global-theme-btn" onclick="toggleTheme()" title="Toggle Light/Dark Mode">🌙</button>
 
 <footer class="site-footer">© QuizStorm 2025 — Learn, Play & Conquer! ⚡</footer>
 <script src="js/script.js"></script>
