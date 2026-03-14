@@ -399,6 +399,7 @@ async function startMixQuiz(){
   for(const subj of state.mixSubjects){
     try {
       const resp = await fetch(`data/class${state.selectedClass}/${subj.key}.json`);
+      if(!resp.ok){ console.warn(`Skipping ${subj.key}: HTTP ${resp.status}`); continue; }
       const qs = await resp.json();
       // Pick random questions from each subject
       const shuffled = qs.sort(()=>Math.random()-.5).slice(0, perSubj);
@@ -463,15 +464,23 @@ async function startGame(mode, level=1){
 
   const url=`data/class${state.selectedClass}/${state.selectedSubject.key}.json`;
   try {
-    const resp=await fetch(url); let qs=await resp.json();
-    if(mode==='level') qs=qs.filter(q=>q.level===level);
-    if(!qs.length) qs=await (await fetch(url)).json();
+    const resp=await fetch(url);
+    if(!resp.ok) throw new Error(`File not found: ${url} (HTTP ${resp.status})`);
+    const text=await resp.text();
+    if(!text || text.trim()==='') throw new Error('Empty file: '+url);
+    let qs=JSON.parse(text);
+    if(!Array.isArray(qs) || !qs.length) throw new Error('No questions in: '+url);
+    if(mode==='level'){ const lf=qs.filter(q=>q.level===level); if(lf.length) qs=lf; }
     // 🔐 Encrypt answers before storing in memory
     state.questions=qs.sort(()=>Math.random()-.5).map(q=>({
       ...q,
       _enc: window.encryptAnswer ? window.encryptAnswer(q.answer) : null
     }));
-  } catch(e) { alert('Questions load failed. Use a local server.'); return; }
+  } catch(e) {
+    console.error('startGame error:', e);
+    alert(`❌ Questions load failed!\n\nFile: ${url}\n\nMake sure "data/class${state.selectedClass}/${state.selectedSubject.key}.json" exists in your GitHub repo.\n\nError: ${e.message}`);
+    return;
+  }
 
   document.getElementById('quiz-class-label').textContent=`Class ${state.selectedClass}`;
   document.getElementById('quiz-subject-label').textContent=state.selectedSubject.name;
@@ -907,12 +916,6 @@ function goToClassSelect(){
     return;
   }
   state.player.name=name; saveStorage();
-  // Sync to all-players list
-  const _players = getAllPlayers();
-  const _ci = _players.findIndex(p => p.name === name);
-  if(_ci >= 0) _players[_ci] = {...state.player}; else _players.push({...state.player});
-  saveAllPlayers(_players);
-  renderPlayerSwitcher();
   const bar=document.getElementById('class-player-bar');
   bar.innerHTML=`${state.player.avatar} <strong>${escHtml(name)}</strong> &nbsp;|&nbsp; ⚡ ${state.player.xp} XP &nbsp;|&nbsp; 🔥 ${state.player.maxStreak} best streak`;
   renderClassGrid(); showScreen('screen-class');
@@ -939,11 +942,6 @@ function init(){
 
   refreshHomeStats();
   updateDatetime(); setInterval(updateDatetime,1000);
-  renderPlayerSwitcher();
-  applyI18n();
-  showScreen('screen-home');
-}
-
 // ===== SAFE HOME NAVIGATION =====
 function goHomeFromModal(modalId) {
   if(modalId) closeModal(modalId);
@@ -951,161 +949,8 @@ function goHomeFromModal(modalId) {
   showScreen("screen-home");
 }
 
+  applyI18n();
+  showScreen('screen-home');
+}
+
 document.addEventListener('DOMContentLoaded',init);
-
-// ===== MULTI-PLAYER SYSTEM =====
-function getAllPlayers() {
-  try { return JSON.parse(localStorage.getItem('qs_all_players') || '[]'); } catch(e) { return []; }
-}
-function saveAllPlayers(players) {
-  localStorage.setItem('qs_all_players', JSON.stringify(players));
-}
-
-function renderPlayerSwitcher() {
-  const players = getAllPlayers();
-  const el = document.getElementById('player-switcher');
-  if (!el) return;
-  if (players.length <= 1) { el.innerHTML = ''; return; }
-  el.innerHTML = players.map((p, i) => `
-    <div class="player-chip ${p.name === state.player.name ? 'active-player' : ''}" onclick="switchToPlayer(${i})">
-      <span class="player-chip-avatar">${p.avatar || '🧒'}</span>
-      <span>${escHtml(p.name)}</span>
-      ${p.name !== state.player.name ? `<button class="player-chip-del" onclick="event.stopPropagation();deletePlayer(${i})" title="Remove">✕</button>` : ''}
-    </div>
-  `).join('');
-}
-
-function switchToPlayer(idx) {
-  // Save current player first
-  const players = getAllPlayers();
-  const curIdx = players.findIndex(p => p.name === state.player.name);
-  if (curIdx >= 0) players[curIdx] = { ...state.player };
-  else players.push({ ...state.player });
-  saveAllPlayers(players);
-
-  // Load selected player
-  const p = players[idx];
-  if (p) {
-    Object.assign(state.player, p);
-    document.getElementById('player-name').value = p.name || '';
-    document.getElementById('selected-avatar-display').textContent = p.avatar || '🧒';
-    document.querySelectorAll('.avatar-option').forEach(el => {
-      el.classList.toggle('selected', el.textContent === p.avatar);
-    });
-    refreshHomeStats();
-    renderPlayerSwitcher();
-    saveStorage();
-  }
-}
-
-function deletePlayer(idx) {
-  const players = getAllPlayers();
-  const delName = players[idx]?.name;
-  if (delName === state.player.name) { alert("Can't delete active player!"); return; }
-  players.splice(idx, 1);
-  saveAllPlayers(players);
-  renderPlayerSwitcher();
-}
-
-function showAddPlayer() {
-  document.getElementById('new-player-name').value = '';
-  document.getElementById('modal-add-player').classList.remove('hidden');
-  setTimeout(() => document.getElementById('new-player-name').focus(), 100);
-}
-
-function addNewPlayer() {
-  const name = document.getElementById('new-player-name').value.trim();
-  if (!name) {
-    const inp = document.getElementById('new-player-name');
-    inp.style.borderColor = '#ef4444';
-    setTimeout(() => inp.style.borderColor = '', 1500);
-    return;
-  }
-  // Save current player state
-  const players = getAllPlayers();
-  const curIdx = players.findIndex(p => p.name === state.player.name);
-  const curData = { ...state.player };
-  if (curIdx >= 0) players[curIdx] = curData; else players.push(curData);
-
-  // Check if name already exists
-  if (players.find(p => p.name.toLowerCase() === name.toLowerCase())) {
-    alert('A player with this name already exists!'); return;
-  }
-
-  // Create new player
-  const newP = {
-    name, avatar: '🧒', xp: 0, highScore: 0, streak: 0, maxStreak: 0,
-    totalGames: 0, totalCorrect: 0, totalWrong: 0, hasPerfect: false,
-    challengeSurvivor: false, dailyCompleted: 0, langsUsed: 1,
-    earnedBadges: [], history: [], dailyDate: '', dailyXP: 0
-  };
-  players.push(newP);
-  saveAllPlayers(players);
-
-  // Switch to new player
-  Object.assign(state.player, newP);
-  document.getElementById('player-name').value = name;
-  document.getElementById('selected-avatar-display').textContent = '🧒';
-  document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
-  const firstAv = document.querySelector('.avatar-option');
-  if (firstAv) firstAv.classList.add('selected');
-  refreshHomeStats();
-  renderPlayerSwitcher();
-  saveStorage();
-  closeModal('modal-add-player');
-}
-
-// ===== MAIL LOGIN =====
-function showMailLogin() {
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
-  document.getElementById('mail-login-msg').textContent = '';
-  document.getElementById('modal-mail-login').classList.remove('hidden');
-  setTimeout(() => document.getElementById('login-email').focus(), 100);
-}
-
-function doMailLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value.trim();
-  const msg = document.getElementById('mail-login-msg');
-  if (!email || !pass) { msg.style.color = '#ef4444'; msg.textContent = '⚠️ Please fill in all fields.'; return; }
-  // Simulate login — check localStorage for registered users
-  try {
-    const users = JSON.parse(localStorage.getItem('qs_mail_users') || '{}');
-    if (!users[email]) { msg.style.color = '#ef4444'; msg.textContent = '❌ Account not found. Please register first.'; return; }
-    if (users[email].pass !== btoa(pass)) { msg.style.color = '#ef4444'; msg.textContent = '❌ Wrong password!'; return; }
-    // Login success — load saved player data
-    const savedData = users[email].player;
-    if (savedData) Object.assign(state.player, savedData);
-    state.player.name = state.player.name || email.split('@')[0];
-    document.getElementById('player-name').value = state.player.name;
-    document.getElementById('selected-avatar-display').textContent = state.player.avatar || '🧒';
-    refreshHomeStats(); saveStorage(); renderPlayerSwitcher();
-    msg.style.color = '#22c55e';
-    msg.textContent = `✅ Welcome back, ${state.player.name}!`;
-    setTimeout(() => closeModal('modal-mail-login'), 1200);
-  } catch(e) { msg.style.color = '#ef4444'; msg.textContent = '❌ Login error.'; }
-}
-
-function doMailRegister() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value.trim();
-  const msg = document.getElementById('mail-login-msg');
-  if (!email || !pass) { msg.style.color = '#ef4444'; msg.textContent = '⚠️ Please fill in all fields.'; return; }
-  if (!email.includes('@')) { msg.style.color = '#ef4444'; msg.textContent = '⚠️ Enter a valid email.'; return; }
-  if (pass.length < 4) { msg.style.color = '#ef4444'; msg.textContent = '⚠️ Password must be at least 4 characters.'; return; }
-  try {
-    const users = JSON.parse(localStorage.getItem('qs_mail_users') || '{}');
-    if (users[email]) { msg.style.color = '#ef4444'; msg.textContent = '❌ Account already exists. Please login.'; return; }
-    const name = state.player.name || email.split('@')[0];
-    users[email] = { pass: btoa(pass), player: { ...state.player, name } };
-    localStorage.setItem('qs_mail_users', JSON.stringify(users));
-    state.player.name = name;
-    document.getElementById('player-name').value = name;
-    refreshHomeStats(); saveStorage();
-    msg.style.color = '#22c55e';
-    msg.textContent = `✅ Account created! Welcome, ${name}!`;
-    setTimeout(() => closeModal('modal-mail-login'), 1200);
-  } catch(e) { msg.style.color = '#ef4444'; msg.textContent = '❌ Registration error.'; }
-}
-
