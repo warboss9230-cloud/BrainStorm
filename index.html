@@ -248,7 +248,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn-action" onclick="retryGame()">🔄 <span data-i18n="tryAgain">Try Again</span></button>
-      <button class="btn-action btn-secondary" onclick="closeModal('modal-gameover');showScreen('screen-home')">🏠</button>
+      <button class="btn-action btn-secondary" onclick="closeModal('modal-gameover');showScreen('screen-home')">🏠 Home</button>
     </div>
   </div>
 </div>
@@ -269,6 +269,33 @@
 <button id="global-theme-btn" onclick="toggleTheme()" title="Toggle Light/Dark Mode">🌙</button>
 
 <footer class="site-footer">© QuizStorm 2025 — Learn, Play & Conquer! ⚡</footer>
+<script src="js/security.js"></script>
 <script src="js/script.js"></script>
+<!-- ===== SECURITY OVERLAYS ===== -->
+<div id="tab-warning-overlay" class="sec-overlay hidden">
+  <div class="sec-box">
+    <div class="sec-icon">👁️</div>
+    <h2>Tab Switch Detected!</h2>
+    <p id="tab-warn-msg">You switched tabs during quiz!<br>This has been recorded.</p>
+    <div class="sec-counter" id="tab-counter">Warnings: 0/3</div>
+    <button class="btn-action" onclick="dismissTabWarning()">I Understand ✅</button>
+  </div>
+</div>
+<div id="session-timeout-overlay" class="sec-overlay hidden">
+  <div class="sec-box">
+    <div class="sec-icon">⏱️</div>
+    <h2>Session Expired!</h2>
+    <p>You were inactive for too long.<br>Please start again.</p>
+    <button class="btn-action" onclick="resetSession()">🔄 Restart</button>
+  </div>
+</div>
+<div id="tamper-overlay" class="sec-overlay hidden">
+  <div class="sec-box">
+    <div class="sec-icon">🚨</div>
+    <h2>Security Alert!</h2>
+    <p id="tamper-msg">Data tampering detected!<br>Your score has been reset.</p>
+    <button class="btn-action" onclick="closeTamperAlert()">OK</button>
+  </div>
+</div>
 </body>
 </html>
