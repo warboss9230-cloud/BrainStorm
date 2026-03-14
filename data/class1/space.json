@@ -1,126 +1,97 @@
-{
-  "class": 1,
-  "subject": "Space",
-  "questions": [
-    {
-      "question": "What is at the center of our Solar System?",
-      "options": ["Sun", "Moon", "Earth", "Mars"],
-      "answer": "Sun",
-      "level": "easy"
-    },
-    {
-      "question": "What do we call the natural satellite of the Earth?",
-      "options": ["Moon", "Sun", "Mars", "Venus"],
-      "answer": "Moon",
-      "level": "easy"
-    },
-    {
-      "question": "How many planets are in our Solar System?",
-      "options": ["8", "9", "7", "10"],
-      "answer": "8",
-      "level": "medium"
-    },
-    {
-      "question": "Which planet is closest to the Sun?",
-      "options": ["Mercury", "Venus", "Earth", "Mars"],
-      "answer": "Mercury",
-      "level": "medium"
-    },
-    {
-      "question": "What do we call a person who travels to space?",
-      "options": ["Astronaut", "Pilot", "Driver", "Sailor"],
-      "answer": "Astronaut",
-      "level": "easy"
-    },
-    {
-      "question": "What is the colour of the Sun?",
-      "options": ["Yellow/White", "Red", "Blue", "Green"],
-      "answer": "Yellow/White",
-      "level": "easy"
-    },
-    {
-      "question": "What do we see shining in the sky at night?",
-      "options": ["Stars", "Clouds", "Birds", "Planes"],
-      "answer": "Stars",
-      "level": "easy"
-    },
-    {
-      "question": "Which is the red planet?",
-      "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-      "answer": "Mars",
-      "level": "easy"
-    },
-    {
-      "question": "What is a shooting star actually?",
-      "options": ["A meteor", "A real star", "A planet", "A satellite"],
-      "answer": "A meteor",
-      "level": "hard"
-    },
-    {
-      "question": "Which planet has rings around it?",
-      "options": ["Saturn", "Earth", "Mars", "Venus"],
-      "answer": "Saturn",
-      "level": "medium"
-    },
-    {
-      "question": "What do we call the path a planet takes around the Sun?",
-      "options": ["Orbit", "Road", "Track", "Lane"],
-      "answer": "Orbit",
-      "level": "medium"
-    },
-    {
-      "question": "How many moons does Earth have?",
-      "options": ["1", "2", "0", "3"],
-      "answer": "1",
-      "level": "easy"
-    },
-    {
-      "question": "What vehicle is used to travel to space?",
-      "options": ["Rocket", "Car", "Boat", "Bicycle"],
-      "answer": "Rocket",
-      "level": "easy"
-    },
-    {
-      "question": "Which is the biggest planet in the Solar System?",
-      "options": ["Jupiter", "Saturn", "Earth", "Neptune"],
-      "answer": "Jupiter",
-      "level": "medium"
-    },
-    {
-      "question": "What is the name of our galaxy?",
-      "options": ["Milky Way", "Andromeda", "Orion", "Nebula"],
-      "answer": "Milky Way",
-      "level": "medium"
-    },
-    {
-      "question": "Which planet is known as the Blue Planet?",
-      "options": ["Earth", "Neptune", "Uranus", "Mars"],
-      "answer": "Earth",
-      "level": "medium"
-    },
-    {
-      "question": "How long does Earth take to go around the Sun?",
-      "options": ["1 year", "1 month", "1 day", "1 week"],
-      "answer": "1 year",
-      "level": "easy"
-    },
-    {
-      "question": "What is the Sun made of?",
-      "options": ["Hot gas and fire", "Water", "Ice", "Rock"],
-      "answer": "Hot gas and fire",
-      "level": "medium"
-    },
-    {
-      "question": "What do astronauts wear in space?",
-      "options": ["Space suit", "School uniform", "Rain coat", "Sweater"],
-      "answer": "Space suit",
-      "level": "easy"
-    },
-    {
-      "question": "What is the name of the space station that orbits Earth?",
-      "options": ["ISS", "NASA", "ISRO", "ESA"],
-      "answer": "ISS",
-      "level": "hard"
-    }
-  ]
-}
+[
+{"id":1,"subject":"Space","question":"🌞 What gives us light in the day?","option1":"Sun","option2":"Moon","option3":"Star","option4":"Cloud","answer":"Sun","level":1},
+{"id":2,"subject":"Space","question":"🌙 What shines at night?","option1":"Moon","option2":"Sun","option3":"Tree","option4":"Car","answer":"Moon","level":1},
+{"id":3,"subject":"Space","question":"🌍 What planet do we live on?","option1":"Mars","option2":"Earth","option3":"Venus","option4":"Jupiter","answer":"Earth","level":1},
+{"id":4,"subject":"Space","question":"🌙 Moon is Earth's what?","option1":"Star","option2":"Planet","option3":"Satellite","option4":"Cloud","answer":"Satellite","level":1},
+{"id":5,"subject":"Space","question":"✨ What twinkles in the night sky?","option1":"Stars","option2":"Clouds","option3":"Birds","option4":"Planes","answer":"Stars","level":1},
+
+{"id":6,"subject":"Space","question":"🚀 What goes to space?","option1":"Rocket","option2":"Car","option3":"Bus","option4":"Bike","answer":"Rocket","level":1},
+{"id":7,"subject":"Space","question":"👨‍🚀 A person who goes to space is called?","option1":"Pilot","option2":"Astronaut","option3":"Driver","option4":"Teacher","answer":"Astronaut","level":1},
+{"id":8,"subject":"Space","question":"🌞 The sun is a?","option1":"Planet","option2":"Star","option3":"Rock","option4":"Moon","answer":"Star","level":1},
+{"id":9,"subject":"Space","question":"🌍 Earth is a?","option1":"Planet","option2":"Star","option3":"Moon","option4":"Cloud","answer":"Planet","level":1},
+{"id":10,"subject":"Space","question":"🌙 The moon moves around?","option1":"Earth","option2":"Sun","option3":"Mars","option4":"Jupiter","answer":"Earth","level":1},
+
+{"id":11,"subject":"Space","question":"🌞 The sun rises in the?","option1":"East","option2":"West","option3":"North","option4":"South","answer":"East","level":1},
+{"id":12,"subject":"Space","question":"🌇 The sun sets in the?","option1":"West","option2":"East","option3":"North","option4":"South","answer":"West","level":1},
+{"id":13,"subject":"Space","question":"🌌 Space is above the?","option1":"Sky","option2":"River","option3":"Road","option4":"Tree","answer":"Sky","level":1},
+{"id":14,"subject":"Space","question":"🌙 The moon looks bright at?","option1":"Night","option2":"Morning","option3":"Noon","option4":"Afternoon","answer":"Night","level":1},
+{"id":15,"subject":"Space","question":"✨ Stars appear in the?","option1":"Night sky","option2":"River","option3":"Forest","option4":"Road","answer":"Night sky","level":1},
+
+{"id":16,"subject":"Space","question":"🚀 Rockets fly in the?","option1":"Space","option2":"Sea","option3":"Road","option4":"River","answer":"Space","level":1},
+{"id":17,"subject":"Space","question":"🌍 Earth moves around the?","option1":"Sun","option2":"Moon","option3":"Mars","option4":"Star","answer":"Sun","level":1},
+{"id":18,"subject":"Space","question":"🌙 Moon gives its own light?","option1":"Yes","option2":"No","option3":"Sometimes","option4":"Always","answer":"No","level":1},
+{"id":19,"subject":"Space","question":"🌞 The sun is very?","option1":"Hot","option2":"Cold","option3":"Wet","option4":"Soft","answer":"Hot","level":1},
+{"id":20,"subject":"Space","question":"🌍 Earth has how many moons?","option1":"1","option2":"2","option3":"3","option4":"4","answer":"1","level":1},
+
+{"id":21,"subject":"Space","question":"🌙 What shape is the full moon?","option1":"Round","option2":"Square","option3":"Triangle","option4":"Star","answer":"Round","level":1},
+{"id":22,"subject":"Space","question":"✨ Stars shine in the?","option1":"Night","option2":"Day","option3":"Noon","option4":"Morning","answer":"Night","level":1},
+{"id":23,"subject":"Space","question":"🚀 Rocket goes up to?","option1":"Space","option2":"River","option3":"Forest","option4":"Road","answer":"Space","level":1},
+{"id":24,"subject":"Space","question":"🌍 Earth is our?","option1":"Home planet","option2":"Star","option3":"Moon","option4":"Rocket","answer":"Home planet","level":1},
+{"id":25,"subject":"Space","question":"🌙 The moon moves around the?","option1":"Earth","option2":"Sun","option3":"Mars","option4":"Star","answer":"Earth","level":1},
+
+{"id":26,"subject":"Space","question":"🌞 Sun gives us?","option1":"Light","option2":"Water","option3":"Sand","option4":"Dust","answer":"Light","level":1},
+{"id":27,"subject":"Space","question":"🌞 Sun also gives?","option1":"Heat","option2":"Snow","option3":"Rain","option4":"Wind","answer":"Heat","level":1},
+{"id":28,"subject":"Space","question":"🌙 Moon is seen mostly at?","option1":"Night","option2":"Day","option3":"Morning","option4":"Afternoon","answer":"Night","level":1},
+{"id":29,"subject":"Space","question":"✨ Many stars together make a?","option1":"Galaxy","option2":"Road","option3":"Tree","option4":"River","answer":"Galaxy","level":1},
+{"id":30,"subject":"Space","question":"🌌 Space is very?","option1":"Big","option2":"Small","option3":"Short","option4":"Low","answer":"Big","level":1},
+
+{"id":31,"subject":"Space","question":"🚀 Rocket goes very?","option1":"Fast","option2":"Slow","option3":"Quiet","option4":"Soft","answer":"Fast","level":1},
+{"id":32,"subject":"Space","question":"🌍 Earth is mostly covered with?","option1":"Water","option2":"Sand","option3":"Stone","option4":"Cloud","answer":"Water","level":1},
+{"id":33,"subject":"Space","question":"🌞 The sun is bigger than the?","option1":"Earth","option2":"Rock","option3":"Tree","option4":"Car","answer":"Earth","level":1},
+{"id":34,"subject":"Space","question":"🌙 Moon looks like a?","option1":"Ball","option2":"Box","option3":"Cube","option4":"Triangle","answer":"Ball","level":1},
+{"id":35,"subject":"Space","question":"✨ Stars are very?","option1":"Far","option2":"Near","option3":"Small","option4":"Cold","answer":"Far","level":1},
+
+{"id":36,"subject":"Space","question":"🌞 Sun is seen in the?","option1":"Day","option2":"Night","option3":"Evening","option4":"Midnight","answer":"Day","level":1},
+{"id":37,"subject":"Space","question":"🌙 Moon is a natural?","option1":"Satellite","option2":"Planet","option3":"Star","option4":"Rock","answer":"Satellite","level":1},
+{"id":38,"subject":"Space","question":"🚀 Rockets carry people to?","option1":"Space","option2":"Road","option3":"River","option4":"Forest","answer":"Space","level":1},
+{"id":39,"subject":"Space","question":"👨‍🚀 Astronaut wears a?","option1":"Space suit","option2":"School dress","option3":"Jacket","option4":"Helmet","answer":"Space suit","level":1},
+{"id":40,"subject":"Space","question":"🌍 Earth is blue because of?","option1":"Water","option2":"Sand","option3":"Fire","option4":"Stone","answer":"Water","level":1},
+
+{"id":41,"subject":"Space","question":"🌙 Moon changes shape every?","option1":"Month","option2":"Day","option3":"Hour","option4":"Minute","answer":"Month","level":1},
+{"id":42,"subject":"Space","question":"✨ Stars are hot balls of?","option1":"Gas","option2":"Water","option3":"Sand","option4":"Ice","answer":"Gas","level":1},
+{"id":43,"subject":"Space","question":"🚀 Rockets use?","option1":"Fuel","option2":"Water","option3":"Air","option4":"Stone","answer":"Fuel","level":1},
+{"id":44,"subject":"Space","question":"🌍 Earth has air called?","option1":"Atmosphere","option2":"Ocean","option3":"River","option4":"Lake","answer":"Atmosphere","level":1},
+{"id":45,"subject":"Space","question":"🌞 Sun is at the center of?","option1":"Solar System","option2":"Forest","option3":"Ocean","option4":"City","answer":"Solar System","level":1},
+
+{"id":46,"subject":"Space","question":"🌍 Earth takes how long to go around the Sun?","option1":"1 year","option2":"1 day","option3":"1 hour","option4":"1 week","answer":"1 year","level":1},
+{"id":47,"subject":"Space","question":"🌙 Moon has no?","option1":"Air","option2":"Rock","option3":"Dust","option4":"Crater","answer":"Air","level":1},
+{"id":48,"subject":"Space","question":"✨ Stars are seen best in?","option1":"Night","option2":"Day","option3":"Noon","option4":"Morning","answer":"Night","level":1},
+{"id":49,"subject":"Space","question":"🌌 Space has many?","option1":"Stars","option2":"Cars","option3":"Trees","option4":"Houses","answer":"Stars","level":1},
+{"id":50,"subject":"Space","question":"🚀 Rockets launch from?","option1":"Earth","option2":"Moon","option3":"Mars","option4":"Sun","answer":"Earth","level":1},
+
+{"id":51,"subject":"Space","question":"🌍 Earth is round like a?","option1":"Ball","option2":"Box","option3":"Table","option4":"Book","answer":"Ball","level":1},
+{"id":52,"subject":"Space","question":"🌙 Moon reflects light from the?","option1":"Sun","option2":"Earth","option3":"Mars","option4":"Star","answer":"Sun","level":1},
+{"id":53,"subject":"Space","question":"🌞 Sun is closest star to?","option1":"Earth","option2":"Mars","option3":"Venus","option4":"Jupiter","answer":"Earth","level":1},
+{"id":54,"subject":"Space","question":"🚀 Rockets are very?","option1":"Powerful","option2":"Weak","option3":"Soft","option4":"Cold","answer":"Powerful","level":1},
+{"id":55,"subject":"Space","question":"✨ Stars look small because they are?","option1":"Far away","option2":"Close","option3":"Cold","option4":"Wet","answer":"Far away","level":1},
+
+{"id":56,"subject":"Space","question":"🌞 Sun is very bright?","option1":"Yes","option2":"No","option3":"Sometimes","option4":"Rarely","answer":"Yes","level":1},
+{"id":57,"subject":"Space","question":"🌙 Moon is smaller than?","option1":"Earth","option2":"Rock","option3":"Car","option4":"Tree","answer":"Earth","level":1},
+{"id":58,"subject":"Space","question":"🚀 Rockets help explore?","option1":"Space","option2":"Road","option3":"Forest","option4":"Sea","answer":"Space","level":1},
+{"id":59,"subject":"Space","question":"🌌 Space has planets and?","option1":"Stars","option2":"Cars","option3":"Rivers","option4":"Trees","answer":"Stars","level":1},
+{"id":60,"subject":"Space","question":"🌍 Earth is part of the?","option1":"Solar System","option2":"Forest","option3":"Ocean","option4":"River","answer":"Solar System","level":1},
+
+{"id":61,"subject":"Space","question":"🌞 Sun looks biggest in the?","option1":"Sky","option2":"River","option3":"Forest","option4":"Road","answer":"Sky","level":1},
+{"id":62,"subject":"Space","question":"🌙 Moon looks bright because of?","option1":"Sunlight","option2":"Fire","option3":"Electricity","option4":"Water","answer":"Sunlight","level":1},
+{"id":63,"subject":"Space","question":"🚀 Rocket launches with loud?","option1":"Sound","option2":"Silence","option3":"Wind","option4":"Snow","answer":"Sound","level":1},
+{"id":64,"subject":"Space","question":"✨ Stars are in the?","option1":"Sky","option2":"Sea","option3":"Road","option4":"River","answer":"Sky","level":1},
+{"id":65,"subject":"Space","question":"🌌 Space has no?","option1":"Air","option2":"Stars","option3":"Planets","option4":"Dust","answer":"Air","level":1},
+
+{"id":66,"subject":"Space","question":"🌍 Earth spins to make?","option1":"Day and Night","option2":"Rain","option3":"Wind","option4":"Snow","answer":"Day and Night","level":1},
+{"id":67,"subject":"Space","question":"🌙 Moon has many?","option1":"Craters","option2":"Trees","option3":"Rivers","option4":"Animals","answer":"Craters","level":1},
+{"id":68,"subject":"Space","question":"🚀 Rockets help scientists?","option1":"Explore space","option2":"Drive cars","option3":"Build houses","option4":"Grow plants","answer":"Explore space","level":1},
+{"id":69,"subject":"Space","question":"✨ Stars are very?","option1":"Hot","option2":"Cold","option3":"Wet","option4":"Soft","answer":"Hot","level":1},
+{"id":70,"subject":"Space","question":"🌞 Sun is very far from?","option1":"Earth","option2":"Rock","option3":"Tree","option4":"Car","answer":"Earth","level":1},
+
+{"id":71,"subject":"Space","question":"🌙 Moon is seen from?","option1":"Earth","option2":"Mars","option3":"Jupiter","option4":"Sun","answer":"Earth","level":1},
+{"id":72,"subject":"Space","question":"🚀 Rockets travel above the?","option1":"Sky","option2":"Road","option3":"River","option4":"Forest","answer":"Sky","level":1},
+{"id":73,"subject":"Space","question":"✨ Stars make the night sky look?","option1":"Beautiful","option2":"Dirty","option3":"Small","option4":"Cold","answer":"Beautiful","level":1},
+{"id":74,"subject":"Space","question":"🌍 Earth has land and?","option1":"Water","option2":"Sand","option3":"Dust","option4":"Smoke","answer":"Water","level":1},
+{"id":75,"subject":"Space","question":"🌞 Sun helps plants?","option1":"Grow","option2":"Sleep","option3":"Jump","option4":"Run","answer":"Grow","level":1},
+
+{"id":76,"subject":"Space","question":"🌙 Moon has no?","option1":"Animals","option2":"Dust","option3":"Rock","option4":"Craters","answer":"Animals","level":1},
+{"id":77,"subject":"Space","question":"🚀 Rockets carry satellites to?","option1":"Space","option2":"Road","option3":"Forest","option4":"Sea","answer":"Space","level":1},
+{"id":78,"subject":"Space","question":"✨ Stars are very bright?","option1":"Yes","option2":"No","option3":"Sometimes","option4":"Rarely","answer":"Yes","level":1},
+{"id":79,"subject":"Space","question":"🌌 Space is very big?","option1":"Yes","option2":"No","option3":"Small","option4":"Tiny","answer":"Yes","level":1},
+{"id":80,"subject":"Space","question":"🌍 Earth is our?","option1":"Home","option2":"Car","option3":"River","option4":"Tree","answer":"Home","level":1}
+]
